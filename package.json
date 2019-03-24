@@ -1,0 +1,25 @@
+{
+  "name": "colorparrot-twitter-bot",
+  "version": "0.1.0",
+  "description": "A twitter bot that tweet colors names and lets you invent new ones",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meodai/colorparrot-twitter-bot.git"
+  },
+  "keywords": [
+    "twitter"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meodai/colorparrot-twitter-bot/issues"
+  },
+  "homepage": "https://github.com/meodai/colorparrot-twitter-bot#readme",
+  "dependencies": {
+    "color-name-list": "^3.77.0"
+  }
+}
