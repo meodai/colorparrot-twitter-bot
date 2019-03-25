@@ -1,6 +1,27 @@
-module.exports = (T) => {
-  const randomImage = require('./lib/generateImage')();
-  const b64content = randomImage.toString('base64');
+const namedColors = require('color-name-list');
+const randomImage = require('./lib/generateImage');
+const checkIfColorExistsInTwitts = require(
+    './redis/checkIfColorExistsInTwitts'
+);
+const addColorNameInPostedTwitts = require(
+    './redis/addColorNameInPostedTwitts'
+);
+
+function generateRandomColor() {
+  const randomColor = namedColors[
+      Math.floor(Math.random() * namedColors.length)];
+  return {name: randomColor.name, hex: randomColor.hex};
+}
+
+async function sendRandomImage(T) {
+  const color = generateRandomColor();
+  if (await checkIfColorExistsInTwitts(color)) {
+    return sendRandomImage(T); // here can be a problem in the future!
+  } else {
+    await addColorNameInPostedTwitts(color.name);
+  }
+  const image = randomImage(color);
+  const b64content = image.toString('base64');
 
   T.post('media/upload', {media_data: b64content}, (err, data) => {
     if (err) {
@@ -24,4 +45,6 @@ module.exports = (T) => {
       });
     }
   });
-};
+}
+
+module.exports = sendRandomImage;

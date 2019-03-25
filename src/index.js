@@ -11,6 +11,6 @@ const sendRandomImage = require('./sendRandomImage');
 
 
 setInterval(() => {
-  sendRandomImage(T);
+  sendRandomImage(T).catch((e) => console.log(e));
 }, 30000);
 
