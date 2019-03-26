@@ -1,4 +1,4 @@
-const sendImage = require('./utils/sendImage');
+const sendImage = require('./utils/twitter/sendImage');
 
 async function sendImageToUser(T, image, status) {
   const b64content = image.toString('base64');

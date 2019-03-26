@@ -1,6 +1,6 @@
 const namedColors = require('color-name-list');
 const randomImage = require('./utils/generateImage');
-const sendImage = require('./utils/sendImage');
+const sendImage = require('./utils/twitter/sendImage');
 const checkIfColorExistsInTwitts = require(
     './redis/checkIfColorExistsInTwitts'
 );
