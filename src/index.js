@@ -9,8 +9,12 @@ const sendRandomImage = require('./sendRandomImage');
 const sendImageToUser = require('./sendImageToUser');
 const generateImage = require('./utils/generateImage');
 const sendText = require('./utils/twitter/sendText');
-const checkIfColorExistsInTwitts = require('./redis/checkIfColorExistsInTwitts');
-const addColorNameInPostedTwitts = require('./redis/addColorNameInPostedTwitts');
+const checkIfColorExistsInTwitts = require(
+    './redis/checkIfColorExistsInTwitts'
+);
+const addColorNameInPostedTwitts = require(
+    './redis/addColorNameInPostedTwitts'
+);
 
 const T = new Twit({
   consumer_key: process.env.CONSUMER_KEY,
@@ -24,6 +28,7 @@ setInterval(() => {
   sendRandomImage(T).catch((e) => console.log(e));
 }, 60000);
 */
+
 const stream = T.stream('statuses/filter', {
   track: '@color_parrot', language: 'en',
 });
@@ -41,10 +46,17 @@ stream.on('tweet', async (tweet) => {
         name: colorName,
         hex: hex});
       const screenName = tweet.user.screen_name;
+      const hashTag = colorName.split(' ').join('_');
       if (await checkIfColorExistsInTwitts(colorName)) {
-        sendText(T, `@${screenName} Posted already see: hex ${hex}`);
+        sendText(
+            T,
+            `@${screenName} Posted already see: color name #${hashTag}`
+        );
       } else {
-        await sendImageToUser(T, img, `For @${screenName} hex: ${hex}`);
+        await sendImageToUser(
+            T,
+            img,
+            `For @${screenName} color name: #${hashTag}`);
         await addColorNameInPostedTwitts(colorName);
       }
     } else {
