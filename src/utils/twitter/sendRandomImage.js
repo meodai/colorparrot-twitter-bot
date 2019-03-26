@@ -1,11 +1,11 @@
 const namedColors = require('color-name-list');
-const randomImage = require('./utils/generateImage');
-const sendImage = require('./utils/twitter/sendImage');
+const randomImage = require('../generateImage');
+const sendImage = require('./sendImage');
 const checkIfColorExistsInTwitts = require(
-    './redis/checkIfColorExistsInTwitts'
+    '../../redis/checkIfColorExistsInTwitts'
 );
 const addColorNameInPostedTwitts = require(
-    './redis/addColorNameInPostedTwitts'
+    '../../redis/addColorNameInPostedTwitts'
 );
 
 function generateRandomColor() {

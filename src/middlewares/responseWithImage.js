@@ -4,7 +4,7 @@ namedColors.forEach((e) => {
   namedColorsMap.set(e.name, e.hex);
 });
 
-const sendImageToUser = require('./../sendImageToUser');
+const sendImageToUser = require('../utils/twitter/sendImageToUser');
 const generateImage = require('./../utils/generateImage');
 const sendText = require('./../utils/twitter/sendText');
 
