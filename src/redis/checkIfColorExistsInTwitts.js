@@ -1,5 +1,5 @@
 const redis = require('./index');
 
-module.exports = async (colorObj) => {
-  return await redis.sismember('postedColors', colorObj.name);
+module.exports = async (colorName) => {
+  return await redis.sismember('postedColors', colorName);
 };
