@@ -15,9 +15,8 @@ const addColorNameInPostedTwitts = require(
     './../redis/addColorNameInPostedTwitts'
 );
 
-module.exports = async (T, tweet) => {
+module.exports = async (T, tweet, next) => {
   const arrayText = tweet.text.split(' ');
-  // user asks color
   if (arrayText[0] === '@color_parrot' ||
     arrayText[arrayText.length - 1] === '@color_parrot'
   ) {
@@ -33,7 +32,10 @@ module.exports = async (T, tweet) => {
       if (await checkIfColorExistsInTwitts(colorName)) {
         sendText(
             T,
-            `@${screenName} Posted already see: color name #${hashTag}`
+            {
+              status:
+                `@${screenName} Posted already see: color name #${hashTag}`,
+            }
         );
       } else {
         await sendImageToUser(
@@ -43,9 +45,9 @@ module.exports = async (T, tweet) => {
         await addColorNameInPostedTwitts(colorName);
       }
     } else {
-      return;
+      await next();
     }
   } else {
-    return;
+    await next();
   }
 };

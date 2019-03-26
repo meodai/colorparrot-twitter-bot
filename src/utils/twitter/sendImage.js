@@ -1,3 +1,5 @@
+const sendText = require('./sendText');
+
 module.exports = (T, b64content, status) => {
   T.post('media/upload', {media_data: b64content}, (err, data) => {
     if (err) {
@@ -11,12 +13,7 @@ module.exports = (T, b64content, status) => {
           console.log(err);
         } else {
           const params = {status: status, media_ids: [mediaIdStr]};
-
-          T.post('statuses/update', params, (err) => {
-            if (err) {
-              console.log(err);
-            }
-          });
+          sendText(T, params);
         }
       });
     }
