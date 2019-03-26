@@ -7,7 +7,7 @@ namedColors.forEach((e) => {
 
 const sendRandomImage = require('./sendRandomImage');
 const sendImageToUser = require('./sendImageToUser');
-const generateImage = require('./lib/generateImage');
+const generateImage = require('./utils/generateImage');
 const checkIfColorExistsInTwitts = require('./redis/checkIfColorExistsInTwitts');
 const addColorNameInPostedTwitts = require('./redis/addColorNameInPostedTwitts');
 
