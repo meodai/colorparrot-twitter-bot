@@ -34,14 +34,14 @@ module.exports = async (T, tweet, next) => {
             T,
             {
               status:
-                `@${screenName} Posted already see: color name #${hashTag}`,
+                `@${screenName} #${hashTag} already exists!`,
             }
         );
       } else {
         await sendImageToUser(
             T,
             img,
-            `For @${screenName} color name: #${hashTag}`);
+            `Hey @${screenName} thats #${hashTag}`);
         await addColorNameInPostedTwitts(colorName);
       }
     } else {

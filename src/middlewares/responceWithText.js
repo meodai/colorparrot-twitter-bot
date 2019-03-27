@@ -28,7 +28,7 @@ module.exports = async (T, tweet) => {
   } else {
     await addUserMessageToFloodList(`${tweet.user.screen_name} -> ${tweet.text}`);
     sendText(T, {
-      status: `@${screenName} I do not understand you`,
+      status: `@${screenName} What?! You need to give me a Name and a color as a hex value...`,
     });
   }
 };
