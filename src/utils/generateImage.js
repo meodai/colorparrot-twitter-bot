@@ -12,11 +12,11 @@ module.exports = (colorObj) => {
   ctx.fillRect(0, 0, 300, 300);
 
   ctx.fillStyle = 'rgb(0,0,0)';
-  ctx.font = 'bold 25px Impact Bold';
+  ctx.font = 'bold 25px Inter';
   ctx.fillText(`${name}`, 10, 250);
 
   ctx.fillStyle = 'rgb(128,128,128)';
-  ctx.font = '15px Impact Bold';
+  ctx.font = 'bold 15px Inter';
   ctx.fillText(`${colorObj.hex}`, 10, 270);
   return canvas.toBuffer();
 };
