@@ -6,7 +6,7 @@ const redis = new Redis({
     process.exit();
   },
   port: process.env.REDIS_PORT,
-  host: process.env.HOST,
+  host: process.env.REDIS_HOST,
 });
 
 
