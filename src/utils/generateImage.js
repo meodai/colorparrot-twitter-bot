@@ -1,6 +1,6 @@
 const Canvas = require('canvas');
-const canvasWidth = 768;
-const canvasHeight = 1024;
+const canvasWidth = 300;
+const canvasHeight = 400;
 
 Canvas.registerFont('./assets/Inter-ExtraBold.ttf', {
   family: 'Inter-EtraBold',

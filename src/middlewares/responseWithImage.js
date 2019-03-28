@@ -6,14 +6,7 @@ namedColors.forEach((e) => {
 
 const sendImageToUser = require('../utils/twitter/sendImageToUser');
 const generateImage = require('./../utils/generateImage');
-const sendText = require('./../utils/twitter/sendText');
 
-const checkIfColorExistsInTwitts = require(
-    './../redis/checkIfColorExistsInTwitts'
-);
-const addColorNameInPostedTwitts = require(
-    './../redis/addColorNameInPostedTwitts'
-);
 
 module.exports = async (T, tweet, next) => {
   const arrayText = tweet.text.split(' ');
@@ -29,21 +22,10 @@ module.exports = async (T, tweet, next) => {
         hex: hex});
       const screenName = tweet.user.screen_name;
       const hashTag = colorName.split(' ').join('_');
-      if (await checkIfColorExistsInTwitts(colorName)) {
-        sendText(
-            T,
-            {
-              status:
-                `@${screenName} #${hashTag} already exists!`,
-            }
-        );
-      } else {
-        await sendImageToUser(
-            T,
-            img,
-            `Hey @${screenName} thats #${hashTag}`);
-        await addColorNameInPostedTwitts(colorName);
-      }
+      await sendImageToUser(
+          T,
+          img,
+          `Hey @${screenName} thats #${hashTag}`);
     } else {
       await next();
     }
