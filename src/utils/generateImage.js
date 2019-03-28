@@ -1,25 +1,48 @@
-const {hexToRgb} = require('color-name-list/scripts/lib');
 const Canvas = require('canvas');
-Canvas.registerFont('./assets/Inter-Bold.ttf', {family: 'Inter-Bold'});
+const canvasWidth = 768;
+const canvasHeight = 1024;
 
+Canvas.registerFont('./assets/Inter-ExtraBold.ttf', {
+  family: 'Inter-EtraBold',
+});
+
+Canvas.registerFont('./assets/Inter-Regular.ttf', {
+  family: 'Inter-Regular',
+});
+
+// debug: https://codepen.io/meodai/pen/44b054419c82f3f38ffe8fcb4de517ed?editors=0110
 
 module.exports = (colorObj) => {
   const name = colorObj.name;
-  const rgbBackground = hexToRgb(colorObj.hex);
+  const color = colorObj.hex;
 
-  const canvas = Canvas.createCanvas(300, 300);
+  const canvas = Canvas.createCanvas(canvasWidth, canvasHeight);
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle =
-    `rgb(${rgbBackground.r},${rgbBackground.g},${rgbBackground.b})`;
-  ctx.fillRect(0, 0, 300, 300);
+  // paints the background in the requested color
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  ctx.fillStyle = 'rgb(0,0,0)';
-  ctx.font = '25px Inter-Bold';
-  ctx.fillText(`${name}`, 10, 250);
+  // white bar on the bottom of the picture
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, canvasHeight * .8, canvasWidth, canvasHeight * .2);
 
-  ctx.fillStyle = 'rgb(128,128,128)';
-  ctx.font = '15px Inter-Bold';
-  ctx.fillText(`${colorObj.hex}`, 10, 270);
+  // color name
+  ctx.fillStyle = '#000';
+  ctx.font = `${canvasHeight * .08}px Inter-EtraBold`;
+  ctx.fillText(
+      `${name}`,
+      canvasWidth * .05,
+      canvasHeight * .8 + canvasHeight * .1
+  );
+
+  // color hex value
+  ctx.font = `${canvasHeight * .04}px Inter-Regular`;
+  ctx.fillText(
+      `${color}`,
+      canvasWidth * .05,
+      canvasHeight * .8 + canvasHeight * .1 + canvasHeight * .06
+  );
+
   return canvas.toBuffer();
 };
