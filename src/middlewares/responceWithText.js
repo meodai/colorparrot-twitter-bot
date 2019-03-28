@@ -35,7 +35,8 @@ module.exports = async (T, tweet) => {
     const filteredMessage = arrayText.filter((i) => i !== '@color_parrot')
         .join(' ');
     sendText(T, {
-      status: `@${screenName} What?! You need to give me a Name and a color as a hex value...`,
+      status: `@${screenName} What?! You need to give me a Name and ` +
+        `a color as a hex value... --> ${filteredMessage}`,
     });
   }
 };
