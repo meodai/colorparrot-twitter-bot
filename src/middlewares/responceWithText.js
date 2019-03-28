@@ -22,21 +22,33 @@ module.exports = async (T, tweet) => {
   }
   const screenName = tweet.user.screen_name;
   if (validMessage) {
-    await addUserMessageToProposalsList(`${tweet.user.screen_name} ` +
-      `-> ${tweet.text}`);
-    sendText(T, {
-      status: `@${screenName} Thanks for your submission! ` +
-        `Your color-name will be reviewed by a bunch of parrots ` +
-        `and will end up in the color list soon. ${hashTag}`,
-    });
+    sendText(
+        T,
+        {
+          status: `@${screenName} Thanks for your submission! ` +
+          `Your color-name will be reviewed by a bunch of parrots ` +
+          `and will end up in the color list soon. ${hashTag}`,
+        },
+        async () => {
+          await addUserMessageToProposalsList(`${tweet.user.screen_name} ` +
+            `-> ${tweet.text}`);
+        },
+        true
+    );
   } else {
-    await addUserMessageToFloodList(`${tweet.user.screen_name} ` +
-      `-> ${tweet.text}`);
     const filteredMessage = arrayText.filter((i) => i !== '@color_parrot')
         .join(' ');
-    sendText(T, {
-      status: `@${screenName} What?! You need to give me a Name and ` +
+    sendText(
+        T,
+        {
+          status: `@${screenName} What?! You need to give me a Name and ` +
         `a color as a hex value... --> ${filteredMessage}`,
-    });
+        },
+        async () => {
+          await addUserMessageToFloodList(`${tweet.user.screen_name} ` +
+            `-> ${tweet.text}`);
+        },
+        true
+    );
   }
 };
