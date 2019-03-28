@@ -1,12 +1,10 @@
 const Twit = require('twit');
 const config = require('./config/default');
 const Middleware = require('./utils/middlewareClass');
-const responseWithImageByColorName = require(
-    './middlewares/responseWithImageByColorName'
+const responseWithImage = require(
+    './middlewares/responseWithImage'
 );
-const responseWithImageByHexValue = require(
-    './middlewares/responseWithImageByHexValue'
-);
+
 const responseWithText = require('./middlewares/responceWithText');
 
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
@@ -31,8 +29,7 @@ const stream = T.stream('statuses/filter', {
 
 stream.on('tweet', async (tweet) => {
   const middleware = new Middleware(T, tweet);
-  //middleware.use(responseWithImageByHexValue);
-  middleware.use(responseWithImageByColorName);
+  middleware.use(responseWithImage);
   middleware.use(responseWithText);
   middleware.run();
 });
