@@ -9,12 +9,15 @@ const generateImage = require('./../utils/generateImage');
 
 
 module.exports = async (T, tweet, next) => {
-  const arrayText = tweet.text.split(' ');
-  if (arrayText[0] === '@color_parrot' ||
-    arrayText[arrayText.length - 1] === '@color_parrot'
+  const userMessageArray = tweet.text.split(' ');
+  if (userMessageArray[0] === '@color_parrot' ||
+    userMessageArray[userMessageArray.length - 1] === '@color_parrot'
   ) {
-    arrayText.splice(arrayText.indexOf('@color_parrot'), 1);
-    const colorName = arrayText.join(' ');
+    /*
+      if user watns to get an image
+     */
+    userMessageArray.splice(userMessageArray.indexOf('@color_parrot'), 1);
+    const colorName = userMessageArray.join(' ');
     if (namedColorsMap.get(colorName)) {
       const hex = namedColorsMap.get(colorName);
       const img = generateImage({
