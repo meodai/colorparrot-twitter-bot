@@ -7,7 +7,10 @@ const checkIfColorExistsInTweets = require(
 const addColorNameInPostedTweets = require(
     '../../redis/addColorNameInPostedTwitts'
 );
-
+/**
+ * Generates random color from color-name-list package
+ * @return {undefined}
+ */
 function generateRandomColor() {
   const randomColor = namedColors[
       Math.floor(Math.random() * namedColors.length)
@@ -17,7 +20,10 @@ function generateRandomColor() {
     hex: randomColor.hex,
   };
 }
-
+/**
+ * @param {object} T The instance of Twit class
+ * @return {undefined}
+ */
 async function sendRandomImage(T) {
   let attempts = 3;
   let generatedUnique = false;
