@@ -14,7 +14,7 @@ module.exports = async (T, tweet, next) => {
     userMessageArray[userMessageArray.length - 1] === '@color_parrot'
   ) {
     /*
-      if user watns to get an image
+      if user wants to get an image
      */
     userMessageArray.splice(userMessageArray.indexOf('@color_parrot'), 1);
     const colorName = userMessageArray.join(' ');
