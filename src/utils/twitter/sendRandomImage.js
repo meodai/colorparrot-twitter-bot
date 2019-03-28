@@ -10,8 +10,12 @@ const addColorNameInPostedTwitts = require(
 
 function generateRandomColor() {
   const randomColor = namedColors[
-      Math.floor(Math.random() * namedColors.length)];
-  return {name: randomColor.name, hex: randomColor.hex};
+    Math.floor(Math.random() * namedColors.length)
+  ];
+  return {
+    name: randomColor.name,
+    hex: randomColor.hex,
+  };
 }
 
 async function sendRandomImage(T) {
