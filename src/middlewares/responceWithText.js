@@ -22,6 +22,9 @@ module.exports = async (T, tweet) => {
   }
   const screenName = tweet.user.screen_name;
   if (validMessage) {
+    /*
+      if user's message contains valid hex value
+     */
     sendText(
         T,
         {
