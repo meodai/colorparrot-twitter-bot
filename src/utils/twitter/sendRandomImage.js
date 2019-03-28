@@ -37,8 +37,7 @@ async function sendRandomImage(T) {
     const b64content = image.toString('base64');
     const hashTagColorName = color.name.split(' ').join('_');
     const hashTagHexValue = color.hex;
-    sendImage(T, b64content, `random color: #${hashTagColorName} ` +
-      `${hashTagHexValue}`);
+    sendImage(T, b64content, `#${hashTagColorName} ${hashTagHexValue}`);
   }
 }
 
