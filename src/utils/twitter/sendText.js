@@ -1,9 +1,9 @@
-module.exports = (T, params, asyncCallback, saveToDB) => {
+module.exports = (T, params, asyncCallback) => {
   T.post('statuses/update', params, (err) => {
     if (err) {
       console.log(err);
     } else {
-      if (saveToDB) {
+      if (asyncCallback) {
         asyncCallback().catch((e) => console.log(e));
       }
     }
