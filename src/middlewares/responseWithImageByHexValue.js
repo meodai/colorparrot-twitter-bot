@@ -9,6 +9,7 @@ const sendImageToUser = require('../utils/twitter/sendImageToUser');
 const generateImage = require('./../utils/generateImage');
 
 module.exports = async (T, tweet, next) => {
+  console.log('debug prod')
   const userMessageArray = tweet.text.split(' ');
   const filteredMessage = userMessageArray
       .filter((i) => i !== '@color_parrot')
