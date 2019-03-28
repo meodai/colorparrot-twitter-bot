@@ -1,5 +1,6 @@
 const Twit = require('twit');
 const config = require('./config/default');
+const Middleware = require('./utils/middlewareClass');
 const responseWithImage = require('./middlewares/responseWithImage');
 const responseWithText = require('./middlewares/responceWithText');
 
@@ -24,9 +25,10 @@ const stream = T.stream('statuses/filter', {
 
 
 stream.on('tweet', async (tweet) => {
-  await responseWithImage(T, tweet, async () => {
-    await responseWithText(T, tweet);
-  });
+  const middleware = new Middleware(T, tweet);
+  middleware.use(responseWithImage);
+  middleware.use(responseWithText);
+  middleware.run();
 });
 
 console.log('bot started work');
