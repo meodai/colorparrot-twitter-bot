@@ -31,7 +31,7 @@ const stream = T.stream('statuses/filter', {
 
 stream.on('tweet', async (tweet) => {
   const middleware = new Middleware(T, tweet);
-  middleware.use(responseWithImageByHexValue);
+  //middleware.use(responseWithImageByHexValue);
   middleware.use(responseWithImageByColorName);
   middleware.use(responseWithText);
   middleware.run();
