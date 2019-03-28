@@ -1,0 +1,8 @@
+module.exports = {
+  CONSUMER_KEY: process.env.CONSUMER_KEY,
+  CONSUMER_SECRET: process.env.CONSUMER_SECRET,
+  ACCESS_TOKEN: process.env.ACCESS_TOKEN,
+  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+  RANDOM_COLOR_DELAY: process.env.RANDOM_COLOR_DELAY || 3600000,
+  REDIS_URL: process.env.REDIS_URL,
+};

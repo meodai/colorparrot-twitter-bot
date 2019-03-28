@@ -1,7 +1,8 @@
 const Redis = require('ioredis');
+const config = require('./../config/default');
 
 
-const redis = new Redis(process.env.REDIS_URL, {
+const redis = new Redis(config.REDIS_URL, {
   retryStrategy: (times) => {
     if (times > 3) {
       console.log('cannot connect to redis');

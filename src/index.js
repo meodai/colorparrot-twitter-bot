@@ -1,20 +1,21 @@
 const Twit = require('twit');
+const config = require('./config/default');
 const responseWithImage = require('./middlewares/responseWithImage');
-const responceWithText = require('./middlewares/responceWithText');
+const responseWithText = require('./middlewares/responceWithText');
 
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
 
 const T = new Twit({
-  consumer_key: process.env.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET,
-  access_token: process.env.ACCESS_TOKEN,
-  access_token_secret: process.env.ACCESS_TOKEN_SECRET,
+  consumer_key: config.CONSUMER_KEY,
+  consumer_secret: config.CONSUMER_SECRET,
+  access_token: config.ACCESS_TOKEN,
+  access_token_secret: config.ACCESS_TOKEN_SECRET,
 });
 
 
 setInterval(() => {
   sendRandomImage(T).catch((e) => console.log(e));
-}, process.env.RANDOM_COLOR_DELAY || 3600000);
+}, config.RANDOM_COLOR_DELAY);
 
 
 const stream = T.stream('statuses/filter', {
@@ -24,7 +25,7 @@ const stream = T.stream('statuses/filter', {
 
 stream.on('tweet', async (tweet) => {
   await responseWithImage(T, tweet, async () => {
-    await responceWithText(T, tweet);
+    await responseWithText(T, tweet);
   });
 });
 
