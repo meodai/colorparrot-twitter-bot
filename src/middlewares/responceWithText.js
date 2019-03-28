@@ -10,10 +10,10 @@ const addUserMessageToFloodList = require(
 );
 
 module.exports = async (T, tweet) => {
-  const arrayText = tweet.text.split(' '); // user message
+  const userMessageArray = tweet.text.split(' ');
   let validMessage = false;
   let hashTag;
-  for (const i of arrayText) {
+  for (const i of userMessageArray) {
     if (hexColorRegex().test(i)) {
       hashTag = i;
       validMessage = true;
@@ -39,7 +39,8 @@ module.exports = async (T, tweet) => {
         true
     );
   } else {
-    const filteredMessage = arrayText.filter((i) => i !== '@color_parrot')
+    const filteredMessage = userMessageArray
+        .filter((i) => i !== '@color_parrot')
         .join(' ');
     sendText(
         T,
