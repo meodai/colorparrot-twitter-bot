@@ -14,7 +14,7 @@ const T = new Twit({
 
 setInterval(() => {
   sendRandomImage(T).catch((e) => console.log(e));
-}, process.env.RANDOM_COLOR_DELAY);
+}, process.env.RANDOM_COLOR_DELAY || 3600000);
 
 
 const stream = T.stream('statuses/filter', {
