@@ -5,8 +5,10 @@ const responseWithImage = require(
     './middlewares/responseWithImage'
 );
 
+const checkIfMessageTypeIsRetweet = require(
+    './middlewares/checkIfMessageTypeIsRetweet'
+);
 const responseWithText = require('./middlewares/responceWithText');
-
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
 
 const T = new Twit({
@@ -29,6 +31,7 @@ const stream = T.stream('statuses/filter', {
 
 stream.on('tweet', async (tweet) => {
   const middleware = new Middleware(T, tweet);
+  middleware.use(checkIfMessageTypeIsRetweet);
   middleware.use(responseWithImage);
   middleware.use(responseWithText);
   middleware.run();
