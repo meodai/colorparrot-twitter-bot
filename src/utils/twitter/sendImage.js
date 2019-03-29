@@ -1,6 +1,6 @@
 const sendText = require('./sendText');
 
-module.exports = (T, b64content, status) => {
+module.exports = (T, b64content, status, asyncCallback) => {
   T.post('media/upload', {media_data: b64content}, (err, data) => {
     if (err) {
       console.log(err);
@@ -13,7 +13,11 @@ module.exports = (T, b64content, status) => {
           console.log(err);
         } else {
           const params = {status: status, media_ids: [mediaIdStr]};
-          sendText(T, params);
+          sendText(
+              T,
+              params,
+              asyncCallback
+          );
         }
       });
     }

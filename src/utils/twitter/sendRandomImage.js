@@ -37,13 +37,18 @@ async function sendRandomImage(T) {
   }
 
   if (generatedUnique) {
-    await addColorNameInPostedTweets(color.name);
-
     const image = randomImage(color);
     const b64content = image.toString('base64');
     const hashTagColorName = color.name.split(' ').join('_');
     const hashTagHexValue = color.hex;
-    sendImage(T, b64content, `#${hashTagColorName} ${hashTagHexValue}`);
+    sendImage(
+        T,
+        b64content,
+        `#${hashTagColorName} ${hashTagHexValue}`,
+        async () => {
+          await addColorNameInPostedTweets(color.name);
+        }
+    );
   }
 }
 
