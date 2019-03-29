@@ -54,7 +54,7 @@ module.exports = async (T, tweet) => {
     }
   } else {
     const filteredMessage = userMessageArray
-        .filter((i) => i !== '@color_parrot')
+        .map((i) => (i.includes('@color_parrot') ? 'color_parrot' : i))
         .join(' ');
     sendText(
         T,
