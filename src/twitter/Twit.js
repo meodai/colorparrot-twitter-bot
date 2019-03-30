@@ -26,7 +26,7 @@ class Twit extends AbstractTwitterClass{
     });
   }
 
-  mediaUpload(b64content, callBack) {
+  mediaUpload(b64content) {
     return new Promise((res, rej) => {
       this._T.post('media/upload', {media_data: b64content}, (err, data) => {
         if (err) {

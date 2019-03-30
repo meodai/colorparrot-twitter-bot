@@ -28,8 +28,8 @@ const stream = T.statusesFilterStream('@color_parrot');
 stream.on('tweet', async (tweet) => {
   tweet = new Tweet(tweet);
   const middleware = new Middleware(T, tweet, db);
-  //middleware.use(checkIfMessageTypeIsRetweet);
-  //middleware.use(responseWithImage);
+  middleware.use(checkIfMessageTypeIsRetweet);
+  middleware.use(responseWithImage);
   middleware.use(responseWithText);
   middleware.run();
 });

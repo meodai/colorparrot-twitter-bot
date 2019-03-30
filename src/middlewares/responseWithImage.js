@@ -4,12 +4,12 @@ namedColors.forEach((e) => {
   namedColorsMap.set(e.name, e.hex);
 });
 
-const sendImageToUser = require('../utils/twitter/sendImageToUser');
+const convertImagebuffTobase64 = require('../utils/convertImagebuffTobase64');
 const generateImage = require('./../utils/generateImage');
 
 
 module.exports = async (T, tweet, next) => {
-  const userMessageArray = tweet.text.split(' ');
+  const userMessageArray = tweet.getUserTweet().split(' ');
   if (userMessageArray[0] === '@color_parrot' ||
     userMessageArray[userMessageArray.length - 1] === '@color_parrot'
   ) {
@@ -20,15 +20,15 @@ module.exports = async (T, tweet, next) => {
     const colorName = userMessageArray.join(' ');
     if (namedColorsMap.get(colorName)) {
       const hex = namedColorsMap.get(colorName);
-      const img = generateImage({
+      const imgBuff = generateImage({
         name: colorName,
         hex: hex});
-      const screenName = tweet.user.screen_name;
+      const screenName = tweet.getUserName();
       const hashTag = colorName.split(' ').join('_');
-      await sendImageToUser(
-          T,
-          img,
-          `Hey @${screenName} thats #${hashTag}`);
+      const imgBase64 = convertImagebuffTobase64(imgBuff);
+      const mediaIdString = await T.mediaUpload(imgBase64);
+      T.statusesUpdate({status: `Hey @${screenName} thats #${hashTag}`,
+        media_ids: mediaIdString});
     } else {
       await next();
     }

@@ -1,5 +1,5 @@
 module.exports = (T, tweet, next) => {
-  if (!tweet.hasOwnProperty('retweeted_status')) {
+  if (!tweet.getRetweetedStatus()) {
     next();
   }
 };
