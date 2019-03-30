@@ -1,5 +1,5 @@
 const AbstractTweetClass = require('./AbstractTweetClass');
-
+/* eslint-disable */
 class Tweet extends AbstractTweetClass{
   constructor(tweet) {
     super(tweet);
