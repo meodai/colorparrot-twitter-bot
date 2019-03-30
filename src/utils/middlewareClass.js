@@ -1,7 +1,8 @@
 class Middleware {
-  constructor(T, tweet) {
+  constructor(T, tweet, db) {
     this.T = T;
     this.tweet = tweet;
+    this.db = db;
     this.listOfMiddlewares = [];
   }
   use(f) {
@@ -13,14 +14,14 @@ class Middleware {
       if (f.constructor.name === 'Function') {
         this.listOfMiddlewares[i] = () => {
           try {
-            f(this.T, this.tweet, this.listOfMiddlewares[i + 1]);
+            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db);
           } catch (e) {
             console.log(e);
           }
         };
       } else if (f.constructor.name === 'AsyncFunction') {
         this.listOfMiddlewares[i] = async () => {
-          await f(this.T, this.tweet, this.listOfMiddlewares[i + 1])
+          await f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db)
               .catch((e) => console.log(e));
         };
       }
