@@ -3,7 +3,7 @@ A bot that tweets random colors and lets you invent new ones
 
 https://twitter.com/color_parrot
 
-# example of commans:
+# example commands:
   - @color_parrot Majestic Green #42f45c
   - @color_parrot Indigo Blue
   - @color What is the name of #dd3333
