@@ -10,11 +10,13 @@ https://twitter.com/color_parrot
 
 # requirements:
   - node >= 10.5
-  - reis (setup https://elements.heroku.com/addons/heroku-redis)
+  - reis
   - heroku 
   
 redis commands:
  - lrange proposals 0 -1 (get list of proposals)
  - lrange flood 0 -1 (get list of flood messages)
  - smembers postedColors (get set of posted colors)
+ 
+heroku deploy help: heroku_help.txt
 
