@@ -1,4 +1,4 @@
-//* eslint-disable */
+/* eslint-disable */
 
 class AbstractDbClass {
   async addColorNameInPostedTweets() {
@@ -14,7 +14,7 @@ class AbstractDbClass {
   }
 
   async checkIfColorExistsInTweets() {
-    throw 'checkIfColorExistsInTwitts not implemented';
+    throw 'checkIfColorExistsInTweets not implemented';
   }
 }
 

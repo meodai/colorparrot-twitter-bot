@@ -1,3 +1,4 @@
+/** Middleware class */
 class Middleware {
   constructor(T, tweet, db) {
     this.T = T;
@@ -5,9 +6,18 @@ class Middleware {
     this.db = db;
     this.listOfMiddlewares = [];
   }
+  /**
+   * register middleware
+   * @param {function} f - function or asyncFunction.
+   * @return {undefined}.
+   */
   use(f) {
     this.listOfMiddlewares.push(f);
   }
+  /**
+   * run chain
+   * @return {undefined}.
+   */
   run() {
     for (let i = 0; i < this.listOfMiddlewares.length; i++) {
       const f = this.listOfMiddlewares[i];
