@@ -5,11 +5,8 @@ namedColors.forEach((e) => {
   namedColorsMap.set(e.hex, e.name);
 });
 
-const sendText = require('./../utils/twitter/sendText');
-
-
 module.exports = async (T, tweet, next, db) => {
-  const userMessageArray = tweet.text.split(' ');
+  const userMessageArray = tweet.getUserTweet().split(' ');
   let validMessage = false;
   let hex;
   for (const i of userMessageArray) {
@@ -19,49 +16,36 @@ module.exports = async (T, tweet, next, db) => {
       break;
     }
   }
-  const screenName = tweet.user.screen_name;
+  const screenName = tweet.getUserName();
   if (validMessage) {
-    /*
-      if user's message contains valid hex value
-     */
     if (namedColorsMap.get(hex)) {
-      sendText(
-          T,
-          {
-            status: `@${screenName} Darn! ${hex} is taken already. Try ` +
-            `shifting the values a bit and try again`,
-          },
-      );
+      T.statusesUpdate({
+        status: `@${screenName} Darn! ${hex} is taken already. Try ` +
+          `shifting the values a bit and try again`,
+      });
     } else {
-      sendText(
-          T,
-          {
-            status: `@${screenName} Thanks for your submission! ` +
-            `Your color-name will be reviewed by a bunch of parrots ` +
-            `and will end up in the color list soon. ${hex}`,
-          },
-          async () => {
-            await db.addUserMessageToProposalsList(
-                `${tweet.user.screen_name} ` +
-                `-> ${tweet.text}`
-            );
-          }
+      await T.statusesUpdate({
+        status: `@${screenName} Thanks for your submission! ` +
+          `Your color-name will be reviewed by a bunch of parrots ` +
+          `and will end up in the color list soon. ${hex}`,
+      });
+
+      await db.addUserMessageToProposalsList(
+          `${tweet.getUserName()} ` +
+          `-> ${tweet.getUserTweet()}`
       );
     }
   } else {
     const filteredMessage = userMessageArray
         .map((i) => (i.includes('@color_parrot') ? 'color_parrot' : i))
         .join(' ');
-    sendText(
-        T,
-        {
-          status: `@${screenName} What?! You need to give me a Name and ` +
+
+    await T.statusesUpdate({
+      status: `@${screenName} What?! You need to give me a Name and ` +
         `a color as a hex value... --> ${filteredMessage}`,
-        },
-        async () => {
-          await db.addUserMessageToFloodList(`${tweet.user.screen_name} ` +
-            `-> ${tweet.text}`);
-        },
-    );
+    });
+
+    await db.addUserMessageToFloodList(`${tweet.getUserName()} ` +
+      `-> ${tweet.getUserTweet()}`);
   }
 };

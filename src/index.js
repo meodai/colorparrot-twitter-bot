@@ -1,4 +1,5 @@
-const Twit = require('twit');
+const Twit = require('./twitter/Twit');
+const Tweet = require('./twitter/Tweet');
 const config = require('./config/default');
 const Middleware = require('./utils/middlewareClass');
 const responseWithImage = require(
@@ -13,28 +14,22 @@ const responseWithText = require(
 const db = require('./db/redisDB');
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
 
-const T = new Twit({
-  consumer_key: config.CONSUMER_KEY,
-  consumer_secret: config.CONSUMER_SECRET,
-  access_token: config.ACCESS_TOKEN,
-  access_token_secret: config.ACCESS_TOKEN_SECRET,
-});
+const T = new Twit();
 
 
-setInterval(() => {
-  sendRandomImage(T, db).catch((e) => console.log(e));
-}, config.RANDOM_COLOR_DELAY);
+//setInterval(() => {
+//  sendRandomImage(T, db).catch((e) => console.log(e));
+//}, config.RANDOM_COLOR_DELAY);
 
 
-const stream = T.stream('statuses/filter', {
-  track: '@color_parrot', language: 'en',
-});
+const stream = T.statusesFilterStream('@color_parrot');
 
 
 stream.on('tweet', async (tweet) => {
+  tweet = new Tweet(tweet);
   const middleware = new Middleware(T, tweet, db);
-  middleware.use(checkIfMessageTypeIsRetweet);
-  middleware.use(responseWithImage);
+  //middleware.use(checkIfMessageTypeIsRetweet);
+  //middleware.use(responseWithImage);
   middleware.use(responseWithText);
   middleware.run();
 });
