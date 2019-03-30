@@ -1,3 +1,6 @@
+/*
+  add user tweet to proposals or flood list
+ */
 const hexColorRegex = require('hex-color-regex');
 const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
