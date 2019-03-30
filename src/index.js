@@ -11,6 +11,9 @@ const checkMessageTypeMiddleware = require(
 const addProposalOrFloodMiddleware = require(
     './middlewares/addProposalOrFloodMiddleware'
 );
+const getColorNameMiddleware = require(
+    './middlewares/getColorNameMiddleware'
+);
 const db = require('./db/RedisDB');
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
 
@@ -30,6 +33,7 @@ stream.on('tweet', async (tweet) => {
   const middleware = new Middleware(T, tweet, db);
   middleware.use(checkMessageTypeMiddleware);
   middleware.use(getImageMiddleware);
+  middleware.use(getColorNameMiddleware);
   middleware.use(addProposalOrFloodMiddleware);
   middleware.run();
 });
