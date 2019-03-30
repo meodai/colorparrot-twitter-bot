@@ -6,15 +6,9 @@ namedColors.forEach((e) => {
 });
 
 const sendText = require('./../utils/twitter/sendText');
-const addUserMessageToProposalsList = require(
-    './../redis/addUserMessageToProposalsList'
-);
 
-const addUserMessageToFloodList = require(
-    './../redis/addUserMessageToFloodList'
-);
 
-module.exports = async (T, tweet) => {
+module.exports = async (T, tweet, next, db) => {
   const userMessageArray = tweet.text.split(' ');
   let validMessage = false;
   let hex;
@@ -47,8 +41,10 @@ module.exports = async (T, tweet) => {
             `and will end up in the color list soon. ${hex}`,
           },
           async () => {
-            await addUserMessageToProposalsList(`${tweet.user.screen_name} ` +
-            `-> ${tweet.text}`);
+            await db.addUserMessageToProposalsList(
+                `${tweet.user.screen_name} ` +
+                `-> ${tweet.text}`
+            );
           }
       );
     }
@@ -63,7 +59,7 @@ module.exports = async (T, tweet) => {
         `a color as a hex value... --> ${filteredMessage}`,
         },
         async () => {
-          await addUserMessageToFloodList(`${tweet.user.screen_name} ` +
+          await db.addUserMessageToFloodList(`${tweet.user.screen_name} ` +
             `-> ${tweet.text}`);
         },
     );

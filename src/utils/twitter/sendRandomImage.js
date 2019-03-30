@@ -1,12 +1,7 @@
 const namedColors = require('color-name-list');
 const randomImage = require('../generateImage');
 const sendImage = require('./sendImage');
-const checkIfColorExistsInTweets = require(
-    '../../redis/checkIfColorExistsInTwitts'
-);
-const addColorNameInPostedTweets = require(
-    '../../redis/addColorNameInPostedTwitts'
-);
+
 /**
  * Generates random color from color-name-list package
  * @return {undefined}
@@ -24,13 +19,13 @@ function generateRandomColor() {
  * @param {object} T The instance of Twit class
  * @return {undefined}
  */
-async function sendRandomImage(T) {
+async function sendRandomImage(T, db) {
   let attempts = 3;
   let generatedUnique = false;
   let color;
   while (generatedUnique === false && attempts !== 0) {
     color = generateRandomColor();
-    if (!(await checkIfColorExistsInTweets(color.name))) {
+    if (!(await db.checkIfColorExistsInTweets(color.name))) {
       generatedUnique = true;
     }
     attempts -= 1;
@@ -46,7 +41,7 @@ async function sendRandomImage(T) {
         b64content,
         `#${hashTagColorName} ${hashTagHexValue}`,
         async () => {
-          await addColorNameInPostedTweets(color.name);
+          await db.addColorNameInPostedTweets(color.name);
         }
     );
   }
