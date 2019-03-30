@@ -3,6 +3,7 @@ const config = require('./../config/default');
 
 const AbstractDbClass = module.require('./AbstractDbClass');
 
+/* eslint-disable */
 class RedisDB extends AbstractDbClass {
   constructor(redis) {
     super();
