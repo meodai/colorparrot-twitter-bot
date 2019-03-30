@@ -31,7 +31,7 @@ module.exports = async (T, tweet, next) => {
       });
     } else {
       T.statusesUpdate({
-        status: `@${screenName} Darn! ${hex} is not exists in my head!`,
+        status: `@${screenName} Darn! ${hex} does not exist in my head!`,
       });
     }
   } else {
