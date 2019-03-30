@@ -2,14 +2,14 @@ const Twit = require('./twitter/Twit');
 const Tweet = require('./twitter/Tweet');
 const config = require('./config/default');
 const Middleware = require('./utils/middlewareClass');
-const sendImageMiddleware = require(
-    './middlewares/sendImageMiddleware'
+const getImageMiddleware = require(
+    './middlewares/getImageMiddleware'
 );
-const checkIfMessageTypeIsRetweet = require(
-    './middlewares/checkIfMessageTypeIsRetweet'
+const checkMessageTypeMiddleware = require(
+    './middlewares/checkMessageTypeMiddleware'
 );
-const proposalAndFloodMiddleware = require(
-    './middlewares/proposalAndFloodMiddleware'
+const addProposalOrFloodMiddleware = require(
+    './middlewares/addProposalOrFloodMiddleware'
 );
 const db = require('./db/RedisDB');
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
@@ -28,9 +28,9 @@ const stream = T.statusesFilterStream('@color_parrot');
 stream.on('tweet', async (tweet) => {
   tweet = new Tweet(tweet);
   const middleware = new Middleware(T, tweet, db);
-  middleware.use(checkIfMessageTypeIsRetweet);
-  middleware.use(sendImageMiddleware);
-  middleware.use(proposalAndFloodMiddleware);
+  middleware.use(checkMessageTypeMiddleware);
+  middleware.use(getImageMiddleware);
+  middleware.use(addProposalOrFloodMiddleware);
   middleware.run();
 });
 
