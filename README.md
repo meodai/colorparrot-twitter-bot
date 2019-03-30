@@ -10,7 +10,7 @@ https://twitter.com/color_parrot
 
 ## requirements:
   - node >= 10.5
-  - reis
+  - redis
   - heroku 
   
 ## redis commands:
