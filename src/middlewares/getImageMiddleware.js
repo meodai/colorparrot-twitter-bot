@@ -1,3 +1,6 @@
+/*
+  get image by color name
+ */
 const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
 namedColors.forEach((e) => {
@@ -13,9 +16,6 @@ module.exports = async (T, tweet, next) => {
   if (userMessageArray[0] === '@color_parrot' ||
     userMessageArray[userMessageArray.length - 1] === '@color_parrot'
   ) {
-    /*
-      if user wants to get an image
-     */
     userMessageArray.splice(userMessageArray.indexOf('@color_parrot'), 1);
     const colorName = userMessageArray.join(' ');
     if (namedColorsMap.get(colorName)) {

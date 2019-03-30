@@ -1,3 +1,6 @@
+/*
+  get color name by hex value
+ */
 const hexColorRegex = require('hex-color-regex');
 const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
