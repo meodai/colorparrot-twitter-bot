@@ -1,6 +1,6 @@
 const namedColors = require('color-name-list');
-const randomImage = require('../generateImage');
-const sendImage = require('./sendImage');
+const generateImage = require('../generateImage');
+const convertImagebuffTobase64 = require('./../convertImagebuffTobase64');
 
 /**
  * Generates random color from color-name-list package
@@ -17,6 +17,7 @@ function generateRandomColor() {
 }
 /**
  * @param {object} T The instance of Twit class
+ * @param {object} db instance of db class
  * @return {undefined}
  */
 async function sendRandomImage(T, db) {
@@ -32,18 +33,14 @@ async function sendRandomImage(T, db) {
   }
 
   if (generatedUnique) {
-    const image = randomImage(color);
-    const b64content = image.toString('base64');
+    const imgBuf = generateImage(color);
+    const imgBase64 = convertImagebuffTobase64(imgBuf);
     const hashTagColorName = color.name.split(' ').join('_');
     const hashTagHexValue = color.hex;
-    sendImage(
-        T,
-        b64content,
-        `#${hashTagColorName} ${hashTagHexValue}`,
-        async () => {
-          await db.addColorNameInPostedTweets(color.name);
-        }
-    );
+    const mediaIdString = await T.mediaUpload(imgBase64);
+    T.statusesUpdate({status: `#${hashTagColorName} ${hashTagHexValue}`,
+      media_ids: mediaIdString});
+    db.addColorNameInPostedTweets(color.name);
   }
 }
 

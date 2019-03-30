@@ -11,15 +11,15 @@ const checkIfMessageTypeIsRetweet = require(
 const responseWithText = require(
     './middlewares/responceWithText'
 );
-const db = require('./db/redisDB');
+const db = require('./db/RedisDB');
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
 
 const T = new Twit();
 
 
-//setInterval(() => {
-//  sendRandomImage(T, db).catch((e) => console.log(e));
-//}, config.RANDOM_COLOR_DELAY);
+setInterval(() => {
+  sendRandomImage(T, db).catch((e) => console.log(e));
+}, config.RANDOM_COLOR_DELAY);
 
 
 const stream = T.statusesFilterStream('@color_parrot');
