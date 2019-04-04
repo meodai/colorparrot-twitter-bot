@@ -46,7 +46,7 @@ module.exports = async (T, tweet, next, db) => {
     await T.statusesUpdate({
       status: `@${screenName} What?! You need to give me a Name and ` +
         `a color as a hex value... --> ${filteredMessage}. And if you want ` +
-        `to know the name of color just ask me: What if the name of #hex`,
+        `to know the name of color just ask me: What is the name of #hex`,
     });
 
     await db.addUserMessageToFloodList(`${tweet.getUserName()} ` +
