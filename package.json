@@ -27,6 +27,7 @@
     "twit": "^2.2.11"
   },
   "devDependencies": {
+    "closestvector": "^0.4.3",
     "eslint": "^5.15.1",
     "eslint-config-google": "^0.12.0"
   }

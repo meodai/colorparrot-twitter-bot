@@ -4,6 +4,7 @@
 const hexColorRegex = require('hex-color-regex');
 const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
+
 namedColors.forEach((e) => {
   namedColorsMap.set(e.hex, e.name);
 });
@@ -12,9 +13,10 @@ module.exports = async (T, tweet, next, db) => {
   const userMessageArray = tweet.getUserTweet().split(' ');
   let validMessage = false;
   let hex;
-  for (const i of userMessageArray) {
-    if (hexColorRegex().test(i)) {
-      hex = i;
+
+  for (let part of userMessageArray) {
+    if (hexColorRegex().test(part)) {
+      hex = part;
       validMessage = true;
       break;
     }
