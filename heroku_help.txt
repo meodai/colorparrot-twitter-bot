@@ -22,5 +22,6 @@ deploy steps:
   2) create redis addon (https://elements.heroku.com/addons/heroku-redis):
     - heroku addons:create heroku-redis:premium-0 (15$ per/month)
   3) push code:
+    - heroku git:remote -a colorparrotbot
     - git push heroku master
   4) provide env variables: see src/config/default
