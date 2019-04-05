@@ -1,12 +1,7 @@
 /*
   get image by color name
  */
-const namedColors = require('color-name-list');
-const namedColorsMap = new Map();
-namedColors.forEach((e) => {
-  namedColorsMap.set(e.name, e.hex);
-});
-
+const namedColorsMap = require('../utils/colorList').namedColorsMap;
 const convertImagebuffTobase64 = require('../utils/convertImagebuffTobase64');
 const generateImage = require('./../utils/generateImage');
 
