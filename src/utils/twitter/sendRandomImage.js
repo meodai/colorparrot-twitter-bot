@@ -1,4 +1,4 @@
-const namedColors = require('../utils/colorList').namedColors;
+const namedColors = require('../colorList').namedColors;
 const generateImage = require('../generateImage');
 const convertImagebuffTobase64 = require('./../convertImagebuffTobase64');
 
