@@ -2,25 +2,11 @@
   get color name by hex value
  */
 const lib = require('../../node_modules/color-name-list/scripts/lib.js');
-const ClosestVector = require('../../node_modules/closestvector/.');
 const hexColorRegex = require('hex-color-regex');
-const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
-const rgbColorsArr = [];
-
-namedColors.forEach((c) => {
-  const rgb = lib.hexToRgb(c.hex);
-  namedColorsMap.set(c.hex, c.name);
-
-  // populates array needed for ClosestVector()
-  rgbColorsArr.push([rgb.r, rgb.g, rgb.b]);
-  // transform hex to RGB
-  c.rgb = rgb;
-  // calculate luminancy for each color
-  c.luminance = lib.luminance(rgb);
-});
-
-const closest = new ClosestVector(rgbColorsArr);
+const colorList = require('../utils/colorList');
+const namedColors = colorList.namedColors;
+const closest = colorList.closest;
 
 module.exports = async (T, tweet, next) => {
   const userMessageArray = tweet.getUserTweet().split(' ');
