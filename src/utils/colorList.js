@@ -1,4 +1,5 @@
 const ClosestVector = require('../../node_modules/closestvector/.');
+const lib = require('../../node_modules/color-name-list/scripts/lib.js');
 const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
 const rgbColorsArr = [];
