@@ -20,5 +20,6 @@ namedColorsExp.forEach((c) => {
 
 module.exports = {
   namedColors: namedColorsExp,
-  closest: new ClosestVector(rgbColorsArr)
+  closest: new ClosestVector(rgbColorsArr),
+  namedColorsMap,
 };

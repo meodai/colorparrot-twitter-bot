@@ -3,10 +3,10 @@
  */
 const lib = require('../../node_modules/color-name-list/scripts/lib.js');
 const hexColorRegex = require('hex-color-regex');
-const namedColorsMap = new Map();
 const colorList = require('../utils/colorList');
 const namedColors = colorList.namedColors;
 const closest = colorList.closest;
+const namedColorsMap = colorList.namedColorsMap;
 
 module.exports = async (T, tweet, next) => {
   const userMessageArray = tweet.getUserTweet().split(' ');
