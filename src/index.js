@@ -19,14 +19,18 @@ const sendRandomImage = require('./utils/twitter/sendRandomImage');
 
 const T = new Twit();
 
-
-setInterval(() => {
+/**
+ * sends a random tweet
+ */
+function sendNow() {
   sendRandomImage(T, db).catch((e) => console.log(e));
-}, config.RANDOM_COLOR_DELAY);
+  console.log('sending a random image');
+}
+
+setInterval(sendNow, config.RANDOM_COLOR_DELAY);
 
 
 const stream = T.statusesFilterStream('@color_parrot');
-
 
 stream.on('tweet', async (tweet) => {
   tweet = new Tweet(tweet);
@@ -38,4 +42,5 @@ stream.on('tweet', async (tweet) => {
   middleware.run();
 });
 
-console.log('bot started work');
+console.log('color parrot started');
+sendNow();

@@ -1,6 +1,6 @@
 const Canvas = require('canvas');
-const canvasWidth = 300;
-const canvasHeight = 400;
+const canvasWidth = 768;
+const canvasHeight = 1024;
 
 Canvas.registerFont('./assets/Inter-ExtraBold.ttf', {
   family: 'Inter-EtraBold',
@@ -16,7 +16,7 @@ module.exports = (colorObj) => {
   const name = colorObj.name;
   const color = colorObj.hex;
 
-  const canvas = Canvas.createCanvas(canvasWidth, canvasHeight);
+  const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, 'png');
   const ctx = canvas.getContext('2d');
 
   // paints the background in the requested color
@@ -44,5 +44,25 @@ module.exports = (colorObj) => {
       canvasHeight * .8 + canvasHeight * .1 + canvasHeight * .06
   );
 
-  return canvas.toBuffer();
+  // overlays a gradient on the text so it would not get cut off on the
+  // right side
+  const gradient = ctx.createLinearGradient(
+      canvasWidth * .7, 0,
+      canvasWidth * .99, 0
+  );
+  gradient.addColorStop(0, 'rgba(255,255,255,0)');
+  gradient.addColorStop(1, 'rgba(255,255,255,1)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(
+      canvasWidth * .7,
+      canvasHeight * .8,
+      canvasWidth * .3,
+      canvasHeight * .2
+  );
+
+  return canvas.toBuffer('image/png', {
+    compressionLevel: 3,
+    filters: canvas.PNG_FILTER_NONE
+  });
 };
