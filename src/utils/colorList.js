@@ -4,7 +4,9 @@ const namedColors = require('color-name-list');
 const namedColorsMap = new Map();
 const rgbColorsArr = [];
 
-const namedColorsExp = [...namedColors].forEach((c) => {
+const namedColorsExp = [...namedColors];
+
+namedColorsExp.forEach((c) => {
   const rgb = lib.hexToRgb(c.hex);
   namedColorsMap.set(c.hex, c.name);
 
