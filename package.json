@@ -21,11 +21,11 @@
   "homepage": "https://github.com/meodai/colorparrot-twitter-bot#readme",
   "dependencies": {
     "canvas": "^2.4.1",
-    "color-name-list": "^3.89.0",
+    "closestvector": "^0.4.3",
+    "color-name-list": "^4.0.0",
     "hex-color-regex": "^1.1.0",
     "ioredis": "^4.9.0",
-    "twit": "^2.2.11",
-    "closestvector": "^0.4.3"
+    "twit": "^2.2.11"
   },
   "devDependencies": {
     "eslint": "^5.15.1",
