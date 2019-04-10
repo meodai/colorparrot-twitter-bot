@@ -10,7 +10,7 @@ module.exports = async (T, tweet, next, db) => {
   let validMessage = false;
   let hex;
 
-  for (let part of userMessageArray) {
+  for (const part of userMessageArray) {
     if (hexColorRegex().test(part)) {
       hex = part;
       validMessage = true;
