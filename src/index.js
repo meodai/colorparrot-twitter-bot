@@ -43,4 +43,3 @@ stream.on('tweet', async (tweet) => {
 });
 
 console.log('color parrot started');
-sendNow();
