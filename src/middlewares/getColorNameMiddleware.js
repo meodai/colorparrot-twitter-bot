@@ -7,15 +7,37 @@ const colorList = require('../utils/colorList');
 const namedColors = colorList.namedColors;
 const closest = colorList.closest;
 const namedColorsMap = colorList.namedColorsMap;
+const fs = require('fs');
+const request = require('request');
+
+/**
+ *
+ * @param {*} uri
+ * @param {*} filename
+ * @param {*} callback
+ */
+function download (uri, filename, callback) {
+  request.head(uri, function (err, res, body) {
+    console.log('content-type:', res.headers['content-type']);
+    console.log('content-length:', res.headers['content-length']);
+
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+  });
+};
 
 module.exports = async (T, tweet, next) => {
   const userMessageArray = tweet.getUserTweet().split(' ');
+  const userImageURL = tweet.getUserPhoto();
   let validHex = false;
   let hex;
   let rgb;
   let color;
   let closestColor;
   const screenName = tweet.getUserName();
+
+  if (userImageURL) {
+    download(userImageURL)
+  }
 
   if (tweet.getUserTweet().includes('What is the name of')) {
     for (const c of userMessageArray) {
@@ -27,7 +49,7 @@ module.exports = async (T, tweet, next) => {
         break;
       }
     }
-    if (!validHex) {
+    if (!validHex && !userImageURL ) {
       await next();
     } else if (namedColorsMap.get(hex)) {
       T.statusesUpdate({
