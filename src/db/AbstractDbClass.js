@@ -6,7 +6,7 @@ class AbstractDbClass {
   }
 
   async addUserMessageToFloodList() {
-    throw 'not implemented';
+    throw 'addUserMessageToFloodList is not implemented';
   }
 
   async addUserMessageToProposalsList() {
@@ -14,7 +14,7 @@ class AbstractDbClass {
   }
 
   async checkIfColorExistsInTweets() {
-    throw 'checkIfColorExistsInTweets not implemented';
+    throw 'checkIfColorExistsInTweets is not implemented';
   }
 }
 
