@@ -1,6 +1,6 @@
 {
   "name": "colorparrot-twitter-bot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A twitter bot that tweet colors names and lets you invent new ones",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   "dependencies": {
     "canvas": "^2.4.1",
     "closestvector": "^0.4.3",
-    "color-name-list": "5.4.1",
+    "color-name-list": "6.0.0",
     "hex-color-regex": "^1.1.0",
     "ioredis": "^4.9.0",
     "twit": "^2.2.11"
