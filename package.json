@@ -22,7 +22,7 @@
   "dependencies": {
     "canvas": "^2.4.1",
     "closestvector": "^0.6.0",
-    "color-name-list": "7.0.1",
+    "color-name-list": "7.22.0",
     "hex-color-regex": "^1.1.0",
     "ioredis": "^4.9.0",
     "twit": "^2.2.11"
