@@ -26,3 +26,5 @@ const Color = (function () {
     namedColorsMap,
   };
 })();
+
+module.exports = Color;

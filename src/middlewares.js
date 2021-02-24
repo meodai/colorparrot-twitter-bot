@@ -3,7 +3,7 @@ const request = require('request');
 const namedColors = require('color-name-list');
 const hexColorRegex = require('hex-color-regex');
 
-const { namedColorsMap, closest } = require('./utils');
+const { namedColorsMap, closest } = require('./colors');
 
 
 class Middleware {

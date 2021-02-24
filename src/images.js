@@ -1,6 +1,17 @@
 const Canvas = require('canvas');
 const namedColors = require('color-name-list');
 
+const canvasWidth = 768;
+const canvasHeight = 1024;
+
+Canvas.registerFont('./assets/Inter-ExtraBold.ttf', {
+  family: 'Inter-EtraBold',
+});
+
+Canvas.registerFont('./assets/Inter-Regular.ttf', {
+  family: 'Inter-Regular',
+});
+
 const Images = {};
 
 /**
@@ -45,17 +56,6 @@ Images.sendRandomImage = async (T, db) => {
     db.addColorNameInPostedTweets(color.name);
   }
 };
-
-const canvasWidth = 768;
-const canvasHeight = 1024;
-
-Canvas.registerFont('./assets/Inter-ExtraBold.ttf', {
-  family: 'Inter-EtraBold',
-});
-
-Canvas.registerFont('./assets/Inter-Regular.ttf', {
-  family: 'Inter-Regular',
-});
 
 // debug: https://codepen.io/meodai/pen/44b054419c82f3f38ffe8fcb4de517ed?editors=0110
 Images.generateImage = (colorObj) => {
