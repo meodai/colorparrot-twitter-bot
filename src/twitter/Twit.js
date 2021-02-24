@@ -1,6 +1,6 @@
 const Twitt = require('twit');
 const AbstractTwitterClass = require('./AbstractTwitterClass');
-const config = require('./../config/default');
+const config = require('../config');
 
 /* eslint-disable */
 class Twit extends AbstractTwitterClass{

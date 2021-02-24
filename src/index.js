@@ -1,18 +1,18 @@
 const Twit = require('./twitter/Twit');
 const Tweet = require('./twitter/Tweet');
-const config = require('./config/default');
+const config = require('./config');
 const Middleware = require('./utils/middlewareClass');
 const getImageMiddleware = require(
-    './middlewares/getImageMiddleware'
+  './middlewares/getImageMiddleware'
 );
 const checkMessageTypeMiddleware = require(
-    './middlewares/checkMessageTypeMiddleware'
+  './middlewares/checkMessageTypeMiddleware'
 );
 const addProposalOrFloodMiddleware = require(
-    './middlewares/addProposalOrFloodMiddleware'
+  './middlewares/addProposalOrFloodMiddleware'
 );
 const getColorNameMiddleware = require(
-    './middlewares/getColorNameMiddleware'
+  './middlewares/getColorNameMiddleware'
 );
 const db = require('./db/RedisDB');
 const sendRandomImage = require('./utils/twitter/sendRandomImage');
@@ -43,3 +43,10 @@ stream.on('tweet', async (tweet) => {
 });
 
 console.log('color parrot started');
+
+/**
+ * 
+ */
+function initialize() {
+
+}

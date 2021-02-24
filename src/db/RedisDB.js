@@ -1,12 +1,9 @@
 const Redis = require('ioredis');
-const config = require('./../config/default');
-
-const AbstractDbClass = module.require('./AbstractDbClass');
+const config = require('../config');
 
 /* eslint-disable */
-class RedisDB extends AbstractDbClass {
+class RedisDB {
   constructor(redis) {
-    super();
     this.redis = redis;
   }
 
