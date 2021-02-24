@@ -1,6 +1,6 @@
-const ClosestVector = require('../node_modules/closestvector/.');
-const namedColors = require('color-name-list');
-const lib = require('../node_modules/color-name-list/scripts/lib.js');
+const ClosestVector = require("../node_modules/closestvector/.");
+const namedColors = require("color-name-list");
+const lib = require("../node_modules/color-name-list/scripts/lib.js");
 
 const Color = (function () {
   const namedColorsMap = new Map();

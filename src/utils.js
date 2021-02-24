@@ -1,5 +1,5 @@
 /**
- * Redis database class
+ * Redis database
  */
 class RedisDB {
   constructor(redis) {
@@ -7,23 +7,25 @@ class RedisDB {
   }
 
   async addColorNameInPostedTweets(colorName) {
-    await this.redis.sadd('postedColors', colorName);
+    await this.redis.sadd("postedColors", colorName);
   }
 
   async addUserMessageToFloodList(message) {
-    await this.redis.rpush('flood', message);
+    await this.redis.rpush("flood", message);
   }
 
   async addUserMessageToProposalsList(message) {
-    await this.redis.rpush('proposals', message);
+    await this.redis.rpush("proposals", message);
   }
 
   async checkIfColorExistsInTweets(colorName) {
-    return await this.redis.sismember('postedColors', colorName);
+    return await this.redis.sismember("postedColors", colorName);
   }
 }
 
-
+/**
+ * Twitter utility
+ */
 const Twitter = (function () {
   class Tweet {
     constructor(tweet) {
@@ -32,9 +34,12 @@ const Twitter = (function () {
     getUserTweet() {
       return this._tweet.text;
     }
-    getUserPhoto () {
-      if (this._tweet.hasOwnProperty('media') && this._tweet.media.type === "photo") {
-        return this._tweet.media['media_url'];
+    getUserPhoto() {
+      if (
+        this._tweet.hasOwnProperty("media") &&
+        this._tweet.media.type === "photo"
+      ) {
+        return this._tweet.media["media_url"];
       }
       return null;
     }
@@ -42,7 +47,7 @@ const Twitter = (function () {
       return this._tweet.user.screen_name;
     }
     getRetweetedStatus() {
-      return this._tweet.hasOwnProperty('retweeted_status');
+      return this._tweet.hasOwnProperty("retweeted_status");
     }
   }
 
@@ -53,7 +58,7 @@ const Twitter = (function () {
 
     statusesUpdate(params) {
       return new Promise((res, rej) => {
-        this._T.post('statuses/update', params, (err) => {
+        this._T.post("statuses/update", params, (err) => {
           if (err) {
             rej(err);
           } else {
@@ -65,19 +70,24 @@ const Twitter = (function () {
 
     mediaUpload(b64content) {
       return new Promise((res, rej) => {
-        this._T.post('media/upload', {media_data: b64content}, (err, data) => {
-          if (err) {
-            rej(err);
-          } else {
-            res(data.media_id_string);
+        this._T.post(
+          "media/upload",
+          { media_data: b64content },
+          (err, data) => {
+            if (err) {
+              rej(err);
+            } else {
+              res(data.media_id_string);
+            }
           }
-        });
+        );
       });
     }
 
     statusesFilterStream(track) {
-      return this._T.stream('statuses/filter', {
-        track: track, language: 'en',
+      return this._T.stream("statuses/filter", {
+        track: track,
+        language: "en",
       });
     }
   }
@@ -85,7 +95,7 @@ const Twitter = (function () {
   return { Tweet, Twit };
 })();
 
-module.exports = { 
-  RedisDB, 
+module.exports = {
+  RedisDB,
   Twitter,
 };
