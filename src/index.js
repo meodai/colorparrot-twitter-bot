@@ -1,26 +1,48 @@
-const Twit = require('./twitter/Twit');
-const Tweet = require('./twitter/Tweet');
+const Redis = require('ioredis');
+const Twitt = require('twit');
 const config = require('./config');
-const Middleware = require('./utils/middlewareClass');
-const db = require('./db/RedisDB');
-const sendRandomImage = require('./utils/twitter/sendRandomImage');
+
+const Images = require('./images');
+const { Middleware, Middlewares } = require('./middlewares');
 
 const {
-  Middlewares
+  RedisDB,
+  Twitter: {
+    Twit,
+    Tweet,
+  },
 } = require("./utils");
-
 
 /**
  * 
  */
 function initialize() {
-  const T = new Twit();
+  const db = new RedisDB(
+    new Redis(config.REDIS_URL, {
+      retryStrategy: (times) => {
+        if (times > 3) {
+          console.log('cannot connect to redis');
+          process.exit(1);
+        }
+        return 5000; // ms
+      },
+    })
+  );
+
+  const T = new Twit(
+    new Twitt({
+      consumer_key: config.CONSUMER_KEY,
+      consumer_secret: config.CONSUMER_SECRET,
+      access_token: config.ACCESS_TOKEN,
+      access_token_secret: config.ACCESS_TOKEN_SECRET,
+    })
+  );
 
   /**
    * sends a random tweet
    */
   function sendNow() {
-    sendRandomImage(T, db).catch((e) => console.log(e));
+    Images.sendRandomImage(T, db).catch((e) => console.log(e));
     console.log('sending a random image');
   }
 
