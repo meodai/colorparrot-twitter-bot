@@ -4,7 +4,8 @@
   "description": "A twitter bot that tweet colors names and lets you invent new ones",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "start:dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -20,16 +21,18 @@
   },
   "homepage": "https://github.com/meodai/colorparrot-twitter-bot#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "canvas": "^2.4.1",
     "closestvector": "^0.6.0",
-    "color-name-list": "7.22.0",
+    "color-name-list": "^7.31.0",
     "hex-color-regex": "^1.1.0",
     "ioredis": "^4.9.0",
     "twit": "^2.2.11"
   },
   "devDependencies": {
     "eslint": "^5.15.1",
-    "eslint-config-google": "^0.12.0"
+    "eslint-config-google": "^0.12.0",
+    "nodemon": "^2.0.7"
   },
   "engines": {
     "node": "=8.11.3"
