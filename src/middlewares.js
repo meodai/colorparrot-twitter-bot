@@ -3,6 +3,7 @@ const request = require("request");
 const hexColorRegex = require("hex-color-regex");
 
 const Color = require("./color");
+const { Templates, buildMessage } = require("./templates");
 
 /**
  * Middleware provides functionality to implement middleware-style control
@@ -83,7 +84,10 @@ Middlewares.getImage = async (T, tweet, next) => {
       const imgBase64 = Image.convertImagebuffTobase64(imgBuff);
       const mediaIdString = await T.mediaUpload(imgBase64);
       T.statusesUpdate({
-        status: `Hey @${screenName} thats #${hashTag}`,
+        status: buildMessage(Templates.IMAGE_RESPONSE, {
+          screenName,
+          hashTag
+        }),
         media_ids: mediaIdString,
       });
     } else {
@@ -120,16 +124,17 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
   if (validMessage) {
     if (namedColorsMap.get(hex)) {
       T.statusesUpdate({
-        status:
-          `@${screenName} Darn! ${hex} is taken already. Try ` +
-          `shifting the values a bit and try again`,
+        status: buildMessage(Templates.HEX_TAKEN, {
+          screenName,
+          hex,
+        })
       });
     } else {
       await T.statusesUpdate({
-        status:
-          `@${screenName} Thanks for your submission! ` +
-          `Your color-name will be reviewed by a bunch of parrots ` +
-          `and will end up in the color list soon. ${hex}`,
+        status: buildMessage(Templates.PROPOSAL_ACCEPTED, {
+          screenName,
+          hex,
+        })
       });
 
       await db.addUserMessageToProposalsList(
@@ -142,10 +147,10 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
       .join(" ");
 
     await T.statusesUpdate({
-      status:
-        `@${screenName} What?! You need to give me a Name and ` +
-        `a color as a hex value... --> ${filteredMessage}. And if you want ` +
-        `to know the name of color just ask me: What is the name of #hex`,
+      status: buildMessage(Templates.PROPOSAL_DENIED, {
+        screenName,
+        filteredMessage,
+      })
     });
 
     await db.addUserMessageToFloodList(
@@ -218,9 +223,11 @@ Middlewares.getColorName = (function () {
         await next();
       } else if (namedColorsMap.get(hex)) {
         T.statusesUpdate({
-          status:
-            `@${screenName} The name of ${hex} is ` +
-            `${namedColorsMap.get(hex)}`,
+          status: buildMessage(Templates.EXACT_HEX_NAME_RESPONSE, {
+            screenName,
+            hex,
+            colorName: namedColorsMap.get(hex),
+          })
         });
       } else {
         // get the closest named colors
@@ -228,10 +235,12 @@ Middlewares.getColorName = (function () {
         color = namedColors[closestColor.index];
 
         T.statusesUpdate({
-          status:
-            `@${screenName} We don't have an exact match for ${hex} ` +
-            ` but the closest color we have is ${color.hex} and its name is ` +
-            ` ${color.name}`,
+          status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {
+            screenName,
+            hex,
+            closestHex: color.hex,
+            closestName: color.name,
+          })
         });
       }
     } else {
