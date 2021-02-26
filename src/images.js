@@ -1,5 +1,5 @@
 const Canvas = require("canvas");
-const namedColors = require("color-name-list");
+const Color = require("./color");
 
 const canvasWidth = 768;
 const canvasHeight = 1024;
@@ -15,18 +15,6 @@ Canvas.registerFont("./assets/Inter-Regular.ttf", {
 const Images = {};
 
 /**
- * Generates random color from color-name-list package
- * @return {object} color
- */
-Images.generateRandomColor = () => {
-  const { name, hex } = namedColors[
-    Math.floor(Math.random() * namedColors.length)
-  ];
-
-  return { name, hex };
-};
-
-/**
  * Sends an image for a random but unique color
  * @param {object} T The instance of Twit class
  * @param {object} db instance of db class
@@ -36,7 +24,7 @@ Images.sendRandomImage = async (T, db) => {
   let generatedUnique = false;
   let color;
   while (generatedUnique === false && attempts !== 0) {
-    color = Images.generateRandomColor();
+    color = Color.generateRandomColor();
     if (!(await db.checkIfColorExistsInTweets(color.name))) {
       generatedUnique = true;
     }

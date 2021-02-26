@@ -6,3 +6,6 @@ start:
 
 dev:
 	npm run start:dev
+
+upgrade-deps:
+	npm upgrade color-name-list@latest

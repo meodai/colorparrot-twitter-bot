@@ -1,9 +1,8 @@
 const fs = require("fs");
 const request = require("request");
-const namedColors = require("color-name-list");
 const hexColorRegex = require("hex-color-regex");
 
-const { namedColorsMap, closest } = require("./colors");
+const { namedColors, namedColorsMap, closest } = require("./color");
 
 /**
  * Middleware provides functionality to implement middleware-style control
@@ -21,7 +20,6 @@ class Middleware {
   /**
    * Register middleware
    * @param {function} f - function or asyncFunction.
-   * @return {undefined}.
    */
   use(f) {
     let func;
@@ -221,9 +219,8 @@ Middlewares.getColorName = (function () {
       } else {
         // get the closest named colors
         closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-        color = namedColors[closestColor.index];
-
-        T.statusesUpdate({
+        color = {namedColors}[closestColor.index];
+./color({
           status:
             `@${screenName} We don't have an exact match for ${hex} ` +
             ` but the closest color we have is ${color.hex} and its name is ` +
