@@ -2,7 +2,7 @@ const fs = require("fs");
 const request = require("request");
 const hexColorRegex = require("hex-color-regex");
 
-const { namedColors, namedColorsMap, closest } = require("./color");
+const Color = require("./color");
 
 /**
  * Middleware provides functionality to implement middleware-style control
@@ -63,6 +63,8 @@ const Middlewares = {};
  * @param {function} next
  */
 Middlewares.getImage = async (T, tweet, next) => {
+  const { namedColorsMap } = await Color.getNamedColors();
+  
   const userMessageArray = tweet.getUserTweet().split(" ");
   if (
     userMessageArray[0] === "@color_parrot" ||
@@ -100,6 +102,8 @@ Middlewares.getImage = async (T, tweet, next) => {
  * @param {*} db
  */
 Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
+  const { namedColorsMap } = await Color.getNamedColors();
+
   const userMessageArray = tweet.getUserTweet().split(" ");
   let validMessage = false;
   let hex;
@@ -185,6 +189,8 @@ Middlewares.getColorName = (function () {
    * @param {function} next
    */
   return async (T, tweet, next) => {
+    const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
+
     const userMessageArray = tweet.getUserTweet().split(" ");
     const userImageURL = tweet.getUserPhoto();
     let validHex = false;
@@ -219,8 +225,9 @@ Middlewares.getColorName = (function () {
       } else {
         // get the closest named colors
         closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-        color = {namedColors}[closestColor.index];
-./color({
+        color = namedColors[closestColor.index];
+
+        T.statusesUpdate({
           status:
             `@${screenName} We don't have an exact match for ${hex} ` +
             ` but the closest color we have is ${color.hex} and its name is ` +

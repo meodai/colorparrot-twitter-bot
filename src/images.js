@@ -24,7 +24,7 @@ Images.sendRandomImage = async (T, db) => {
   let generatedUnique = false;
   let color;
   while (generatedUnique === false && attempts !== 0) {
-    color = Color.generateRandomColor();
+    color = await Color.generateRandomColor();
     if (!(await db.checkIfColorExistsInTweets(color.name))) {
       generatedUnique = true;
     }
