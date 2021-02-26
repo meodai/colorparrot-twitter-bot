@@ -3,6 +3,7 @@ const request = require("request");
 const hexColorRegex = require("hex-color-regex");
 
 const Color = require("./color");
+const Images = require("./images");
 const { Templates, buildMessage } = require("./templates");
 
 /**
@@ -23,35 +24,37 @@ class Middleware {
    * @param {function} f - function or asyncFunction.
    */
   use(f) {
-    let func;
-    if (f.constructor.name === "Function") {
-      func = () => {
-        try {
-          f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db);
-        } catch (e) {
-          console.log(e);
-        }
-      };
-    } else if (f.constructor.name === "AsyncFunction") {
-      func = async () => {
-        await f(
-          this.T,
-          this.tweet,
-          this.listOfMiddlewares[i + 1],
-          this.db
-        ).catch((e) => console.log(e));
-      };
-    }
-    this.listOfMiddlewares.push(func);
+    this.listOfMiddlewares.push(f);
   }
 
   /**
    * Run chain of middlewares, starting from the first
    */
   run() {
-    if (this.listOfMiddlewares.length) {
-      this.listOfMiddlewares[0]();
+    for (let i = 0; i < this.listOfMiddlewares.length; i++) {
+      let f = this.listOfMiddlewares[i];
+      let func;
+      if (f.constructor.name === "Function") {
+        func = () => {
+          try {
+            f(this.T, this.tweet, this.listOfMiddlewares[i+1], this.db);
+          } catch (e) {
+            console.log(e);
+          }
+        };
+      } else if (f.constructor.name === "AsyncFunction") {
+        func = async () => {
+          await f(
+            this.T,
+            this.tweet,
+            this.listOfMiddlewares[i+1],
+            this.db
+          ).catch((e) => console.log(e));
+        };
+      }
+      this.listOfMiddlewares[i] = func;
     }
+    this.listOfMiddlewares[0]();
   }
 }
 
@@ -64,8 +67,6 @@ const Middlewares = {};
  * @param {function} next
  */
 Middlewares.getImage = async (T, tweet, next) => {
-  const { namedColorsMap } = await Color.getNamedColors();
-  
   const userMessageArray = tweet.getUserTweet().split(" ");
   if (
     userMessageArray[0] === "@color_parrot" ||
@@ -73,15 +74,16 @@ Middlewares.getImage = async (T, tweet, next) => {
   ) {
     userMessageArray.splice(userMessageArray.indexOf("@color_parrot"), 1);
     const colorName = userMessageArray.join(" ");
-    if (namedColorsMap.get(colorName)) {
-      const hex = namedColorsMap.get(colorName);
-      const imgBuff = Image.generateImage({
+    const existingColor = await Color.getColorFromName(colorName);
+    if (existingColor) {
+      const { hex } = existingColor;
+      const imgBuff = Images.generateImage({
         name: colorName,
         hex: hex,
       });
       const screenName = tweet.getUserName();
       const hashTag = colorName.split(" ").join("_");
-      const imgBase64 = Image.convertImagebuffTobase64(imgBuff);
+      const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
       const mediaIdString = await T.mediaUpload(imgBase64);
       T.statusesUpdate({
         status: buildMessage(Templates.IMAGE_RESPONSE, {
@@ -213,7 +215,7 @@ Middlewares.getColorName = (function () {
       for (const c of userMessageArray) {
         if (hexColorRegex().test(c)) {
           hex = c;
-          rgb = lib.hexToRgb(hex);
+          rgb = Color.hexToRgb(hex);
           validHex = true;
 
           break;

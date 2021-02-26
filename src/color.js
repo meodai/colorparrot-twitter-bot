@@ -9,6 +9,7 @@ let namedColorsExp;
 let closest;
 let lastColorsUpdateTime = -1;
 const CACHE_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 3;
+const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
 
 const setupColors = (namedColors) => {
   namedColorsMap = new Map();
@@ -39,6 +40,7 @@ Color.getNamedColors = async () => {
   if (!namedColorsExp || now - lastColorsUpdateTime >= CACHE_UPDATE_INTERVAL) {
     const { data } = await axios.get("https://api.color.pizza/v1/");
     setupColors(data.colors);
+    lastColorsUpdateTime = now;
   }
 
   return {
@@ -60,6 +62,26 @@ Color.generateRandomColor = async () => {
 
   return { name, hex };
 };
+
+Color.getColorFromName = async (colorName) => {
+  try {
+    const url = `https://api.color.pizza/v1/names/${encodeURIComponent(colorName)}`;
+    const { data } = await axios.get(url);
+    const { colors } = data;
+
+    if (!colors.length) return null;
+
+    // find exact match
+    const exact = colors.find(color => color.name.toLowerCase() === colorName.toLowerCase());
+    if (exact) {
+      return exact;
+    }
+
+    return colors[0];
+  } catch (error) {
+    return null;
+  }
+}
 
 /**
  * disassembles a HEX color to its RGB components
