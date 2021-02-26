@@ -1,6 +1,5 @@
 const axios = require("axios");
 const ClosestVector = require("../node_modules/closestvector/.");
-const lib = require("../node_modules/color-name-list/scripts/lib.js");
 
 const Color = {};
 
@@ -17,7 +16,7 @@ const setupColors = (namedColors) => {
   namedColorsExp = [...namedColors];
 
   namedColorsExp.forEach((c) => {
-    const rgb = lib.hexToRgb(c.hex);
+    const rgb = Color.hexToRgb(c.hex);
     namedColorsMap.set(c.hex, c.name);
 
     // populates array needed for ClosestVector()
@@ -25,9 +24,9 @@ const setupColors = (namedColors) => {
     // transform hex to RGB
     c.rgb = rgb;
     // calculate luminancy for each color
-    c.luminance = lib.luminance(rgb);
+    c.luminance = Color.luminance(rgb);
   });
-  
+
   closest = new ClosestVector(rgbColorsArr);
 };
 
@@ -46,7 +45,7 @@ Color.getNamedColors = async () => {
     namedColors: namedColorsExp,
     namedColorsMap,
     closest,
-  }
+  };
 };
 
 /**
@@ -61,5 +60,41 @@ Color.generateRandomColor = async () => {
 
   return { name, hex };
 };
+
+/**
+ * disassembles a HEX color to its RGB components
+ * https: //gist.github.com/comficker/871d378c535854c1c460f7867a191a5a#gistcomment-2615849
+ * @param   {string} hexSrt hex color representatin
+ * @return  {object} {r,g,b}
+ */
+Color.hexToRgb = (hexSrt) => {
+  const [, short, long] = String(hexSrt).match(RGB_HEX) || [];
+
+  if (long) {
+    const value = Number.parseInt(long, 16);
+    return {
+      r: value >> 16,
+      g: (value >> 8) & 0xff,
+      b: value & 0xff,
+    };
+  } else if (short) {
+    const rgbArray = Array.from(short, (s) => Number.parseInt(s, 16)).map(
+      (n) => (n << 4) | n
+    );
+    return {
+      r: rgbArray[0],
+      g: rgbArray[1],
+      b: rgbArray[2],
+    };
+  }
+};
+
+// return HSP luminance http://alienryderflex.com/hsp.html
+Color.luminance = (rgb) =>
+  Math.sqrt(
+    Math.pow(0.299 * rgb.r, 2) +
+      Math.pow(0.587 * rgb.g, 2) +
+      Math.pow(0.114 * rgb.b, 2)
+  );
 
 module.exports = Color;
