@@ -34,6 +34,9 @@ const Twitter = (function () {
     getUserTweet() {
       return this._tweet.text;
     }
+    getReferencedTweets() {
+      return this._tweet.referenced_tweets;
+    }
     getUserPhoto() {
       if (
         this._tweet.hasOwnProperty("media") &&

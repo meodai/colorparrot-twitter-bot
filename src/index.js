@@ -52,6 +52,8 @@ function initialize() {
   const stream = T.statusesFilterStream('@color_parrot');
 
   stream.on('tweet', async (tweet) => {
+    console.log({ tweet });
+    console.log(JSON.stringify(tweet, null, 4));
     tweet = new Tweet(tweet);
     const middleware = new Middleware(T, tweet, db);
     middleware.use(Middlewares.checkMessageType);

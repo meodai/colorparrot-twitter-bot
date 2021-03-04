@@ -100,6 +100,10 @@ Middlewares.getImage = async (T, tweet, next) => {
   }
 };
 
+Middlewares.getImageColor = async (T, tweet, next, db) => {
+  const tweets = tweet.getReferencedTweets();
+};
+
 /**
  * add user tweet to proposals or flood list
  * @param {*} T
