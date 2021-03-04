@@ -55,6 +55,13 @@ const Twitter = (function () {
       }
       return null;
     }
+    getMediaURL(type) {
+      const { media } = this._tweet.entities;
+      if (!media || media.length === 0) {
+        return null;
+      }
+      return media.find(m => m.type === type) || null;
+    }
     getUserName() {
       return this._tweet.user.screen_name;
     }
@@ -70,7 +77,7 @@ const Twitter = (function () {
 
     getTweetByID(id) {
       return new Promise((res, rej) => {
-        this.T.get('statuses/show/:id', { id }, (err, data) => {
+        this._T.get('statuses/show/:id', { id }, (err, data) => {
           if (err) {
             rej(err);
           } else {

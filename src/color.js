@@ -1,8 +1,11 @@
+const request = require("request");
+const fs = require('fs');
 const axios = require("axios");
-const dominantColor = require("dominant-color");
+const ColorThief = require("color-thief");
 const ClosestVector = require("../node_modules/closestvector/.");
 
 const Color = {};
+const colorThief = new ColorThief();
 
 let namedColorsMap;
 let rgbColorsArr;
@@ -66,14 +69,18 @@ Color.generateRandomColor = async () => {
 
 Color.getColorFromName = async (colorName) => {
   try {
-    const url = `https://api.color.pizza/v1/names/${encodeURIComponent(colorName)}`;
+    const url = `https://api.color.pizza/v1/names/${encodeURIComponent(
+      colorName
+    )}`;
     const { data } = await axios.get(url);
     const { colors } = data;
 
     if (!colors.length) return null;
 
     // find exact match
-    const exact = colors.find(color => color.name.toLowerCase() === colorName.toLowerCase());
+    const exact = colors.find(
+      (color) => color.name.toLowerCase() === colorName.toLowerCase()
+    );
     if (exact) {
       return exact;
     }
@@ -82,7 +89,12 @@ Color.getColorFromName = async (colorName) => {
   } catch (error) {
     return null;
   }
-}
+};
+
+Color.rgbToHex = ({ r, g, b }) => {
+  const s = x => x.toString(16);
+  return '#' + s(r) + s(g) + s(b);
+};
 
 /**
  * disassembles a HEX color to its RGB components
@@ -122,14 +134,26 @@ Color.luminance = (rgb) =>
 
 Color.getDominantColor = async (imageURL) => {
   return new Promise((resolve, reject) => {
-    dominantColor(imageURL, (err, color) => {
-      if (err) {
-        reject(err);
+    request({ url: imageURL, encoding: 'binary' }, (error, response, body) => {
+      if (!error && response.statusCode == 200) {
+        // grnerate file name
+        const file = Math.random().toString(16).substr(2) 
+        + '.' + imageURL.split('.').pop();
+        // write to disk
+        fs.writeFile(file, body, 'binary', (err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          const [r,g,b] = colorThief.getColor(file);
+          resolve(Color.rgbToHex({ r, g, b }));
+        });
       } else {
-        resolve(color);
+        reject(error);
       }
-    })
+    });
   });
-}
+};
 
 module.exports = Color;

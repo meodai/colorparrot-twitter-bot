@@ -32,10 +32,10 @@
   ],
 
   "DOMINANT_COLOR_IN_IMAGE": [
-    "@{{screenName}} The color {{hex}} {{name}} is the dominant color in the image"
+    "@{{screenName}} The color {{hex}} {{name}} is the dominant color in the image. {{mediaURL}}"
   ],
 
   "CLOSEST_DOMINANT_COLOR_IN_IMAGE": [
-    "@{{screenName}} The color {{hex}} is the dominant color in the image. We could not find that color in our records, but we found {{closestHex}} {{closestName}} as its closest."
+    "@{{screenName}} The color {{hex}} is the dominant color in the image. We could not find that color in our records, but we found {{closestHex}} {{closestName}} as its closest. {{mediaURL}}"
   ]
 }

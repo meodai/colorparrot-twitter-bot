@@ -1,5 +1,4 @@
 const fs = require("fs");
-const request = require("request");
 const hexColorRegex = require("hex-color-regex");
 
 const Color = require("./color");
@@ -103,7 +102,9 @@ Middlewares.getImage = async (T, tweet, next) => {
 Middlewares.getImageColor = async (T, tweet, next, db) => {
   const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
 
+  const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet().replace(/  /g, " ").toLowerCase();
+
   if (
     !userMessage.includes("what color is this") &&
     !userMessage.includes("what is the dominant color")
@@ -113,17 +114,15 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   let ref = null;
-  if (tweet.getUserPhoto()) {
+  if (tweet.getMediaURL("photo")) {
     ref = tweet._tweet;
-    console.log('same tweet')
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
-    console.log('quoted tweet')
+    console.log("quoted tweet");
   } else if (tweet.isReplyTweet()) {
     ref = await T.getTweetByID(tweet.getOriginalTweetID());
-    console.log('reply tweet')
+    console.log("reply tweet");
   }
-  console.log(JSON.stringify(ref, null, 2));
 
   if (!ref) {
     T.statusesUpdate({
@@ -134,10 +133,12 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const { media } = ref;
+  console.log(JSON.stringify(ref, null, 4))
+
+  const media = tweet.getMediaURL.call({ _tweet: ref }, "photo");
   let imageURL = null;
-  if (media && media.type === "photo") {
-    imageURL = media["media_url"];
+  if (media) {
+    imageURL = media["media_url_https"];
   }
 
   if (!imageURL) {
@@ -149,7 +150,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const hex = "#" + Color.getDominantColor(imageURL);
+  const hex = await Color.getDominantColor(imageURL);
   const name = namedColorsMap.get(hex);
   if (!name) {
     const rgb = Color.hexToRgb(hex);
@@ -162,6 +163,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         hex,
         closestHex: color.hex,
         closestName: color.name,
+        mediaURL: media['url'],
       }),
     });
   } else {
@@ -170,6 +172,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         screenName,
         hex,
         name,
+        mediaURL: media['url'],
       }),
     });
   }
