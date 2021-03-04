@@ -133,8 +133,6 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  console.log(JSON.stringify(ref, null, 4))
-
   const media = tweet.getMediaURL.call({ _tweet: ref }, "photo");
   let imageURL = null;
   if (media) {
