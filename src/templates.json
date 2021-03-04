@@ -21,5 +21,21 @@
   
   "CLOSEST_HEX_NAME_RESPONSE": [
     "@{{screenName}} We don't have an exact match for {{hex}} but the closest color we have is {{closestHex}} and its name is {{closestName}}"
+  ],
+
+  "REFERENCE_TWEET_NOT_FOUND": [
+    "@{{screenName}} Remember to quote or a reply a tweet when asking for the color in an image!"
+  ],
+
+  "IMAGE_NOT_FOUND_IN_REFERENCE": [
+    "@{{screenName}} I could not find an image in the tweet. Make sure there is one."
+  ],
+
+  "DOMINANT_COLOR_IN_IMAGE": [
+    "@{{screenName}} The color {{hex}} {{name}} is the dominant color in the image"
+  ],
+
+  "CLOSEST_DOMINANT_COLOR_IN_IMAGE": [
+    "@{{screenName}} The color {{hex}} is the dominant color in the image. We could not find that color in our records, but we found {{closestHex}} {{closestName}} as its closest."
   ]
 }

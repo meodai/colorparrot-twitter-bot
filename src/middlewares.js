@@ -37,7 +37,7 @@ class Middleware {
       if (f.constructor.name === "Function") {
         func = () => {
           try {
-            f(this.T, this.tweet, this.listOfMiddlewares[i+1], this.db);
+            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db);
           } catch (e) {
             console.log(e);
           }
@@ -47,7 +47,7 @@ class Middleware {
           await f(
             this.T,
             this.tweet,
-            this.listOfMiddlewares[i+1],
+            this.listOfMiddlewares[i + 1],
             this.db
           ).catch((e) => console.log(e));
         };
@@ -88,7 +88,7 @@ Middlewares.getImage = async (T, tweet, next) => {
       T.statusesUpdate({
         status: buildMessage(Templates.IMAGE_RESPONSE, {
           screenName,
-          hashTag
+          hashTag,
         }),
         media_ids: mediaIdString,
       });
@@ -101,7 +101,78 @@ Middlewares.getImage = async (T, tweet, next) => {
 };
 
 Middlewares.getImageColor = async (T, tweet, next, db) => {
-  const tweets = tweet.getReferencedTweets();
+  const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
+
+  const userMessage = tweet.getUserTweet().replace(/  /g, " ").toLowerCase();
+  if (
+    !userMessage.includes("what color is this") &&
+    !userMessage.includes("what is the dominant color")
+  ) {
+    await next();
+    return;
+  }
+
+  let ref = null;
+  if (tweet.getUserPhoto()) {
+    ref = tweet._tweet;
+    console.log('same tweet')
+  } else if (tweet.isQuotedTweet()) {
+    ref = tweet.getQuotedTweet();
+    console.log('quoted tweet')
+  } else if (tweet.isReplyTweet()) {
+    ref = await T.getTweetByID(tweet.getOriginalTweetID());
+    console.log('reply tweet')
+  }
+  console.log(JSON.stringify(ref, null, 2));
+
+  if (!ref) {
+    T.statusesUpdate({
+      status: buildMessage(Templates.REFERENCE_TWEET_NOT_FOUND, {
+        screenName,
+      }),
+    });
+    return;
+  }
+
+  const { media } = ref;
+  let imageURL = null;
+  if (media && media.type === "photo") {
+    imageURL = media["media_url"];
+  }
+
+  if (!imageURL) {
+    T.statusesUpdate({
+      status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
+        screenName,
+      }),
+    });
+    return;
+  }
+
+  const hex = "#" + Color.getDominantColor(imageURL);
+  const name = namedColorsMap.get(hex);
+  if (!name) {
+    const rgb = Color.hexToRgb(hex);
+    // get the closest named colors
+    closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
+    color = namedColors[closestColor.index];
+    T.statusesUpdate({
+      status: buildMessage(Templates.CLOSEST_DOMINANT_COLOR_IN_IMAGE, {
+        screenName,
+        hex,
+        closestHex: color.hex,
+        closestName: color.name,
+      }),
+    });
+  } else {
+    T.statusesUpdate({
+      status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
+        screenName,
+        hex,
+        name,
+      }),
+    });
+  }
 };
 
 /**
@@ -133,14 +204,14 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
         status: buildMessage(Templates.HEX_TAKEN, {
           screenName,
           hex,
-        })
+        }),
       });
     } else {
       await T.statusesUpdate({
         status: buildMessage(Templates.PROPOSAL_ACCEPTED, {
           screenName,
           hex,
-        })
+        }),
       });
 
       await db.addUserMessageToProposalsList(
@@ -156,7 +227,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
       status: buildMessage(Templates.PROPOSAL_DENIED, {
         screenName,
         filteredMessage,
-      })
+      }),
     });
 
     await db.addUserMessageToFloodList(
@@ -200,7 +271,11 @@ Middlewares.getColorName = (function () {
    * @param {function} next
    */
   return async (T, tweet, next) => {
-    const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
+    const {
+      namedColors,
+      namedColorsMap,
+      closest,
+    } = await Color.getNamedColors();
 
     const userMessageArray = tweet.getUserTweet().split(" ");
     const userImageURL = tweet.getUserPhoto();
@@ -233,7 +308,7 @@ Middlewares.getColorName = (function () {
             screenName,
             hex,
             colorName: namedColorsMap.get(hex),
-          })
+          }),
         });
       } else {
         // get the closest named colors
@@ -246,7 +321,7 @@ Middlewares.getColorName = (function () {
             hex,
             closestHex: color.hex,
             closestName: color.name,
-          })
+          }),
         });
       }
     } else {

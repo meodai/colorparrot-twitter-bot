@@ -1,4 +1,5 @@
 const axios = require("axios");
+const dominantColor = require("dominant-color");
 const ClosestVector = require("../node_modules/closestvector/.");
 
 const Color = {};
@@ -118,5 +119,17 @@ Color.luminance = (rgb) =>
       Math.pow(0.587 * rgb.g, 2) +
       Math.pow(0.114 * rgb.b, 2)
   );
+
+Color.getDominantColor = async (imageURL) => {
+  return new Promise((resolve, reject) => {
+    dominantColor(imageURL, (err, color) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(color);
+      }
+    })
+  });
+}
 
 module.exports = Color;

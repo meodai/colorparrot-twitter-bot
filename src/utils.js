@@ -34,8 +34,17 @@ const Twitter = (function () {
     getUserTweet() {
       return this._tweet.text;
     }
-    getReferencedTweets() {
-      return this._tweet.referenced_tweets;
+    isQuotedTweet() {
+      return this._tweet.is_quote_status;
+    }
+    getQuotedTweet() {
+      return this._tweet.quoted_status;
+    }
+    isReplyTweet() {
+      return !!this._tweet.in_reply_to_status_id;
+    }
+    getOriginalTweetID() {
+      return this._tweet.in_reply_to_status_id_str;
     }
     getUserPhoto() {
       if (
@@ -57,6 +66,18 @@ const Twitter = (function () {
   class Twit {
     constructor(twitt) {
       this._T = twitt;
+    }
+
+    getTweetByID(id) {
+      return new Promise((res, rej) => {
+        this.T.get('statuses/show/:id', { id }, (err, data) => {
+          if (err) {
+            rej(err);
+          } else {
+            res(data);
+          }
+        });
+      });
     }
 
     statusesUpdate(params) {
