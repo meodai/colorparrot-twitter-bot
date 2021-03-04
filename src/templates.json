@@ -1,0 +1,25 @@
+{
+  "IMAGE_RESPONSE": [
+    "@{{screenName}} that's #{{hashTag}}"
+  ],
+
+  "HEX_TAKEN": [
+    "@{{screenName}} Darn! {{hex}} is taken already. Try shifting the values a bit and try again"
+  ],
+
+  "PROPOSAL_ACCEPTED": [
+    "@{{screenName}} Thanks for your submission! Your color-name will be reviewed by a bunch of parrots and will end up in the color list soon. {{hex}}"
+  ],
+
+  "PROPOSAL_DENIED": [
+    "@{{screenName}} What?! You need to give me a Name and a color as a hex value... --> {{filteredMessage}}. And if you want to know the name of color just ask me: What is the name of #hex"
+  ],
+
+  "EXACT_HEX_NAME_RESPONSE": [
+    "@{{screenName}} The name of {{hex}} is {{colorName}}"
+  ],
+  
+  "CLOSEST_HEX_NAME_RESPONSE": [
+    "@{{screenName}} We don't have an exact match for {{hex}} but the closest color we have is {{closestHex}} and its name is {{closestName}}"
+  ]
+}
