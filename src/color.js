@@ -92,7 +92,7 @@ Color.getColorFromName = async (colorName) => {
 };
 
 Color.rgbToHex = ({ r, g, b }) => {
-  const s = x => x.toString(16);
+  const s = x => x.toString(16).padStart(2, '0');
   return '#' + s(r) + s(g) + s(b);
 };
 
