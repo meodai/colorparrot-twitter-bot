@@ -151,11 +151,23 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
 
   const hex = await Color.getDominantColor(imageURL);
   const name = namedColorsMap.get(hex);
+
+  const generateAndUploadImage = async (name, hex) => {
+    const imgBuff = Images.generateImage({
+      name,
+      hex,
+    });
+    const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+    const mediaIdString = await T.mediaUpload(imgBase64);
+    return mediaIdString;
+  };
+  
   if (!name) {
     const rgb = Color.hexToRgb(hex);
     // get the closest named colors
     closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
     color = namedColors[closestColor.index];
+    const mediaIdString = await generateAndUploadImage(color.name, color.hex);
     await T.statusesUpdate({
       status: buildMessage(Templates.CLOSEST_DOMINANT_COLOR_IN_IMAGE, {
         screenName,
@@ -164,9 +176,11 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         closestName: color.name,
         mediaURL: media['url'],
       }),
+      media_ids: [mediaIdString],
       in_reply_to_status_id: tweet.getStatusID(),
     });
   } else {
+    const mediaIdString = await generateAndUploadImage(name, hex);
     await T.statusesUpdate({
       status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
         screenName,
@@ -174,6 +188,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         name,
         mediaURL: media['url'],
       }),
+      media_ids: [mediaIdString],
       in_reply_to_status_id: tweet.getStatusID(),
     });
   }
@@ -225,17 +240,17 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
       );
     }
   } else {
-    const filteredMessage = userMessageArray
-      .map((i) => (i.includes("@color_parrot") ? "color_parrot" : i))
-      .join(" ");
+    // const filteredMessage = userMessageArray
+    //   .map((i) => (i.includes("@color_parrot") ? "color_parrot" : i))
+    //   .join(" ");
 
-    await T.statusesUpdate({
-      status: buildMessage(Templates.PROPOSAL_DENIED, {
-        screenName,
-        filteredMessage,
-      }),
-      in_reply_to_status_id: tweet.getStatusID(),
-    });
+    // await T.statusesUpdate({
+    //   status: buildMessage(Templates.PROPOSAL_DENIED, {
+    //     screenName,
+    //     filteredMessage,
+    //   }),
+    //   in_reply_to_status_id: tweet.getStatusID(),
+    // });
 
     await db.addUserMessageToFloodList(
       `${tweet.getUserName()} ` + `-> ${tweet.getUserTweet()}`

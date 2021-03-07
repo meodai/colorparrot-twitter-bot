@@ -147,7 +147,13 @@ Color.getDominantColor = async (imageURL) => {
           }
 
           const [r,g,b] = colorThief.getColor(file);
-          resolve(Color.rgbToHex({ r, g, b }));
+          fs.unlink(file, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(Color.rgbToHex({ r, g, b }));
+            }
+          });
         });
       } else {
         reject(error);

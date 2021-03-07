@@ -6,7 +6,9 @@ https://twitter.com/color_parrot
 ## example commands:
   - @color_parrot Majestic Green #42f45c
   - @color_parrot Indigo Blue
-  - @color What is the name of #dd3333
+  - @color_parrot What is the name of #dd3333
+  - @color_parrot What color is this?
+  - @color_parrot What is the dominant color?
 
 ## requirements:
   - node >= 10.5
