@@ -108,6 +108,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
 
   if (
     !userMessage.includes("what color is this") &&
+    !userMessage.includes("what is this color") &&
     !userMessage.includes("what is the dominant color")
   ) {
     await next();
