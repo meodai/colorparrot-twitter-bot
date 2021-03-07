@@ -176,7 +176,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         closestName: color.name,
         mediaURL: media['url'],
       }),
-      media_ids: [mediaIdString],
+      media_ids: mediaIdString,
       in_reply_to_status_id: tweet.getStatusID(),
     });
   } else {
@@ -188,7 +188,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         name,
         mediaURL: media['url'],
       }),
-      media_ids: [mediaIdString],
+      media_ids: mediaIdString,
       in_reply_to_status_id: tweet.getStatusID(),
     });
   }
