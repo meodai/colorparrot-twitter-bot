@@ -84,12 +84,13 @@ Middlewares.getImage = async (T, tweet, next) => {
       const hashTag = colorName.split(" ").join("_");
       const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
       const mediaIdString = await T.mediaUpload(imgBase64);
-      T.statusesUpdate({
+      await T.statusesUpdate({
         status: buildMessage(Templates.IMAGE_RESPONSE, {
           screenName,
           hashTag,
         }),
         media_ids: mediaIdString,
+        in_reply_to_status_id: tweet.getStatusID(),
       });
     } else {
       await next();
@@ -118,17 +119,16 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     ref = tweet._tweet;
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
-    console.log("quoted tweet");
   } else if (tweet.isReplyTweet()) {
     ref = await T.getTweetByID(tweet.getOriginalTweetID());
-    console.log("reply tweet");
   }
 
   if (!ref) {
-    T.statusesUpdate({
+    await T.statusesUpdate({
       status: buildMessage(Templates.REFERENCE_TWEET_NOT_FOUND, {
         screenName,
       }),
+      in_reply_to_status_id: tweet.getStatusID(),
     });
     return;
   }
@@ -140,10 +140,11 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   if (!imageURL) {
-    T.statusesUpdate({
+    await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
         screenName,
       }),
+      in_reply_to_status_id: tweet.getStatusID(),
     });
     return;
   }
@@ -155,7 +156,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     // get the closest named colors
     closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
     color = namedColors[closestColor.index];
-    T.statusesUpdate({
+    await T.statusesUpdate({
       status: buildMessage(Templates.CLOSEST_DOMINANT_COLOR_IN_IMAGE, {
         screenName,
         hex,
@@ -163,15 +164,17 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
         closestName: color.name,
         mediaURL: media['url'],
       }),
+      in_reply_to_status_id: tweet.getStatusID(),
     });
   } else {
-    T.statusesUpdate({
+    await T.statusesUpdate({
       status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
         screenName,
         hex,
         name,
         mediaURL: media['url'],
       }),
+      in_reply_to_status_id: tweet.getStatusID(),
     });
   }
 };
@@ -201,11 +204,12 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
   const screenName = tweet.getUserName();
   if (validMessage) {
     if (namedColorsMap.get(hex)) {
-      T.statusesUpdate({
+      await T.statusesUpdate({
         status: buildMessage(Templates.HEX_TAKEN, {
           screenName,
           hex,
         }),
+        in_reply_to_status_id: tweet.getStatusID(),
       });
     } else {
       await T.statusesUpdate({
@@ -213,6 +217,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
           screenName,
           hex,
         }),
+        in_reply_to_status_id: tweet.getStatusID(),
       });
 
       await db.addUserMessageToProposalsList(
@@ -229,6 +234,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
         screenName,
         filteredMessage,
       }),
+      in_reply_to_status_id: tweet.getStatusID(),
     });
 
     await db.addUserMessageToFloodList(
@@ -304,25 +310,27 @@ Middlewares.getColorName = (function () {
       if (!validHex && !userImageURL) {
         await next();
       } else if (namedColorsMap.get(hex)) {
-        T.statusesUpdate({
+        await T.statusesUpdate({
           status: buildMessage(Templates.EXACT_HEX_NAME_RESPONSE, {
             screenName,
             hex,
             colorName: namedColorsMap.get(hex),
           }),
+          in_reply_to_status_id: tweet.getStatusID(),
         });
       } else {
         // get the closest named colors
         closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
         color = namedColors[closestColor.index];
 
-        T.statusesUpdate({
+        await T.statusesUpdate({
           status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {
             screenName,
             hex,
             closestHex: color.hex,
             closestName: color.name,
           }),
+          in_reply_to_status_id: tweet.getStatusID(),
         });
       }
     } else {

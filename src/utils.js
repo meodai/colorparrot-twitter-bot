@@ -31,6 +31,9 @@ const Twitter = (function () {
     constructor(tweet) {
       this._tweet = tweet;
     }
+    getStatusID() {
+      return this._tweet.id_str;
+    }
     getUserTweet() {
       return this._tweet.text;
     }
