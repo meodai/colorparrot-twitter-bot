@@ -201,7 +201,7 @@ Images.generateCollection = (() => {
           h/y - (margin * 2)
         ), 
         margin + (i % x) * (w / x), 
-        margin + Math.floor(i / y) * (h / y)
+        margin + Math.floor(i / x) * (h / y)
       )
     });
     

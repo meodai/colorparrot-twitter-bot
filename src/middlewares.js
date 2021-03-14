@@ -159,8 +159,8 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const generateAndUploadCollection = async (palette) => {
     const p = palette.map(
       color => ({
-        row2: color.hex, 
-        row1: color.name, 
+        row2: color.name, 
+        row1: color.hex, 
         color: color.hex,
       })
     );
