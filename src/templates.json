@@ -28,7 +28,7 @@
   ],
 
   "IMAGE_NOT_FOUND_IN_REFERENCE": [
-    "@{{screenName}} I could not find an image in the tweet.\nCurrently, only images (png, jpg) are supported"
+    "@{{screenName}} I could not find an image in the tweet."
   ],
 
   "DOMINANT_COLOR_IN_IMAGE": [
