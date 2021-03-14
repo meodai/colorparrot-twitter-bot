@@ -106,7 +106,13 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
 
   if (
     !userMessage.includes("what color is this") &&
+    !userMessage.includes("what colour is this") &&
     !userMessage.includes("what is this color") &&
+    !userMessage.includes("what is this colour") &&
+    !userMessage.includes("what are those colors") &&
+    !userMessage.includes("what are those colours") &&
+    !userMessage.includes("what colors are in this") &&
+    !userMessage.includes("what colours are in this") &&
     !userMessage.includes("what is the dominant color")
   ) {
     await next();
@@ -153,15 +159,15 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const generateAndUploadCollection = async (palette) => {
     const p = palette.map(
       color => ({
-        row2: color.name, 
-        row1: color.hex, 
+        row2: color.hex, 
+        row1: color.name, 
         color: color.hex,
       })
     );
     const imgBuff = Images.generateCollection(
       p,
       2424, 
-      3192
+      2128
     );
     const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
     const mediaIdString = await T.mediaUpload(imgBase64);

@@ -137,9 +137,9 @@ Images.generateCollection = (() => {
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, canvasHeight * 0.8, canvasWidth, canvasHeight * 0.2);
   
-    // color row1
+    // name row1
     ctx.fillStyle = '#000';
-    ctx.font = `${canvasHeight * 0.08}px Inter`;
+    ctx.font = `${canvasHeight * 0.08}px Inter-EtraBold`;
     ctx.fillText(
       `${row1}`,
       canvasWidth * 0.05,
@@ -147,7 +147,7 @@ Images.generateCollection = (() => {
     );
   
     // color row2 value
-    ctx.font = `${canvasHeight * 0.04}px Inter`;
+    ctx.font = `${canvasHeight * 0.04}px Inter-Regular`;
     
     ctx.fillText(
       `${row2}`,
@@ -180,7 +180,7 @@ Images.generateCollection = (() => {
   const generateCollection = (
     colors, 
     w, h, 
-    x = 3, y = 3,
+    x = 3, y = 2,
     margin = 20
   ) => {
     const canvasWidth = w + margin * 2;
