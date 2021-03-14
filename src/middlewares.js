@@ -145,6 +145,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   if (!imageURL) {
+    console.log({ tweet: ref, imageURL })
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
         screenName,
