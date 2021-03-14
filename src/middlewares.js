@@ -101,8 +101,6 @@ Middlewares.getImage = async (T, tweet, next) => {
 };
 
 Middlewares.getImageColor = async (T, tweet, next, db) => {
-  const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
-
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet().replace(/  /g, " ").toLowerCase();
 
@@ -150,49 +148,38 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const hex = await Color.getDominantColor(imageURL);
-  const name = namedColorsMap.get(hex);
+  const palette = await Color.getPalette(imageURL);
 
-  const generateAndUploadImage = async (name, hex) => {
-    const imgBuff = Images.generateImage({
-      name,
-      hex,
-    });
+  const generateAndUploadCollection = async (palette) => {
+    const p = palette.map(
+      color => ({
+        row2: color.name, 
+        row1: color.hex, 
+        color: color.hex,
+      })
+    );
+    const imgBuff = Images.generateCollection(
+      p,
+      2424, 
+      3192
+    );
     const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
     const mediaIdString = await T.mediaUpload(imgBase64);
     return mediaIdString;
   };
   
-  if (!name) {
-    const rgb = Color.hexToRgb(hex);
-    // get the closest named colors
-    closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-    color = namedColors[closestColor.index];
-    const mediaIdString = await generateAndUploadImage(color.name, color.hex);
-    await T.statusesUpdate({
-      status: buildMessage(Templates.CLOSEST_DOMINANT_COLOR_IN_IMAGE, {
-        screenName,
-        hex,
-        closestHex: color.hex,
-        closestName: color.name,
-        mediaURL: media['url'],
-      }),
-      media_ids: mediaIdString,
-      in_reply_to_status_id: tweet.getStatusID(),
-    });
-  } else {
-    const mediaIdString = await generateAndUploadImage(name, hex);
-    await T.statusesUpdate({
-      status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
-        screenName,
-        hex,
-        name,
-        mediaURL: media['url'],
-      }),
-      media_ids: mediaIdString,
-      in_reply_to_status_id: tweet.getStatusID(),
-    });
-  }
+  const mediaIdString = await generateAndUploadCollection(palette);
+  const vibrant = palette.find(color => color.variant == 'Vibrant');
+  await T.statusesUpdate({
+    status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
+      screenName,
+      hex: vibrant.hex,
+      name: vibrant.name,
+      mediaURL: media['url'],
+    }),
+    media_ids: mediaIdString,
+    in_reply_to_status_id: tweet.getStatusID(),
+  });
 };
 
 /**

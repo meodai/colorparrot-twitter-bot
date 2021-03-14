@@ -2,6 +2,7 @@ const request = require("request");
 const fs = require('fs');
 const axios = require("axios");
 const ColorThief = require("color-thief");
+const Vibrant = require("node-vibrant");
 const ClosestVector = require("../node_modules/closestvector/.");
 
 const Color = {};
@@ -161,5 +162,34 @@ Color.getDominantColor = async (imageURL) => {
     });
   });
 };
+
+Color.getPalette = async (imageURL) => {
+  const v = new Vibrant(imageURL);
+  return v.getPalette()
+    .then(async (palette) => {
+      const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
+
+      const all = Object.entries(palette).map(async ([variant, color]) => {
+        const rgb = {
+          r: color.rgb[0] | 0,
+          g: color.rgb[1] | 0,
+          b: color.rgb[2] | 0,
+        };
+
+        let hex = Color.rgbToHex(rgb);
+        let name = namedColorsMap.get(hex);
+        if (!name) {
+          const closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
+          const c = namedColors[closestColor.index];
+          name = c.name;
+          hex = c.hex;
+        }
+
+        return { name, hex, variant };
+      });
+
+      return Promise.all(all);
+    });
+}
 
 module.exports = Color;
