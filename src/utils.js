@@ -59,7 +59,7 @@ const Twitter = (function () {
       return null;
     }
     getMediaURL(type) {
-      const { media } = this._tweet.entities;
+      const { media } = this._tweet.extended_entities || this._tweet.entities;
       if (!media || media.length === 0) {
         return null;
       }
@@ -80,7 +80,7 @@ const Twitter = (function () {
 
     getTweetByID(id) {
       return new Promise((res, rej) => {
-        this._T.get('statuses/show/:id', { id }, (err, data) => {
+        this._T.get('statuses/show/:id', { id, tweet_mode: 'extended' }, (err, data) => {
           if (err) {
             rej(err);
           } else {

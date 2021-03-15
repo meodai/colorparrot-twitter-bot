@@ -121,11 +121,16 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
 
   let ref = null;
   if (tweet.getMediaURL("photo")) {
-    ref = tweet._tweet;
+    ref = tweet.getStatusID();
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
+    if (ref) ref = ref.id_str;
   } else if (tweet.isReplyTweet()) {
-    ref = await T.getTweetByID(tweet.getOriginalTweetID());
+    ref = tweet.getOriginalTweetID();
+  }
+
+  if (ref) {
+    ref = await T.getTweetByID(ref);
   }
 
   if (!ref) {
