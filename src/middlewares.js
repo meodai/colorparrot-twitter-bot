@@ -315,7 +315,10 @@ Middlewares.getColorName = (function() {
     if (tweet.getUserTweet().includes('What is the name of')) {
       for (const c of userMessageArray) {
         if (hexColorRegex().test(c)) {
-          hex = c;
+          const match = hexColorRegex().exec(c);
+          if (!match) continue;
+          
+          hex = match[0];
           rgb = Color.hexToRgb(hex);
           validHex = true;
 
