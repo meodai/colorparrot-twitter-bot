@@ -3,7 +3,7 @@ const Twitt = require('twit');
 const config = require('./config');
 
 const Images = require('./images');
-const { Middleware, Middlewares } = require('./middlewares');
+const {Middleware, Middlewares} = require('./middlewares');
 
 const {
   RedisDB,
@@ -11,31 +11,31 @@ const {
     Twit,
     Tweet,
   },
-} = require("./utils");
+} = require('./utils');
 
 /**
- * 
+ *
  */
 function initialize() {
   const db = new RedisDB(
-    new Redis(config.REDIS_URL, {
-      retryStrategy: (times) => {
-        if (times > 3) {
-          console.log('cannot connect to redis');
-          process.exit(1);
-        }
-        return 5000; // ms
-      },
-    })
+      new Redis(config.REDIS_URL, {
+        retryStrategy: (times) => {
+          if (times > 3) {
+            console.log('cannot connect to redis');
+            process.exit(1);
+          }
+          return 5000; // ms
+        },
+      })
   );
 
   const T = new Twit(
-    new Twitt({
-      consumer_key: config.CONSUMER_KEY,
-      consumer_secret: config.CONSUMER_SECRET,
-      access_token: config.ACCESS_TOKEN,
-      access_token_secret: config.ACCESS_TOKEN_SECRET,
-    })
+      new Twitt({
+        consumer_key: config.CONSUMER_KEY,
+        consumer_secret: config.CONSUMER_SECRET,
+        access_token: config.ACCESS_TOKEN,
+        access_token_secret: config.ACCESS_TOKEN_SECRET,
+      })
   );
 
   /**

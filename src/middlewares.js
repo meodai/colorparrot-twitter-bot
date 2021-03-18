@@ -1,9 +1,9 @@
-const fs = require("fs");
-const hexColorRegex = require("hex-color-regex");
+const fs = require('fs');
+const hexColorRegex = require('hex-color-regex');
 
-const Color = require("./color");
-const Images = require("./images");
-const { Templates, buildMessage } = require("./templates");
+const Color = require('./color');
+const Images = require('./images');
+const {Templates, buildMessage} = require('./templates');
 
 /**
  * Middleware provides functionality to implement middleware-style control
@@ -31,9 +31,9 @@ class Middleware {
    */
   run() {
     for (let i = 0; i < this.listOfMiddlewares.length; i++) {
-      let f = this.listOfMiddlewares[i];
+      const f = this.listOfMiddlewares[i];
       let func;
-      if (f.constructor.name === "Function") {
+      if (f.constructor.name === 'Function') {
         func = () => {
           try {
             f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db);
@@ -41,13 +41,13 @@ class Middleware {
             console.log(e);
           }
         };
-      } else if (f.constructor.name === "AsyncFunction") {
+      } else if (f.constructor.name === 'AsyncFunction') {
         func = async () => {
           await f(
-            this.T,
-            this.tweet,
-            this.listOfMiddlewares[i + 1],
-            this.db
+              this.T,
+              this.tweet,
+              this.listOfMiddlewares[i + 1],
+              this.db
           ).catch((e) => console.log(e));
         };
       }
@@ -66,22 +66,22 @@ const Middlewares = {};
  * @param {function} next
  */
 Middlewares.getImage = async (T, tweet, next) => {
-  const userMessageArray = tweet.getUserTweet().split(" ");
+  const userMessageArray = tweet.getUserTweet().split(' ');
   if (
-    userMessageArray[0] === "@color_parrot" ||
-    userMessageArray[userMessageArray.length - 1] === "@color_parrot"
+    userMessageArray[0] === '@color_parrot' ||
+    userMessageArray[userMessageArray.length - 1] === '@color_parrot'
   ) {
-    userMessageArray.splice(userMessageArray.indexOf("@color_parrot"), 1);
-    const colorName = userMessageArray.join(" ");
+    userMessageArray.splice(userMessageArray.indexOf('@color_parrot'), 1);
+    const colorName = userMessageArray.join(' ');
     const existingColor = await Color.getColorFromName(colorName);
     if (existingColor) {
-      const { hex } = existingColor;
+      const {hex} = existingColor;
       const imgBuff = Images.generateImage({
         name: colorName,
         hex: hex,
       });
       const screenName = tweet.getUserName();
-      const hashTag = colorName.split(" ").join("_");
+      const hashTag = colorName.split(' ').join('_');
       const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
       const mediaIdString = await T.mediaUpload(imgBase64);
       await T.statusesUpdate({
@@ -102,25 +102,25 @@ Middlewares.getImage = async (T, tweet, next) => {
 
 Middlewares.getImageColor = async (T, tweet, next, db) => {
   const screenName = tweet.getUserName();
-  const userMessage = tweet.getUserTweet().replace(/  /g, " ").toLowerCase();
+  const userMessage = tweet.getUserTweet().replace(/ {2}/g, ' ').toLowerCase();
 
   if (
-    !userMessage.includes("what color is this") &&
-    !userMessage.includes("what colour is this") &&
-    !userMessage.includes("what is this color") &&
-    !userMessage.includes("what is this colour") &&
-    !userMessage.includes("what are those colors") &&
-    !userMessage.includes("what are those colours") &&
-    !userMessage.includes("what colors are in this") &&
-    !userMessage.includes("what colours are in this") &&
-    !userMessage.includes("what is the dominant color")
+    !userMessage.includes('what color is this') &&
+    !userMessage.includes('what colour is this') &&
+    !userMessage.includes('what is this color') &&
+    !userMessage.includes('what is this colour') &&
+    !userMessage.includes('what are those colors') &&
+    !userMessage.includes('what are those colours') &&
+    !userMessage.includes('what colors are in this') &&
+    !userMessage.includes('what colours are in this') &&
+    !userMessage.includes('what is the dominant color')
   ) {
     await next();
     return;
   }
 
   let ref = null;
-  if (tweet.getMediaURL("photo")) {
+  if (tweet.getMediaURL('photo')) {
     ref = tweet.getStatusID();
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
@@ -143,14 +143,14 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const media = tweet.getMediaURL.call({ _tweet: ref }, "photo");
+  const media = tweet.getMediaURL.call({_tweet: ref}, 'photo');
   let imageURL = null;
   if (media) {
-    imageURL = media["media_url_https"];
+    imageURL = media['media_url_https'];
   }
 
   if (!imageURL) {
-    console.log({ tweet: JSON.stringify(ref, null, 2) })
+    console.log({tweet: JSON.stringify(ref, null, 2)});
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
         screenName,
@@ -164,24 +164,24 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
 
   const generateAndUploadCollection = async (palette) => {
     const p = palette.map(
-      color => ({
-        row2: color.name, 
-        row1: color.hex, 
-        color: color.hex,
-      })
+        (color) => ({
+          row2: color.name,
+          row1: color.hex,
+          color: color.hex,
+        })
     );
     const imgBuff = Images.generateCollection(
-      p,
-      2424, 
-      2128
+        p,
+        2424,
+        2128
     );
     const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
     const mediaIdString = await T.mediaUpload(imgBase64);
     return mediaIdString;
   };
-  
+
   const mediaIdString = await generateAndUploadCollection(palette);
-  const vibrant = palette.find(color => color.variant == 'Vibrant');
+  const vibrant = palette.find((color) => color.variant == 'Vibrant');
   await T.statusesUpdate({
     status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
       screenName,
@@ -202,9 +202,9 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
  * @param {*} db
  */
 Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
-  const { namedColorsMap } = await Color.getNamedColors();
+  const {namedColorsMap} = await Color.getNamedColors();
 
-  const userMessageArray = tweet.getUserTweet().split(" ");
+  const userMessageArray = tweet.getUserTweet().split(' ');
   let validMessage = false;
   let hex;
 
@@ -236,7 +236,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
       });
 
       await db.addUserMessageToProposalsList(
-        `${tweet.getUserName()} ` + `-> ${tweet.getUserTweet()}`
+          `${tweet.getUserName()} ` + `-> ${tweet.getUserTweet()}`
       );
     }
   } else {
@@ -253,7 +253,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
     // });
 
     await db.addUserMessageToFloodList(
-      `${tweet.getUserName()} ` + `-> ${tweet.getUserTweet()}`
+        `${tweet.getUserName()} ` + `-> ${tweet.getUserTweet()}`
     );
   }
 };
@@ -270,7 +270,7 @@ Middlewares.checkMessageType = (T, tweet, next) => {
   }
 };
 
-Middlewares.getColorName = (function () {
+Middlewares.getColorName = (function() {
   /**
    *
    * @param {*} uri
@@ -278,11 +278,11 @@ Middlewares.getColorName = (function () {
    * @param {function} callback
    */
   function download(uri, filename, callback) {
-    request.head(uri, function (err, res, body) {
-      console.log("content-type:", res.headers["content-type"]);
-      console.log("content-length:", res.headers["content-length"]);
+    request.head(uri, function(err, res, body) {
+      console.log('content-type:', res.headers['content-type']);
+      console.log('content-length:', res.headers['content-length']);
 
-      request(uri).pipe(fs.createWriteStream(filename)).on("close", callback);
+      request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
     });
   }
 
@@ -299,7 +299,7 @@ Middlewares.getColorName = (function () {
       closest,
     } = await Color.getNamedColors();
 
-    const userMessageArray = tweet.getUserTweet().split(" ");
+    const userMessageArray = tweet.getUserTweet().split(' ');
     const userImageURL = tweet.getUserPhoto();
     let validHex = false;
     let hex;
@@ -312,7 +312,7 @@ Middlewares.getColorName = (function () {
       download(userImageURL);
     }
 
-    if (tweet.getUserTweet().includes("What is the name of")) {
+    if (tweet.getUserTweet().includes('What is the name of')) {
       for (const c of userMessageArray) {
         if (hexColorRegex().test(c)) {
           hex = c;
@@ -354,4 +354,4 @@ Middlewares.getColorName = (function () {
   };
 })();
 
-module.exports = { Middleware, Middlewares };
+module.exports = {Middleware, Middlewares};
