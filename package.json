@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/meodai/colorparrot-twitter-bot#readme",
   "dependencies": {
+    "@andreekeberg/imagedata": "^1.0.2",
     "axios": "^0.21.1",
     "canvas": "^2.4.1",
     "closestvector": "^0.6.0",

@@ -31,11 +31,7 @@
     "@{{screenName}} I could not find an image in the tweet."
   ],
 
-  "DOMINANT_COLOR_IN_IMAGE": [
-    "@{{screenName}} Hey! These are the colors we found in your picture, the dominant one being {{hex}} - {{name}}"
-  ],
-
-  "CLOSEST_DOMINANT_COLOR_IN_IMAGE": [
-    "@{{screenName}} The dominant color is {{hex}} but we found something close to it: \n\n{{closestHex}} - {{closestName}}"
+  "COLORS_IN_IMAGE": [
+    "@{{screenName}} Hey! These are the colors we found in your picture:\n"
   ]
 }

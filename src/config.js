@@ -4,5 +4,6 @@ module.exports = {
   ACCESS_TOKEN: process.env.ACCESS_TOKEN,
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
   RANDOM_COLOR_DELAY: process.env.RANDOM_COLOR_DELAY || 3600000,
+  MAX_PALETTE_COLORS: process.env.MAX_PALETTE_COLORS ? +process.env.MAX_PALETTE_COLORS : 9,
   REDIS_URL: process.env.REDIS_URL,
 };

@@ -163,30 +163,16 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const palette = await Color.getPalette(imageURL);
 
   const generateAndUploadCollection = async (palette) => {
-    const p = palette.map(
-        (color) => ({
-          row2: color.name,
-          row1: color.hex,
-          color: color.hex,
-        })
-    );
-    const imgBuff = Images.generateCollection(
-        p,
-        2424,
-        2128
-    );
+    const imgBuff = Images.generateCollection(palette);
     const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
     const mediaIdString = await T.mediaUpload(imgBase64);
     return mediaIdString;
   };
 
   const mediaIdString = await generateAndUploadCollection(palette);
-  const vibrant = palette.find((color) => color.variant == 'Vibrant');
   await T.statusesUpdate({
-    status: buildMessage(Templates.DOMINANT_COLOR_IN_IMAGE, {
+    status: buildMessage(Templates.COLORS_IN_IMAGE, {
       screenName,
-      hex: vibrant.hex,
-      name: vibrant.name,
       mediaURL: media['url'],
     }),
     media_ids: mediaIdString,
@@ -317,7 +303,7 @@ Middlewares.getColorName = (function() {
         if (hexColorRegex().test(c)) {
           const match = hexColorRegex().exec(c);
           if (!match) continue;
-          
+
           hex = match[0];
           rgb = Color.hexToRgb(hex);
           validHex = true;

@@ -1,9 +1,14 @@
 const request = require('request');
+const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
 const ColorThief = require('color-thief');
 const Vibrant = require('node-vibrant');
+const PaletteExtractor = require('./vendor/palette-extractor');
+const config = require('./config');
 const ClosestVector = require('../node_modules/closestvector/.');
+const ImageData = require('@andreekeberg/imagedata');
+const Images = require('./images');
 
 const Color = {};
 const colorThief = new ColorThief();
@@ -163,7 +168,7 @@ Color.getDominantColor = async (imageURL) => {
   });
 };
 
-Color.getPalette = async (imageURL) => {
+Color.getPaletteWithVibrant = async (imageURL) => {
   const v = new Vibrant(imageURL);
   return v.getPalette()
       .then(async (palette) => {
@@ -190,6 +195,67 @@ Color.getPalette = async (imageURL) => {
 
         return Promise.all(all);
       });
+};
+
+async function download (uri, filename) {
+  return new Promise((resolve, reject) => {
+    request.head(uri, function(err, res, body) {
+      if (err) {
+        reject(err);
+      } else {
+        console.log('content-type:', res.headers['content-type']);
+        console.log('content-length:', res.headers['content-length']);
+
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', resolve);
+      }
+    });
+  });
+}
+
+Color.getPalette = async (imageURL) => {
+  // imports
+  const {namedColors, namedColorsMap, closest} = await Color.getNamedColors();
+
+  const ext = path.extname(imageURL);
+  let file = new Date().getTime() + Math.random().toString(16).substr(2);
+  file += ext;
+    
+  // download image to local disk
+  await download(imageURL, file);
+
+  return new Promise((res, rej) => {
+    ImageData.get(file, (err, {data}) => {
+      if (err) {
+        rej(err);
+        return;
+      }
+
+      const paletteExtractor = new PaletteExtractor();
+      const colors = paletteExtractor.processImageData(data, config.MAX_PALETTE_COLORS);
+
+      const usableColors = colors.map(hex => {
+        let name = namedColorsMap.get(hex);
+
+        if (!name) {
+          const rgb = Color.hexToRgb(hex);
+          const closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
+          const c = namedColors[closestColor.index];
+          name = c.name;
+          hex = c.hex;
+        }
+
+        return {name, hex};
+      });
+
+      fs.unlink(file, (err) => {
+        if (err) {
+          rej(err);
+        } else {
+          res(usableColors);
+        }
+      });
+    });
+  });
 };
 
 module.exports = Color;
