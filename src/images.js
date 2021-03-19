@@ -144,7 +144,7 @@ Images.generateCollection = (() => {
 
     // color row1
     ctx.fillStyle = '#000';
-    ctx.font = `700 ${canvasHeight * 0.08}px 'Inter'`;
+    ctx.font = `700 ${canvasHeight * 0.08}px 'Inter-EtraBold'`;
     ctx.fillText(
       `${row1}`,
       canvasWidth * 0.05,
@@ -152,7 +152,7 @@ Images.generateCollection = (() => {
     );
 
     // color row2 value
-    ctx.font = `${canvasHeight * 0.04}px 'Inter'`;
+    ctx.font = `${canvasHeight * 0.04}px 'Inter-Regular'`;
     
     ctx.fillText(
       `${row2}`,
@@ -259,7 +259,7 @@ Images.generateCollection = (() => {
     // color row1
     ctx.fillStyle = '#fff';
       
-    ctx.font = `900 ${rowHeight * 0.4}px 'Inter'`;
+    ctx.font = `900 ${rowHeight * 0.4}px 'Inter-EtraBold'`;
     ctx.fillText(
       `${color.row1}`,
       watchSize[0] + padding,
@@ -267,7 +267,7 @@ Images.generateCollection = (() => {
     );
 
     // color row2 value
-    ctx.font = `${rowHeight * 0.2}px 'Inter'`;
+    ctx.font = `${rowHeight * 0.2}px 'Inter-Regular'`;
     
     ctx.fillText(
       `${color.row2}`,
