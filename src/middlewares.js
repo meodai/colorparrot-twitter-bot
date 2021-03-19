@@ -120,7 +120,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   let ref = null;
-  if (tweet.getMediaURL('photo')) {
+  if (tweet.getMediaURL('photo') || tweet.getMediaURL('animated_gif')) {
     ref = tweet.getStatusID();
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
@@ -143,14 +143,16 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const media = tweet.getMediaURL.call({_tweet: ref}, 'photo');
+  let media = tweet.getMediaURL.call({_tweet: ref}, 'photo') 
+    || tweet.getMediaURL.call({_tweet: ref}, 'animated_gif');
   let imageURL = null;
   if (media) {
     imageURL = media['media_url_https'];
   }
 
   if (!imageURL) {
-    console.log({tweet: JSON.stringify(ref, null, 2)});
+    console.log('No image url found: ', JSON.stringify(ref.extended_entities));
+
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
         screenName,
