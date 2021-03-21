@@ -197,7 +197,7 @@ Color.getPaletteWithVibrant = async (imageURL) => {
       });
 };
 
-async function download (uri, filename) {
+async function download(uri, filename) {
   return new Promise((resolve, reject) => {
     request.head(uri, function(err, res, body) {
       if (err) {
@@ -219,7 +219,7 @@ Color.getPalette = async (imageURL) => {
   const ext = path.extname(imageURL);
   let file = new Date().getTime() + Math.random().toString(16).substr(2);
   file += ext;
-    
+
   // download image to local disk
   await download(imageURL, file);
 
@@ -233,7 +233,7 @@ Color.getPalette = async (imageURL) => {
       const paletteExtractor = new PaletteExtractor();
       const colors = paletteExtractor.processImageData(data, config.MAX_PALETTE_COLORS);
 
-      const usableColors = colors.map(hex => {
+      const usableColors = colors.map((hex) => {
         let name = namedColorsMap.get(hex);
 
         if (!name) {

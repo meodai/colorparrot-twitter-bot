@@ -26,10 +26,10 @@ const arrayUtils = {};
  * @return {!Array<T>} Clone of the input array.
  */
 arrayUtils.clone = function(arr) {
-  var length = arr.length;
+  const length = arr.length;
   if (length > 0) {
-    var rv = new Array(length);
-    for (var i = 0; i < length; i++) {
+    const rv = new Array(length);
+    for (let i = 0; i < length; i++) {
       rv[i] = arr[i];
     }
     return rv;
@@ -44,8 +44,8 @@ arrayUtils.clone = function(arr) {
  * @return {!Array<VALUE>} An array with the repeated value.
  */
 arrayUtils.repeat = function(value, n) {
-  var array = [];
-  for (var i = 0; i < n; i++) {
+  const array = [];
+  for (let i = 0; i < n; i++) {
     array[i] = value;
   }
   return array;
@@ -136,7 +136,7 @@ class PaletteExtractor {
     this.weights_ = arrayUtils.repeat(0, PaletteExtractor.HISTOGRAM_SIZE_);
 
     for (let i = 0; i < l; i += 4) {
-      const r = data[i], g = data[i + 1], b = data[i + 2];
+      const r = data[i]; const g = data[i + 1]; const b = data[i + 2];
       // Convert RGB color to Lab.
       const lab = vec3Utils.createFloat32FromArray(this.rgbToLab(r, g, b));
       // Get the index of the corresponding histogram bin.
@@ -363,7 +363,7 @@ class PaletteExtractor {
       }
     }
     return seedIndex;
-  };
+  }
 
   /**
    * Converts color component to hexaminal part.
@@ -372,9 +372,9 @@ class PaletteExtractor {
    * @package
    */
   componentToHex(c) {
-    var hex = c.toString(16);
+    const hex = c.toString(16);
     return hex.length == 1 ? '0' + hex : hex;
-  };
+  }
 
   /**
    * Converts a color from RGB to hex representation.
@@ -394,7 +394,7 @@ class PaletteExtractor {
     const hexG = this.componentToHex(g);
     const hexB = this.componentToHex(b);
     return '#' + hexR + hexG + hexB;
-  };
+  }
 
   /**
    * Converts RGB color values to LAB.
@@ -424,7 +424,7 @@ class PaletteExtractor {
     return [
       Math.min(255, Math.max(0, Math.round(rgb[0] * 255))),
       Math.min(255, Math.max(0, Math.round(rgb[1] * 255))),
-      Math.min(255, Math.max(0, Math.round(rgb[2] * 255)))
+      Math.min(255, Math.max(0, Math.round(rgb[2] * 255))),
     ];
   }
 
@@ -476,7 +476,7 @@ class PaletteExtractor {
     return [
       PaletteExtractor.REF_X * Math.pow(p + a / 500, 3),
       PaletteExtractor.REF_Y * Math.pow(p, 3),
-      PaletteExtractor.REF_Z * Math.pow(p - b / 200, 3)
+      PaletteExtractor.REF_Z * Math.pow(p - b / 200, 3),
     ];
   }
 
@@ -496,7 +496,7 @@ class PaletteExtractor {
     return [
       yRatio > 0.008856 ? 116 * Math.pow(yRatio, 1.0 / 3) - 16 : 903.3 * yRatio,
       500 * (this.transformation(xRatio) - this.transformation(yRatio)),
-      200 * (this.transformation(yRatio) - this.transformation(zRatio))
+      200 * (this.transformation(yRatio) - this.transformation(zRatio)),
     ];
   }
 
@@ -530,7 +530,7 @@ class PaletteExtractor {
     b = b * 100;
     return [
       r * 0.4124 + g * 0.3576 + b * 0.1805,
-      r * 0.2126 + g * 0.7152 + b * 0.0722, r * 0.0193 + g * 0.1192 + b * 0.9505
+      r * 0.2126 + g * 0.7152 + b * 0.0722, r * 0.0193 + g * 0.1192 + b * 0.9505,
     ];
   }
 
@@ -633,9 +633,9 @@ vec3Utils.scale = function(vec0, scalar, resultVec) {
  * @return {number} The squared distance between the points.
  */
 vec3Utils.distanceSquared = function(vec0, vec1) {
-  var x = vec0[0] - vec1[0];
-  var y = vec0[1] - vec1[1];
-  var z = vec0[2] - vec1[2];
+  const x = vec0[0] - vec1[0];
+  const y = vec0[1] - vec1[1];
+  const z = vec0[2] - vec1[2];
   return x * x + y * y + z * z;
 };
 
@@ -663,11 +663,11 @@ vec3Utils.setFromArray = function(vec, values) {
  * @return {!Float32Array} The new 3 element array.
  */
 vec3Utils.createFloat32FromArray = function(vec) {
-  var newVec = new Float32Array(3);
+  const newVec = new Float32Array(3);
   vec3Utils.setFromArray(newVec, vec);
   return newVec;
 };
-  
+
 /**
  * Creates a clone of the given 3 element Float32 vector.
  * @param {!Float32Array} vec The source 3 element vector.
