@@ -7,26 +7,26 @@ class RedisDB {
   }
 
   async addColorNameInPostedTweets(colorName) {
-    await this.redis.sadd("postedColors", colorName);
+    await this.redis.sadd('postedColors', colorName);
   }
 
   async addUserMessageToFloodList(message) {
-    await this.redis.rpush("flood", message);
+    await this.redis.rpush('flood', message);
   }
 
   async addUserMessageToProposalsList(message) {
-    await this.redis.rpush("proposals", message);
+    await this.redis.rpush('proposals', message);
   }
 
   async checkIfColorExistsInTweets(colorName) {
-    return await this.redis.sismember("postedColors", colorName);
+    return await this.redis.sismember('postedColors', colorName);
   }
 }
 
 /**
  * Twitter utility
  */
-const Twitter = (function () {
+const Twitter = (function() {
   class Tweet {
     constructor(tweet) {
       this._tweet = tweet;
@@ -51,25 +51,25 @@ const Twitter = (function () {
     }
     getUserPhoto() {
       if (
-        this._tweet.hasOwnProperty("media") &&
-        this._tweet.media.type === "photo"
+        this._tweet.hasOwnProperty('media') &&
+        this._tweet.media.type === 'photo'
       ) {
-        return this._tweet.media["media_url"];
+        return this._tweet.media['media_url'];
       }
       return null;
     }
     getMediaURL(type) {
-      const { media } = this._tweet.extended_entities || this._tweet.entities;
+      const {media} = this._tweet.extended_entities || this._tweet.entities;
       if (!media || media.length === 0) {
         return null;
       }
-      return media.find(m => m.type === type) || null;
+      return media.find((m) => m.type === type) || null;
     }
     getUserName() {
       return this._tweet.user.screen_name;
     }
     getRetweetedStatus() {
-      return this._tweet.hasOwnProperty("retweeted_status");
+      return this._tweet.hasOwnProperty('retweeted_status');
     }
   }
 
@@ -80,7 +80,7 @@ const Twitter = (function () {
 
     getTweetByID(id) {
       return new Promise((res, rej) => {
-        this._T.get('statuses/show/:id', { id, tweet_mode: 'extended' }, (err, data) => {
+        this._T.get('statuses/show/:id', {id, tweet_mode: 'extended'}, (err, data) => {
           if (err) {
             rej(err);
           } else {
@@ -92,7 +92,7 @@ const Twitter = (function () {
 
     statusesUpdate(params) {
       return new Promise((res, rej) => {
-        this._T.post("statuses/update", params, (err) => {
+        this._T.post('statuses/update', params, (err) => {
           if (err) {
             rej(err);
           } else {
@@ -105,28 +105,28 @@ const Twitter = (function () {
     mediaUpload(b64content) {
       return new Promise((res, rej) => {
         this._T.post(
-          "media/upload",
-          { media_data: b64content },
-          (err, data) => {
-            if (err) {
-              rej(err);
-            } else {
-              res(data.media_id_string);
+            'media/upload',
+            {media_data: b64content},
+            (err, data) => {
+              if (err) {
+                rej(err);
+              } else {
+                res(data.media_id_string);
+              }
             }
-          }
         );
       });
     }
 
     statusesFilterStream(track) {
-      return this._T.stream("statuses/filter", {
+      return this._T.stream('statuses/filter', {
         track: track,
-        language: "en",
+        language: 'en',
       });
     }
   }
 
-  return { Tweet, Twit };
+  return {Tweet, Twit};
 })();
 
 module.exports = {
