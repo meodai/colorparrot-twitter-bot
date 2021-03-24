@@ -56,7 +56,7 @@ function initialize() {
     const middleware = new Middleware(T, tweet, db);
     middleware.use(Middlewares.checkMessageType);
     middleware.use(Middlewares.getImageColor);
-    middleware.use(Middleware.getFullImagePalette);
+    middleware.use(Middlewares.getFullImagePalette);
     middleware.use(Middlewares.getImage);
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.addProposalOrFlood);

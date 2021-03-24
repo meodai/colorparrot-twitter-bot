@@ -67,7 +67,6 @@ const Middlewares = {};
  */
 Middlewares.getImage = async (T, tweet, next) => {
   const userMessageArray = tweet.getUserTweet().split(' ');
-  console.log(userMessageArray)
   if (
     userMessageArray[0] === '@color_parrot' ||
     userMessageArray[userMessageArray.length - 1] === '@color_parrot'
@@ -115,7 +114,9 @@ const isGetImageColorCommand = (userMessage) => {
     !msg.includes('what colours are in this') &&
     !msg.includes('what is the dominant color') &&
     !msg.includes('what are the colors') &&
-    !msg.includes('what are the colours')
+    !msg.includes('what are the colours') &&
+    !msg.includes('what colors are in this picture') &&
+    !msg.includes('what colours are in this picture')
   )
 };
 
@@ -203,7 +204,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middleware.getFullImagePalette = async (T, tweet, next, db) => {
+Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
 
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet().replace(/ {2}/g, ' ').toLowerCase();
@@ -227,7 +228,31 @@ Middleware.getFullImagePalette = async (T, tweet, next, db) => {
     return;
   }
 
-  const originalTweet = await T.getTweetByID(botTweet.getOriginalTweetID());
+  const getOriginalTweetWithMedia = async (start) => {
+    let tweet = await T.getTweetByID(start.getOriginalTweetID());
+    
+    if (tweet.isQuotedTweet()) {
+      const q = tweet.getQuotedTweet();
+
+      if (q) {
+        tweet = await T.getTweetByID(q.id_str);
+      } else {
+        tweet = null;
+      }
+    } else if (tweet.isReplyTweet()) {
+      tweet = await getOriginalTweetWithMedia(tweet);
+    }
+
+    return tweet;
+  };
+
+  let originalTweet = await getOriginalTweetWithMedia(botTweet);
+
+  if (!originalTweet) {
+    await next();
+    return; 
+  }
+
   let media = originalTweet.getMediaURL('photo') 
     || originalTweet.getMediaURL('animated_gif');
 
