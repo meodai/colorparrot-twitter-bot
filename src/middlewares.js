@@ -100,23 +100,34 @@ Middlewares.getImage = async (T, tweet, next) => {
   }
 };
 
+const isGetImageColorCommand = (userMessage) => {
+  const msg = userMessage.replace(/ {2}/g, ' ').toLowerCase();
+
+  return !(
+    !msg.includes('what color is this') &&
+    !msg.includes('what colour is this') &&
+    !msg.includes('what is this color') &&
+    !msg.includes('what is this colour') &&
+    !msg.includes('what are those colors') &&
+    !msg.includes('what are those colours') &&
+    !msg.includes('what colors are in this') &&
+    !msg.includes('what colours are in this') &&
+    !msg.includes('what is the dominant color') &&
+    !msg.includes('what are the colors') &&
+    !msg.includes('what are the colours')
+  )
+};
+
+/**
+ * grabs the color palette from an image
+ * @param {*} T
+ * @param {*} tweet
+ * @param {function} next
+ */
 Middlewares.getImageColor = async (T, tweet, next, db) => {
   const screenName = tweet.getUserName();
-  const userMessage = tweet.getUserTweet().replace(/ {2}/g, ' ').toLowerCase();
 
-  if (
-    !userMessage.includes('what color is this') &&
-    !userMessage.includes('what colour is this') &&
-    !userMessage.includes('what is this color') &&
-    !userMessage.includes('what is this colour') &&
-    !userMessage.includes('what are those colors') &&
-    !userMessage.includes('what are those colours') &&
-    !userMessage.includes('what colors are in this') &&
-    !userMessage.includes('what colours are in this') &&
-    !userMessage.includes('what is the dominant color') &&
-    !userMessage.includes('what are the colors') &&
-    !userMessage.includes('what are the colours')
-  ) {
+  if (!isGetImageColorCommand(tweet.getUserTweet())) {
     await next();
     return;
   }
@@ -145,15 +156,16 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  let media = tweet.getMediaURL.call({_tweet: ref}, 'photo') 
-    || tweet.getMediaURL.call({_tweet: ref}, 'animated_gif');
+  let media = ref.getMediaURL('photo') || ref.getMediaURL('animated_gif');
   let imageURL = null;
   if (media) {
     imageURL = media['media_url_https'];
   }
 
   if (!imageURL) {
-    console.log('No image url found: ', JSON.stringify(ref.extended_entities));
+    console.log('No image url found: ', JSON.stringify(
+      ref._tweet.extended_entities['media']
+    ));
 
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
@@ -164,7 +176,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const palette = await Color.getPalette(imageURL);
+  const palette = await Color.getPalette(imageURL, 9);
 
   const generateAndUploadCollection = async (palette) => {
     const imgBuff = Images.generateCollection(palette);
@@ -182,6 +194,78 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     media_ids: mediaIdString,
     in_reply_to_status_id: tweet.getStatusID(),
   });
+};
+
+/**
+ * grabs the color palette from an image
+ * @param {*} T
+ * @param {*} tweet
+ * @param {function} next
+ */
+Middleware.getFullImagePalette = async (T, tweet, next, db) => {
+
+  const screenName = tweet.getUserName();
+  const userMessage = tweet.getUserTweet().replace(/ {2}/g, ' ').toLowerCase();
+
+  if (!userMessage.includes('more')) {
+    await next();
+    return;
+  }
+
+  // abort if this tweet isn't a reply
+  if (!tweet.isReplyTweet()) {
+    await next();
+    return;
+  }
+
+  const botTweet = await T.getTweetByID(tweet.getOriginalTweetID());
+  const username = botTweet.getUserName();
+
+  if (username !== 'color_parrot' || !botTweet.isReplyTweet()) {
+    await next();
+    return;
+  }
+
+  const originalTweet = await T.getTweetByID(botTweet.getOriginalTweetID());
+  let media = originalTweet.getMediaURL('photo') 
+    || originalTweet.getMediaURL('animated_gif');
+
+  if (!media) {
+    await next();
+    return;
+  }
+
+  const imageURL = media['media_url_https'];
+  const palette = await Color.getPalette(imageURL);
+  
+  if (palette.length <= 9) {
+    await T.statusesUpdate({
+      status: buildMessage(Templates.NO_MORE_COLORS_IN_IMAGE, {
+        screenName,
+        mediaURL: media['url'],
+      }),
+      in_reply_to_status_id: tweet.getStatusID(),
+    });
+    return;
+  }
+
+  const generateAndUploadCollection = async (palette) => {
+    const imgBuff = Images.generateCollection(palette);
+    const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+    const mediaIdString = await T.mediaUpload(imgBase64);
+    return mediaIdString;
+  };
+
+  const mediaIdString = await generateAndUploadCollection(palette);
+  await T.statusesUpdate({
+    status: buildMessage(Templates.ALL_COLORS_IN_IMAGE, {
+      screenName,
+      mediaURL: media['url'],
+    }),
+    media_ids: mediaIdString,
+    in_reply_to_status_id: tweet.getStatusID(),
+  });
+
 };
 
 /**

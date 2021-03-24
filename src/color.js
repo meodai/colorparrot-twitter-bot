@@ -212,7 +212,7 @@ async function download(uri, filename) {
   });
 }
 
-Color.getPalette = async (imageURL) => {
+Color.getPalette = async (imageURL, numColors) => {
   // imports
   const {namedColors, namedColorsMap, closest} = await Color.getNamedColors();
 
@@ -231,7 +231,7 @@ Color.getPalette = async (imageURL) => {
       }
 
       const paletteExtractor = new PaletteExtractor();
-      const colors = paletteExtractor.processImageData(data, config.MAX_PALETTE_COLORS);
+      const colors = paletteExtractor.processImageData(data, numColors || config.MAX_PALETTE_COLORS);
 
       const usableColors = colors.map((hex) => {
         let name = namedColorsMap.get(hex);

@@ -84,7 +84,7 @@ const Twitter = (function() {
           if (err) {
             rej(err);
           } else {
-            res(data);
+            res(new Tweet(data));
           }
         });
       });
