@@ -32,14 +32,16 @@
   ],
 
   "COLORS_IN_IMAGE": [
-    "@{{screenName}} Hey! These are the colors we found in your picture:\n"
+    "@{{screenName}} Hey! These are the colors we found in your picture:\n(Tip: answer 'more' to see more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
-    "@{{screenName}} Hey! We found more colors in your picture:\n"
+    "@{{screenName}} We found more colors in your picture:\n",
+    "@{{screenName}} Here are the rest of the colors:\n"
   ],
 
   "NO_MORE_COLORS_IN_IMAGE": [
-    "@{{screenName}} Hey! We found no more colors in your picture"
+    "@{{screenName}} We found no more colors in your picture",
+    "@{{screenName}} There are no others colors"
   ]
 }
