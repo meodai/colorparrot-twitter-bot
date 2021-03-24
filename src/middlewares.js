@@ -67,6 +67,7 @@ const Middlewares = {};
  */
 Middlewares.getImage = async (T, tweet, next) => {
   const userMessageArray = tweet.getUserTweet().split(' ');
+  console.log(userMessageArray)
   if (
     userMessageArray[0] === '@color_parrot' ||
     userMessageArray[userMessageArray.length - 1] === '@color_parrot'
