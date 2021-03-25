@@ -412,7 +412,9 @@ Middlewares.getColorName = (function() {
       download(userImageURL);
     }
 
-    if (tweet.getUserTweet().includes('What is the name of')) {
+    const userTweet = tweet.getUserTweet().replace(/ {2}/g, ' ').toLowerCase();
+
+    if (userTweet.includes('what is the name of')) {
       for (const c of userMessageArray) {
         if (hexColorRegex().test(c)) {
           const match = hexColorRegex().exec(c);
