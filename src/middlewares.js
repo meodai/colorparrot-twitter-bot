@@ -102,6 +102,7 @@ Middlewares.getImage = async (T, tweet, next) => {
 
 const isGetImageColorCommand = (userMessage) => {
   const msg = userMessage.replace(/ {2}/g, ' ').toLowerCase();
+  console.log({ msg })
 
   return !(
     !msg.includes('what color is this') &&
