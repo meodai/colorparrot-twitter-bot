@@ -52,7 +52,7 @@ function initialize() {
   const stream = T.statusesFilterStream('@color_parrot');
 
   stream.on('tweet', async (tweet) => {
-    tweet = new Tweet(tweet);
+    tweet = await T.getTweetByID(tweet.id_str);
     const middleware = new Middleware(T, tweet, db);
     middleware.use(Middlewares.checkMessageType);
     middleware.use(Middlewares.getImageColor);

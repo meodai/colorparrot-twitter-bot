@@ -35,7 +35,7 @@ const Twitter = (function() {
       return this._tweet.id_str;
     }
     getUserTweet() {
-      return this._tweet.text;
+      return this._tweet.full_text || this._tweet.text;
     }
     isQuotedTweet() {
       return this._tweet.is_quote_status;
