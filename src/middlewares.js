@@ -166,9 +166,14 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   if (!imageURL) {
-    console.log('No image url found: ', JSON.stringify(
-      ref._tweet.extended_entities['media']
-    ));
+  	try {
+	    console.log('No image url found: ', JSON.stringify(
+	      (ref._tweet.extended_entities || ref._tweet.entities)['media']
+	    ));
+	} catch (error) {
+		console.log('Error logging error haha :)');
+		console.log({ error });
+	}
 
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
