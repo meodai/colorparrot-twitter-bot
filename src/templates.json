@@ -35,11 +35,11 @@
   ],
 
   "COLORS_IN_IMAGE": [
-    "@{{screenName}} Hey! These are the colors we found in your picture.s\n(answer 'more' to see more colors)\n",
+    "@{{screenName}} Hey! These are the colors we found in your picture.\n(answer 'more' to see more colors)\n",
     "@{{screenName}} Voilà! Some of the colors our robo-parrots found.\n(reply 'more' to see even more colors)\n",
     "@{{screenName}} GoGo Robo-Parrot found some colors.\n(respond 'more' to get more colors)\n",
     "@{{screenName}} Bip Bip Blup... (color robot noises).\n(reply 'more' to for more colors)\n",
-    "@{{screenName}} Tada! I prensent to you, the dominat colors in your image.\n(reply 'more' to for more colors)\n",
+    "@{{screenName}} Tada! I present to you, the dominant colors in your image.\n(reply 'more' to for more colors)\n",
     "@{{screenName}} There you go. delicous colors.\n(reply 'more' to for more colors)\n"
   ],
 
