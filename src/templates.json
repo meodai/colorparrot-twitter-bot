@@ -16,9 +16,10 @@
   ],
 
   "EXACT_HEX_NAME_RESPONSE": [
-    "@{{screenName}} The name of {{hex}} is {{colorName}}"
+    "@{{screenName}} The name of {{hex}} is {{colorName}}",
+    "@{{screenName}} '{{hex}}' is named {{colorName}}."
   ],
-  
+
   "CLOSEST_HEX_NAME_RESPONSE": [
     "@{{screenName}} We don't have an exact match for {{hex}} but the closest color we have is {{closestHex}} and its name is {{closestName}}"
   ],
@@ -28,20 +29,28 @@
   ],
 
   "IMAGE_NOT_FOUND_IN_REFERENCE": [
-    "@{{screenName}} I could not find an image in the tweet."
+    "@{{screenName}} I could not find an image in the tweet.",
+    "@{{screenName}} Error! Is there an image in the tweet?",
+    "@{{screenName}} Sorry, I could not find an image :("
   ],
 
   "COLORS_IN_IMAGE": [
-    "@{{screenName}} Hey! These are the colors we found in your picture:\n(Tip: answer 'more' to see more colors)\n"
+    "@{{screenName}} Hey! These are the colors we found in your picture.s\n(answer 'more' to see more colors)\n",
+    "@{{screenName}} Voilà! Some of the colors our robo-parrots found.\n(reply 'more' to see even more colors)\n",
+    "@{{screenName}} GoGo Robo-Parrot found some colors.\n(respond 'more' to get more colors)\n",
+    "@{{screenName}} Bip Bip Blup... (color robot noises).\n(reply 'more' to for more colors)\n",
+    "@{{screenName}} Tada! I prensent to you, the dominat colors in your image.\n(reply 'more' to for more colors)\n",
+    "@{{screenName}} There you go. delicous colors.\n(reply 'more' to for more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
     "@{{screenName}} We found more colors in your picture:\n",
-    "@{{screenName}} Here are the rest of the colors:\n"
+    "@{{screenName}} Here are the rest of the colors:\n",
+    "@{{screenName}} There you go, more colors:\n"
   ],
 
   "NO_MORE_COLORS_IN_IMAGE": [
-    "@{{screenName}} We found no more colors in your picture",
+    "@{{screenName}} We did not find any more colors in your picture",
     "@{{screenName}} There are no others colors"
   ]
 }
