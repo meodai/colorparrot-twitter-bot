@@ -54,6 +54,9 @@ function initialize() {
   stream.on('tweet', async (tweet) => {
     tweet = await T.getTweetByID(tweet.id_str);
     const middleware = new Middleware(T, tweet, db);
+
+    console.log({ msg: tweet.getUserTweet(), user: tweet.getUserName() });
+
     middleware.use(Middlewares.checkMessageType);
     middleware.use(Middlewares.getImageColor);
     middleware.use(Middlewares.getFullImagePalette);
