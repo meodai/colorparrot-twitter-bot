@@ -4,11 +4,11 @@
   ],
 
   "HEX_TAKEN": [
-    "@{{screenName}} Darn! {{hex}} is taken already. Try shifting the values a bit and try again"
+    "@{{screenName}} Darn! {{hex}} is taken already. Try shifting values a bit and try again"
   ],
 
   "PROPOSAL_ACCEPTED": [
-    "@{{screenName}} Thanks for your submission! Your color-name will be reviewed by a bunch of parrots and will end up in the color list soon. {{hex}}"
+    "@{{screenName}} Thanks for your submission! Your color-name will be reviewed by a bunch of parrots and will end up on the color list soon. {{hex}}"
   ],
 
   "PROPOSAL_DENIED": [
@@ -25,7 +25,7 @@
   ],
 
   "REFERENCE_TWEET_NOT_FOUND": [
-    "@{{screenName}} Remember to quote or a reply a tweet when asking for the color in an image!"
+    "@{{screenName}} Remember to quote or reply to a tweet when asking for the color in an image!"
   ],
 
   "IMAGE_NOT_FOUND_IN_REFERENCE": [
@@ -39,13 +39,13 @@
     "@{{screenName}} Voilà! Some of the colors our robo-parrots found.\n(reply 'more' to see even more colors)\n",
     "@{{screenName}} GoGo Robo-Parrot found some colors.\n(respond 'more' to get more colors)\n",
     "@{{screenName}} Bip Bip Blup... (color robot noises).\n(reply 'more' to for more colors)\n",
-    "@{{screenName}} Tada! I present to you, the dominant colors in your image.\n(reply 'more' to for more colors)\n",
-    "@{{screenName}} There you go. delicous colors.\n(reply 'more' to for more colors)\n"
+    "@{{screenName}} Tada! I present to you, the dominant colors in your image.\n(reply 'more' for more colors)\n",
+    "@{{screenName}} There you go. delicious colors.\n(reply 'more' to get more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
     "@{{screenName}} We found more colors in your picture:\n",
-    "@{{screenName}} Here are the rest of the colors:\n",
+    "@{{screenName}} Here are your remaining colors:\n",
     "@{{screenName}} There you go, more colors:\n"
   ],
 
