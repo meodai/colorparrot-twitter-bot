@@ -24,6 +24,7 @@
     "@andreekeberg/imagedata": "^1.0.2",
     "axios": "^0.21.1",
     "canvas": "^2.4.1",
+    "chroma-js": "^2.1.1",
     "closestvector": "^0.6.0",
     "color-name-list": "^7.31.0",
     "color-thief": "^2.2.5",

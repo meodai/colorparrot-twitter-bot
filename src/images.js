@@ -1,5 +1,6 @@
 const Canvas = require('canvas');
 const Color = require('./color');
+const chroma = require('chroma-js');
 
 const canvasWidth = 768;
 const canvasHeight = 1024;
@@ -119,14 +120,14 @@ Images.convertImagebuffTobase64 = (imageBuff) => imageBuff.toString('base64');
 
 Images.generateCollection = (() => {
   const generateImage = (
-    colorObj, 
+    colorObj,
     w = 768, h = 1024,
     labelBackground = '#fff',
     labelColor = '#000'
   ) => {
     const canvasWidth = w;
     const canvasHeight = h;
-    
+
     const row1 = colorObj.row1;
     const row2 = colorObj.row2;
     const color = colorObj.color;
@@ -153,7 +154,7 @@ Images.generateCollection = (() => {
 
     // color row2 value
     ctx.font = `${canvasHeight * 0.04}px 'Inter-Regular'`;
-    
+
     ctx.fillText(
       `${row2}`,
       canvasWidth * 0.05,
@@ -166,7 +167,7 @@ Images.generateCollection = (() => {
       canvasWidth * 0.7, 0,
       canvasWidth * 0.99, 0
     );
-    
+
     gradient.addColorStop(0, 'rgba(255,255,255,0)');
     gradient.addColorStop(1, 'rgba(255,255,255,1)');
 
@@ -182,8 +183,8 @@ Images.generateCollection = (() => {
   };
 
   const generateGrid = (
-    colors, 
-    w, h, 
+    colors,
+    w, h,
     x = 3, y = 3,
     padding = 40
   ) => {
@@ -194,17 +195,17 @@ Images.generateCollection = (() => {
 
     const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, 'png');
     const ctx = canvas.getContext('2d');
-    
+
     ctx.fillStyle = '#212121';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.translate(padding * 2, padding * 2);
-    
+
     colors.forEach((color, i) => {
       let rx = (i % x);
       let ry = Math.floor(i / y);
       let cx = (rx * padding * 2) + rx * w;
       let cy = (ry * padding * 2) + ry * h;
-      
+
       // adds color shine
       /*
       ctx.filter = `blur(${padding * 2}px)`;
@@ -212,19 +213,19 @@ Images.generateCollection = (() => {
       ctx.fillRect(cx, cy, w, h);
       ctx.filter = 'none';
       */
-      
+
       ctx.drawImage(
-        generateImage(color, w, h), 
+        generateImage(color, w, h),
         cx, cy
       )
     });
-    
+
     return canvas;
   };
 
 
-  const generateTable = (  
-    colors, 
+  const generateTable = (
+    colors,
     watchSize = [70, 80],
     w = 760,
     rowHeight = 100,
@@ -235,14 +236,14 @@ Images.generateCollection = (() => {
 
     const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, 'png');
     const ctx = canvas.getContext('2d');
-    
+
     ctx.fillStyle = '#212121';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    
+
     colors.forEach((color, i) => {
       ctx.save();
       ctx.translate(padding, i * rowHeight + padding);
-      
+
       ctx.drawImage(
         generateImage(
           {
@@ -252,13 +253,13 @@ Images.generateCollection = (() => {
           },
           watchSize[0],
           watchSize[1]
-        ), 
+        ),
         0, 0
       );
-      
+
     // color row1
     ctx.fillStyle = '#fff';
-      
+
     ctx.font = `900 ${rowHeight * 0.4}px 'Inter-EtraBold'`;
     ctx.fillText(
       `${color.row1}`,
@@ -268,16 +269,16 @@ Images.generateCollection = (() => {
 
     // color row2 value
     ctx.font = `${rowHeight * 0.2}px 'Inter-Regular'`;
-    
+
     ctx.fillText(
       `${color.row2}`,
       watchSize[0] + padding,
       rowHeight * 0.7
     );
-      
+
       ctx.restore();
     });
-    
+
     return canvas;
   };
 
@@ -287,6 +288,7 @@ Images.generateCollection = (() => {
     } else if (colors.length < 10) {
       return generateGrid(colors.map(c => ({row2: c.name, row1: c.hex, color: c.hex})), 768, 1024);
     } else {
+      colors = colors.sort((a, b) => (chroma(b.hex).luminance() - chroma(a.hex).luminance()) -(chroma(b.hex).hcl()[0] - chroma(a.hex).hcl()[0]));
       return generateTable(colors.map(c => ({row1: c.name, row2: c.hex, color: c.hex})));
     }
   };
