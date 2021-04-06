@@ -40,7 +40,10 @@
     "@{{screenName}} GoGo Robo-Parrot found some colors.\n(respond 'more' to get more colors)\n",
     "@{{screenName}} Bip Bip Blup... (color robot noises).\n(reply 'more' to for more colors)\n",
     "@{{screenName}} Tada! I present to you, the dominant colors in your image.\n(reply 'more' for more colors)\n",
-    "@{{screenName}} There you go. delicious colors.\n(reply 'more' to get more colors)\n"
+    "@{{screenName}} There you go. delicious colors.\n(reply 'more' to get more colors)\n",
+    "@{{screenName}} Color extraction bip bip... Beautiful!\n(say 'more!' to get more colors)\n",
+    "@{{screenName}} Express palette delivery!\n(reply 'more' to get even more colors)\n",
+    "@{{screenName}} Abracadabra!\n(say 'more!' to get more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
