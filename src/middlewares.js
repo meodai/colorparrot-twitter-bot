@@ -186,9 +186,10 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const startTime = Date.now();
   const palette = await Color.getPalette(imageURL, 9);
   const msElapsed = Date.now() - startTime;
+  const sElapsed = Math.round((msElapsed/1000) * 100) / 100;
 
   console.log(
-      `it took ${Math.round((msElapsed/1000) * 100) / 100}s to generate the image`
+      `it took ${sElapsed}s to generate the image`
   );
 
   const generateAndUploadCollection = async (palette) => {
@@ -203,6 +204,8 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     status: buildMessage(Templates.COLORS_IN_IMAGE, {
       screenName,
       mediaURL: media['url'],
+      palette,
+      sElapsed,
     }),
     media_ids: mediaIdString,
     in_reply_to_status_id: tweet.getStatusID(),
@@ -273,7 +276,11 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
   }
 
   const imageURL = media['media_url_https'];
+
+  const startTime = Date.now();
   const palette = await Color.getPalette(imageURL);
+  const msElapsed = Date.now() - startTime;
+  const sElapsed = Math.round((msElapsed/1000) * 100) / 100;
 
   if (palette.length <= 9) {
     await T.statusesUpdate({
@@ -281,6 +288,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
         screenName,
         mediaURL: media['url'],
         palette,
+        sElapsed,
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
@@ -300,6 +308,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
       screenName,
       mediaURL: media['url'],
       palette,
+      sElapsed,
     }),
     media_ids: mediaIdString,
     in_reply_to_status_id: tweet.getStatusID(),
