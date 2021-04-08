@@ -5,6 +5,9 @@ const Color = require('./color');
 const Images = require('./images');
 const {Templates, buildMessage} = require('./templates');
 
+const hexArrToURLStr = arr => arr.toString().replace(/(,#)/g, '-').replace(/^#/, '');
+const palleteArrToHexArr = arr => arr.map(c => c.hex);
+
 /**
  * Middleware provides functionality to implement middleware-style control
  * flow
@@ -188,8 +191,11 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const msElapsed = Date.now() - startTime;
   const sElapsed = Math.round((msElapsed/1000) * 100) / 100;
 
+  const hexArr = palleteArrToHexArr(palette);
+  const hexURLStr = hexArrToURLStr(hexArr);
+
   console.log(
-      `it took ${sElapsed}s to generate the image`
+      `it took ${sElapsed}s to generate the image`,
   );
 
   const generateAndUploadCollection = async (palette) => {
@@ -204,7 +210,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     status: buildMessage(Templates.COLORS_IN_IMAGE, {
       screenName,
       mediaURL: media['url'],
-      palette,
+      hexURLStr,
       sElapsed,
     }),
     media_ids: mediaIdString,
@@ -282,12 +288,19 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
   const msElapsed = Date.now() - startTime;
   const sElapsed = Math.round((msElapsed/1000) * 100) / 100;
 
+  const hexArr = palleteArrToHexArr(palette);
+  const hexURLStr = hexArrToURLStr(hexArr);
+
+  console.log(
+      `it took ${sElapsed}s to generate the image`,
+  );
+
   if (palette.length <= 9) {
     await T.statusesUpdate({
       status: buildMessage(Templates.NO_MORE_COLORS_IN_IMAGE, {
         screenName,
         mediaURL: media['url'],
-        palette,
+        hexURLStr,
         sElapsed,
       }),
       in_reply_to_status_id: tweet.getStatusID(),
