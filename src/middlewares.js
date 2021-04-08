@@ -183,7 +183,13 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
+  const startTime = Date.now();
   const palette = await Color.getPalette(imageURL, 9);
+  const msElapsed = Date.now() - startTime;
+
+  console.log(
+      `it took ${Math.round((msElapsed/1000) * 100) / 100}s to generate the image`
+  );
 
   const generateAndUploadCollection = async (palette) => {
     const imgBuff = Images.generateCollection(palette);
