@@ -158,21 +158,21 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  let media = ref.getMediaURL('photo') || ref.getMediaURL('animated_gif');
+  const media = ref.getMediaURL('photo') || ref.getMediaURL('animated_gif');
   let imageURL = null;
   if (media) {
     imageURL = media['media_url_https'];
   }
 
   if (!imageURL) {
-  	try {
-	    console.log('No image url found: ', JSON.stringify(
-	      (ref._tweet.extended_entities || ref._tweet.entities)['media']
-	    ));
-	} catch (error) {
-		console.log('Error logging error haha :)');
-		console.log({ error });
-	}
+    try {
+      console.log('No image url found: ', JSON.stringify(
+          (ref._tweet.extended_entities || ref._tweet.entities)['media']
+      ));
+    } catch (error) {
+      console.log('Error logging error haha :)');
+      console.log({error});
+    }
 
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
@@ -235,7 +235,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
 
   const getOriginalTweetWithMedia = async (start) => {
     let tweet = await T.getTweetByID(start.getOriginalTweetID());
-    
+
     if (tweet.isQuotedTweet()) {
       const q = tweet.getQuotedTweet();
 
@@ -255,10 +255,10 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
 
   if (!originalTweet) {
     await next();
-    return; 
+    return;
   }
 
-  let media = originalTweet.getMediaURL('photo') 
+  let media = originalTweet.getMediaURL('photo')
     || originalTweet.getMediaURL('animated_gif');
 
   if (!media) {
@@ -268,12 +268,13 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
 
   const imageURL = media['media_url_https'];
   const palette = await Color.getPalette(imageURL);
-  
+
   if (palette.length <= 9) {
     await T.statusesUpdate({
       status: buildMessage(Templates.NO_MORE_COLORS_IN_IMAGE, {
         screenName,
         mediaURL: media['url'],
+        palette,
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
@@ -292,6 +293,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
     status: buildMessage(Templates.ALL_COLORS_IN_IMAGE, {
       screenName,
       mediaURL: media['url'],
+      palette,
     }),
     media_ids: mediaIdString,
     in_reply_to_status_id: tweet.getStatusID(),
