@@ -39,17 +39,26 @@
     "@{{screenName}} Voilà! Some of the colors our robo-parrots found.\n(reply 'more' to see even more colors)\n",
     "@{{screenName}} GoGo Robo-Parrot found some colors.\n(respond 'more' to get more colors)\n",
     "@{{screenName}} Bip Bip Blup... (color robot noises).\n(reply 'more' to for more colors)\n",
+    "@{{screenName}} Color is my obsession, joy and torment.\n(reply 'more' to for more colors)\n",
     "@{{screenName}} Tada! I present to you, the dominant colors in your image.\n(reply 'more' for more colors)\n",
     "@{{screenName}} There you go. delicious colors.\n(reply 'more' to get more colors)\n",
     "@{{screenName}} Color extraction bip bip... Beautiful!\n(say 'more!' to get more colors)\n",
     "@{{screenName}} Express palette delivery!\n(reply 'more' to get even more colors)\n",
-    "@{{screenName}} Abracadabra!\n(say 'more!' to get more colors)\n"
+    "@{{screenName}} Abracadabra!\n(say 'more!' to get more colors)\n",
+    "@{{screenName}} The greatest masterpices were once only colors from a robo parrot!\n(reply 'more!' to get more colors)\n",
+    "@{{screenName}} Uhh! You have an impeccable color taste\n(say 'more!' to get more colors)\n",
+    "@{{screenName}} You have an eye for nice colors \n(answer 'more!' to get more colors)\n",
+    "@{{screenName}} Here is your color firework \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} Life is like a box of crayons. Here are your colors: \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} Color names function like a thread attached to a delicate needle, capable of stitching together our most valued emotions and memories. When the needle hits the target, we feel either pleasure or empathy.\n(reply more for more colors)"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
     "@{{screenName}} We found more colors in your picture:\n",
     "@{{screenName}} Here are your remaining colors:\n",
-    "@{{screenName}} There you go, more colors:\n"
+    "@{{screenName}} There you go, more colors:\n",
+    "@{{screenName}} More colors than you can handle:\n",
+    "@{{screenName}} Baby robots found some more:\n"
   ],
 
   "NO_MORE_COLORS_IN_IMAGE": [
