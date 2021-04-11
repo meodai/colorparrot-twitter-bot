@@ -119,8 +119,12 @@ const isGetImageColorCommand = (userMessage) => {
     !msg.includes('what are the colors') &&
     !msg.includes('what are the colours') &&
     !msg.includes('what colors are in this picture') &&
-    !msg.includes('what colours are in this picture')
-  )
+    !msg.includes('what colours are in this picture') &&
+    !msg.includes('what colors are these') &&
+    !msg.includes('what colours are these') &&
+    !msg.includes('what are these colors') &&
+    !msg.includes('what are these colours')
+  );
 };
 
 /**
