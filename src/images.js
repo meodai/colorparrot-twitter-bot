@@ -227,12 +227,13 @@ Images.generateCollection = (() => {
   const generateTable = (
     colors,
     watchSize = [70, 80],
-    w = 760,
+    rowWidth = 650,
     rowHeight = 100,
-    padding = 20
+    padding = 20,
+    rows = 1
   ) => {
-    const canvasWidth = w + padding * 2;
-    const canvasHeight = colors.length * rowHeight + padding;
+    const canvasWidth = rows * (rowWidth + padding * 2);
+    const canvasHeight = Math.ceil(colors.length / rows) * rowHeight + padding;
 
     const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, 'png');
     const ctx = canvas.getContext('2d');
@@ -241,6 +242,10 @@ Images.generateCollection = (() => {
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     colors.forEach((color, i) => {
+      const currentRowIndex = Math.floor(i / Math.ceil(colors.length / rows));
+      const left = currentRowIndex * rowWidth + (currentRowIndex * padding);
+      const top = currentRowIndex * canvasHeight - (currentRowIndex * padding);
+
       ctx.save();
       ctx.translate(padding, i * rowHeight + padding);
 
@@ -254,7 +259,8 @@ Images.generateCollection = (() => {
           watchSize[0],
           watchSize[1]
         ),
-        0, 0
+        left,
+        -top
       );
 
     // color row1
@@ -263,8 +269,8 @@ Images.generateCollection = (() => {
     ctx.font = `900 ${rowHeight * 0.4}px 'Inter-EtraBold'`;
     ctx.fillText(
       `${color.row1}`,
-      watchSize[0] + padding,
-      rowHeight * 0.4
+      watchSize[0] + padding + left,
+      rowHeight * 0.4 - top
     );
 
     // color row2 value
@@ -272,8 +278,8 @@ Images.generateCollection = (() => {
 
     ctx.fillText(
       `${color.row2}`,
-      watchSize[0] + padding,
-      rowHeight * 0.7
+      watchSize[0] + padding + left,
+      rowHeight * 0.7 - top
     );
 
       ctx.restore();
@@ -289,7 +295,17 @@ Images.generateCollection = (() => {
       return generateGrid(colors.map(c => ({row2: c.name, row1: c.hex, color: c.hex})), 768, 1024);
     } else {
       colors = colors.sort((a, b) => (chroma(b.hex).luminance() - chroma(a.hex).luminance()) -(chroma(b.hex).hcl()[0] - chroma(a.hex).hcl()[0]));
-      return generateTable(colors.map(c => ({row1: c.name, row2: c.hex, color: c.hex})));
+
+      return generateTable(
+        colors.map(
+          c => ({row1: c.name, row2: c.hex, color: c.hex})
+        ),
+        [70, 80],
+        660,
+        100,
+        20,
+        colors.length > 16 ? 2 : 1
+      );
     }
   };
 
