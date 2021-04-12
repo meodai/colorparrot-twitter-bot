@@ -48,21 +48,25 @@ function initialize() {
 
   setInterval(sendNow, config.RANDOM_COLOR_DELAY);
 
-
   const stream = T.statusesFilterStream('@color_parrot');
 
   stream.on('tweet', async (tweet) => {
     tweet = await T.getTweetByID(tweet.id_str);
     const middleware = new Middleware(T, tweet, db);
 
-    console.log({ msg: tweet.getUserTweet(), user: tweet.getUserName() });
+    console.log({
+      msg: tweet.getUserTweet(),
+      user: tweet.getUserName(),
+    });
 
+    middleware.use(Middlewares.checkIfSelf);
     middleware.use(Middlewares.checkMessageType);
     middleware.use(Middlewares.getImageColor);
     middleware.use(Middlewares.getFullImagePalette);
     middleware.use(Middlewares.getImage);
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.addProposalOrFlood);
+
     middleware.run();
   });
 

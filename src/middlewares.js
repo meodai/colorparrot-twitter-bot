@@ -2,6 +2,7 @@ const fs = require('fs');
 const hexColorRegex = require('hex-color-regex');
 
 const Color = require('./color');
+const config = require('./config');
 const Images = require('./images');
 const {Templates, buildMessage} = require('./templates');
 
@@ -61,6 +62,20 @@ class Middleware {
 }
 
 const Middlewares = {};
+
+/**
+ * checks if the tweet is from the bot itself
+ * makes sure bot does not answers itself
+ * @param {*} T
+ * @param {*} tweet
+ * @param {*} next
+ */
+Middlewares.checkIfSelf = async (T, tweet, next) => {
+  const screenName = tweet.getUserName();
+  if (screenName !== config.TWITTER_BOT_USERNAME) {
+    next();
+  }
+};
 
 /**
  * get image by color name
