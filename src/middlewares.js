@@ -453,7 +453,10 @@ Middlewares.getColorName = (function() {
 
     const userTweet = tweet.getUserTweet().replace(/ {2}/g, ' ').toLowerCase();
 
-    if (userTweet.includes('what is the name of')) {
+    if (
+      userTweet.includes('what is the name of') ||
+      userTweet.includes(`what's the name of`)
+    ) {
       for (const c of userMessageArray) {
         if (hexColorRegex().test(c)) {
           const match = hexColorRegex().exec(c);
