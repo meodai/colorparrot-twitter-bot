@@ -46,7 +46,7 @@
     "@{{screenName}} Express palette delivery!\n(reply 'more' to get even more colors)\n",
     "@{{screenName}} Abracadabra!\n(say 'more!' to get more colors)\n",
     "@{{screenName}} Keep the colors flowing!\n(say 'more!' to get more colors)\n",
-    "@{{screenName}} These pretty colors took me {{sElapsed}}seconds to extract. Enjoy!\n(say 'more!' to get more colors)\n",
+    "@{{screenName}} These pretty colors took me {{sElapsed}} seconds to extract. Enjoy!\n(say 'more!' to get more colors)\n",
     "@{{screenName}} The greatest masterpices were once only colors from a robo parrot!\n(reply 'more!' to get more colors)\n",
     "@{{screenName}} I was built to please your eyes, in this case it took me {{sElapsed}}s!\n(reply 'more!' to get more colors)\n",
     "@{{screenName}} Uhh! You have an impeccable color taste\n(say 'more!' to get more colors)\n",
@@ -55,10 +55,18 @@
     "@{{screenName}} Life is like a box of crayons. Here are your colors: \n(reply 'more!' to see more colors)\n",
     "@{{screenName}} Very inspiring! \n(reply 'more!' to see more colors)\n",
     "@{{screenName}} It was fun extracting these colors for you: \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} Mario is Red. Sonic is blue. This are the colors I have extracted for you. \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} You love me, I love hue: \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} It was fun extracting these colors for hue: \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} Sorry it took {{sElapsed}}s to extract these, I was on vecation in color-ado: \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} If I was a robo-cat I would go: Purrrrple. \n(reply 'more!' to see more colors)\n",
+    "@{{screenName}} Every time you ask for colors, I dye a little on the inside.\n(reply 'more!' to see more colors)\n",
     "@{{screenName}} It took me {{sElapsed}}s to extract those colors for you. \n(reply 'more!' to see more colors)\n",
     "@{{screenName}} A fresh color bouquet, just for you: \n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} The phone rings green...green...green! So I pink up and say yellow: \n(answer 'more!' to see more colors)\n",
     "@{{screenName}} *bip* *bop*. Color extraction noises: \n(answer 'more!' to see more colors)\n",
-    "@{{screenName}} Color names function like a thread attached to a delicate needle, capable of stitching together our most valued emotions and memories. When the needle hits the target, we feel either pleasure or empathy.\n(reply more for more colors)"
+    "@{{screenName}} Color names function like a thread attached to a delicate needle, capable of stitching together our most valued emotions and memories. When the needle hits the target, we feel either pleasure or empathy.\n(reply more for more colors)",
+    "@{{screenName}} Your command is my wish: \n(answer 'more!' to see more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
