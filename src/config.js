@@ -6,4 +6,5 @@ module.exports = {
   RANDOM_COLOR_DELAY: process.env.RANDOM_COLOR_DELAY || 3600000,
   MAX_PALETTE_COLORS: process.env.MAX_PALETTE_COLORS ? +process.env.MAX_PALETTE_COLORS : 9,
   REDIS_URL: process.env.REDIS_URL,
+  TWITTER_BOT_USERNAME: process.env.REDIS_URL,
 };
