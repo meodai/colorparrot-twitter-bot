@@ -74,6 +74,8 @@ Middlewares.checkIfSelf = async (T, tweet, next) => {
   const screenName = tweet.getUserName();
   if (screenName !== config.TWITTER_BOT_USERNAME) {
     next();
+  } else {
+    console.log('Bot mentioned itself.');
   }
 };
 
@@ -124,8 +126,12 @@ const isGetImageColorCommand = (userMessage) => {
   return !(
     !msg.includes('what color is this') &&
     !msg.includes('what colour is this') &&
+    !msg.includes('what color is that') &&
+    !msg.includes('what colour is that') &&
     !msg.includes('what is this color') &&
     !msg.includes('what is this colour') &&
+    !msg.includes('what is that color') &&
+    !msg.includes('what is that colour') &&
     !msg.includes('what are those colors') &&
     !msg.includes('what are those colours') &&
     !msg.includes('what colors are in this') &&
