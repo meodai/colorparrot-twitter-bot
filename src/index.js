@@ -1,4 +1,8 @@
-require('dotenv').config();
+const options = {};
+if (process.env.NODE_ENV === "development") {
+  options.path = ".env.development";
+}
+require('dotenv').config(options);
 
 const Redis = require('ioredis');
 const Twitt = require('twit');

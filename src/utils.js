@@ -65,6 +65,14 @@ const Twitter = (function() {
       }
       return media.find((m) => m.type === type) || null;
     }
+    getAllMediaOfType(type) {
+      const {media} = this._tweet.extended_entities || this._tweet.entities;
+      if (!media || media.length === 0) {
+        return [];
+      }
+      const checkIfOfType = (object) => object.type == type;
+      return media.filter(checkIfOfType);
+    }
     getUserName() {
       return this._tweet.user.screen_name;
     }

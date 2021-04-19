@@ -186,13 +186,13 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  const media = ref.getMediaURL('photo') || ref.getMediaURL('animated_gif');
-  let imageURL = null;
-  if (media) {
-    imageURL = media['media_url_https'];
-  }
+  const photos = ref.getAllMediaOfType('photo');
+  const gifs = ref.getAllMediaOfType('animated_gif');
+  const allMedia = photos.concat(gifs);
+  const allMediaURLs = allMedia.map((media) => media['media_url_https']);
+  const mediaCount = allMediaURLs.length;
 
-  if (!imageURL) {
+  if (mediaCount === 0) {
     try {
       console.log('No image url found: ', JSON.stringify(
           (ref._tweet.extended_entities || ref._tweet.entities)['media']
@@ -212,15 +212,17 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   const startTime = Date.now();
-  const palette = await Color.getPalette(imageURL, 9);
+  const defaultColorCount = 9;
+  const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, defaultColorCount));
+  const palettes = await Promise.all(paletteWorkers);
   const msElapsed = Date.now() - startTime;
   const sElapsed = Math.round((msElapsed/1000) * 100) / 100;
 
-  const hexArr = palleteArrToHexArr(palette);
-  const hexURLStr = hexArrToURLStr(hexArr);
+  const hexArrays = palettes.map((palette) => palleteArrToHexArr(palette));
+  const hexURLStrings = hexArrays.map((hexArr) => hexArrToURLStr(hexArr));
 
   console.log(
-      `it took ${sElapsed}s to generate the image`,
+      `it took ${sElapsed}s to generate the images`,
   );
 
   const generateAndUploadCollection = async (palette) => {
@@ -230,15 +232,17 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return mediaIdString;
   };
 
-  const mediaIdString = await generateAndUploadCollection(palette);
+  const uploadWorkers = palettes.map((palette) => generateAndUploadCollection(palette));
+  const mediaIds = await Promise.all(uploadWorkers);
+
   await T.statusesUpdate({
     status: buildMessage(Templates.COLORS_IN_IMAGE, {
       screenName,
       mediaURL: media['url'],
-      hexURLStr,
+      hexURLStrings,
       sElapsed,
     }),
-    media_ids: mediaIdString,
+    media_ids: mediaIds,
     in_reply_to_status_id: tweet.getStatusID(),
   });
 };
@@ -298,34 +302,36 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
     return;
   }
 
-  let media = originalTweet.getMediaURL('photo')
-    || originalTweet.getMediaURL('animated_gif');
-
-  if (!media) {
+  const photos = originalTweet.getAllMediaOfType('photo');
+  const gifs = originalTweet.getAllMediaOfType('animated_gif');
+  const allMedia = photos.concat(gifs);
+  if (allMedia.length === 0) {
     await next();
     return;
   }
 
-  const imageURL = media['media_url_https'];
+  const imageURLs = allMedia.map((media) => media['media_url_https']);
 
   const startTime = Date.now();
-  const palette = await Color.getPalette(imageURL);
+  const paletteWorkers = imageURLs.map((url) => Color.getPalette(url));
+  const palettes = await Promise.all(paletteWorkers);
   const msElapsed = Date.now() - startTime;
   const sElapsed = Math.round((msElapsed/1000) * 100) / 100;
 
-  const hexArr = palleteArrToHexArr(palette);
-  const hexURLStr = hexArrToURLStr(hexArr);
+  const hexArrays = palettes.map((palette) => palleteArrToHexArr(palette));
+  const hexURLStrings = hexArrays.map((hexArr) => hexArrToURLStr(hexArr));
 
   console.log(
       `it took ${sElapsed}s to generate the image`,
   );
 
-  if (palette.length <= 9) {
+  const validPalettes = palettes.filter((palette) => palette.length > 9);
+
+  if (validPalettes.length === 0) {
     await T.statusesUpdate({
       status: buildMessage(Templates.NO_MORE_COLORS_IN_IMAGE, {
         screenName,
-        mediaURL: media['url'],
-        hexURLStr,
+        hexURLStrings,
         sElapsed,
       }),
       in_reply_to_status_id: tweet.getStatusID(),
@@ -340,15 +346,16 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
     return mediaIdString;
   };
 
-  const mediaIdString = await generateAndUploadCollection(palette);
+  const uploadWorkers = validPalettes.map((palette) => generateAndUploadCollection(palette))
+  const mediaIds = await Promise.all(uploadWorkers);
+
   await T.statusesUpdate({
     status: buildMessage(Templates.ALL_COLORS_IN_IMAGE, {
       screenName,
-      mediaURL: media['url'],
-      palette,
+      palettes: validPalettes,
       sElapsed,
     }),
-    media_ids: mediaIdString,
+    media_ids: mediaIds,
     in_reply_to_status_id: tweet.getStatusID(),
   });
 
