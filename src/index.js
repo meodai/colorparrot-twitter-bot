@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const Redis = require('ioredis');
 const Twitt = require('twit');
 const config = require('./config');
