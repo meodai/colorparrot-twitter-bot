@@ -67,11 +67,11 @@ function initialize() {
     middleware.use(Middlewares.checkIfSelf);
     middleware.use(Middlewares.checkMessageType);
     middleware.use(Middlewares.replyThankYou);
-    middleware.use(Middlewares.getImageColor);
     middleware.use(Middlewares.getFullImagePalette);
     middleware.use(Middlewares.getImage);
     middleware.use(Middlewares.getColorName);
-    middleware.use(Middlewares.addProposalOrFlood);
+    middleware.use(Middlewares.getImageColor);
+    // middleware.use(Middlewares.addProposalOrFlood);
 
     middleware.run();
   });

@@ -149,6 +149,14 @@ const isGetImageColorCommand = (userMessage) => {
   );
 };
 
+const checkIfTweetIsEmpty = (userMessage) => {
+  const msg = userMessage
+    .replace(/@\S+/g, "")
+    .replace(/ {2}/g, " ")
+    .toLowerCase();
+  return msg.trim() === "";
+};
+
 /**
  * grabs the color palette from an image
  * @param {*} T
@@ -157,11 +165,7 @@ const isGetImageColorCommand = (userMessage) => {
  */
 Middlewares.getImageColor = async (T, tweet, next, db) => {
   const screenName = tweet.getUserName();
-
-  if (!isGetImageColorCommand(tweet.getUserTweet())) {
-    await next();
-    return;
-  }
+  const userMessage = tweet.getUserTweet();
 
   let ref = null;
   if (tweet.getMediaURL("photo") || tweet.getMediaURL("animated_gif")) {
@@ -193,7 +197,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const allMediaURLs = allMedia.map((media) => media.media_url_https);
   const mediaCount = allMediaURLs.length;
 
-  if (mediaCount === 0) {
+  const noImagesFound = async () => {
     try {
       console.log("No image url found: ", JSON.stringify(
         (ref._tweet.extended_entities || ref._tweet.entities).media
@@ -209,6 +213,20 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
+  };
+
+  if (checkIfTweetIsEmpty(userMessage) && mediaCount === 0) {
+    await noImagesFound();
+    return;
+  }
+
+  if (!isGetImageColorCommand(userMessage) && mediaCount === 0) {
+    await next();
+    return;
+  }
+
+  if (mediaCount === 0) {
+    noImagesFound();
     return;
   }
 
