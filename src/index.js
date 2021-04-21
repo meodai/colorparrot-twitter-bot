@@ -71,6 +71,7 @@ function initialize() {
     middleware.use(Middlewares.getImage);
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.getImageColor);
+    // there must always be a next, fn
     middleware.use(() => void 0);
     // middleware.use(Middlewares.addProposalOrFlood);
 
