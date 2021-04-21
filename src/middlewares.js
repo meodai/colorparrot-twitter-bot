@@ -389,6 +389,7 @@ const isThankYouMessage = (msg) => {
  * @param {function} next
  */
 Middlewares.replyThankYou = async (T, tweet, next, db) => {
+  const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet()
     .replace(/ {2}/g, " ").toLowerCase();
 
@@ -413,7 +414,9 @@ Middlewares.replyThankYou = async (T, tweet, next, db) => {
   }
 
   await T.statusesUpdate({
-    status: buildMessage(Templates.THANK_YOU_REPLY, {}),
+    status: buildMessage(Templates.THANK_YOU_REPLY, {
+      screenName,
+    }),
     in_reply_to_status_id: tweet.getStatusID(),
   });
 };

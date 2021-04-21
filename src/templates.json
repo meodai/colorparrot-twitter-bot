@@ -87,8 +87,8 @@
   ],
 
   "THANK_YOU_REPLY": [
-    "You are welcome, I was built for this.",
-    "Love it when you feed me colors",
-    "Please don't hesitate to feed me more colors"
+    "@{{screenName}} You are welcome, I was built for this.",
+    "@{{screenName}} Love it when you feed me colors",
+    "@{{screenName}} Please don't hesitate to feed me more colors"
   ]
 }
