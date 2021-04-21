@@ -13,6 +13,7 @@ const Templates = {
   COLORS_IN_IMAGE: "COLORS_IN_IMAGE",
   ALL_COLORS_IN_IMAGE: "ALL_COLORS_IN_IMAGE",
   NO_MORE_COLORS_IN_IMAGE: "NO_MORE_COLORS_IN_IMAGE",
+  THANK_YOU_REPLY: "THANK_YOU_REPLY",
 };
 
 /**
@@ -20,7 +21,7 @@ const Templates = {
  * @param {String} tmpl The template to execute
  * @param {Object} opts Variables for the template
  */
-const executeTemplate = (tmpl, opts) => {
+const executeTemplate = (tmpl, opts = {}) => {
   const entries = Object.entries(opts);
   let result = tmpl;
   for (const entry of entries) {
@@ -35,7 +36,7 @@ const executeTemplate = (tmpl, opts) => {
  * @param {String} category The template category
  * @param {Object} opts Template variables
  */
-const buildMessage = (category, opts) => {
+const buildMessage = (category, opts = {}) => {
   const tmpls = templates[category];
   const idx = Math.floor(Math.random() * tmpls.length);
   const tmpl = tmpls[idx];

@@ -271,7 +271,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
   const botTweet = await T.getTweetByID(tweet.getOriginalTweetID());
   const username = botTweet.getUserName();
 
-  if (username !== "color_parrot" || !botTweet.isReplyTweet()) {
+  if (username !== config.TWITTER_BOT_USERNAME || !botTweet.isReplyTweet()) {
     await next();
     return;
   }
@@ -355,6 +355,47 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
       sElapsed,
     }),
     media_ids: mediaIds,
+    in_reply_to_status_id: tweet.getStatusID(),
+  });
+};
+
+const isThankYouMessage = (msg) => {
+  const queries = ["thank you", "thanks"];
+  return queries.some((query) => msg.includes(query));
+};
+
+/**
+ * grabs the color palette from an image
+ * @param {*} T
+ * @param {*} tweet
+ * @param {function} next
+ */
+Middlewares.replyThankYou = async (T, tweet, next, db) => {
+  const userMessage = tweet.getUserTweet()
+    .replace(/ {2}/g, " ").toLowerCase();
+
+  // abort if this tweet isn't a reply
+  if (!tweet.isReplyTweet()) {
+    await next();
+    return;
+  }
+
+  if (!isThankYouMessage(userMessage)) {
+    await next();
+    return;
+  }
+
+  const botTweet = await T.getTweetByID(tweet.getOriginalTweetID());
+  const username = botTweet.getUserName();
+
+  if (username !== config.TWITTER_BOT_USERNAME || !botTweet.isReplyTweet()) {
+    // abort if it's not a reply to the bot
+    await next();
+    return;
+  }
+
+  await T.statusesUpdate({
+    status: buildMessage(Templates.THANK_YOU_REPLY, {}),
     in_reply_to_status_id: tweet.getStatusID(),
   });
 };

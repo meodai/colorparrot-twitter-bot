@@ -84,5 +84,11 @@
   "NO_MORE_COLORS_IN_IMAGE": [
     "@{{screenName}} We did not find any more colors in your picture",
     "@{{screenName}} There are no others colors"
+  ],
+
+  "THANK_YOU_REPLY": [
+    "You are welcome, I was built for this.",
+    "Love it when you feed me colors",
+    "Please don't hesitate to feed me more colors"
   ]
 }
