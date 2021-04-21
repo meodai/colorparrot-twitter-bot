@@ -158,8 +158,8 @@ const checkIfTweetIsEmpty = (userMessage) => {
 };
 
 const checkIfTweetHasMedia = (tweet) => {
-  const photos = originalTweet.getAllMediaOfType("photo");
-  const gifs = originalTweet.getAllMediaOfType("animated_gif");
+  const photos = tweet.getAllMediaOfType("photo");
+  const gifs = tweet.getAllMediaOfType("animated_gif");
   return photos.length + gifs.length > 0;
 };
 
