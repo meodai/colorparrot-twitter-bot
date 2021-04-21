@@ -271,7 +271,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
   const botTweet = await T.getTweetByID(tweet.getOriginalTweetID());
   const username = botTweet.getUserName();
 
-  if (username !== config.TWITTER_BOT_USERNAME || !botTweet.isReplyTweet()) {
+  if (username !== config.TWITTER_BOT_USERNAME) {
     await next();
     return;
   }
@@ -388,7 +388,7 @@ Middlewares.replyThankYou = async (T, tweet, next, db) => {
   const botTweet = await T.getTweetByID(tweet.getOriginalTweetID());
   const username = botTweet.getUserName();
 
-  if (username !== config.TWITTER_BOT_USERNAME || !botTweet.isReplyTweet()) {
+  if (username !== config.TWITTER_BOT_USERNAME) {
     // abort if it's not a reply to the bot
     await next();
     return;
