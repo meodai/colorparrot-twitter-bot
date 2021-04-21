@@ -157,6 +157,12 @@ const checkIfTweetIsEmpty = (userMessage) => {
   return msg.trim() === "";
 };
 
+const checkIfTweetHasMedia = (tweet) => {
+  const photos = originalTweet.getAllMediaOfType("photo");
+  const gifs = originalTweet.getAllMediaOfType("animated_gif");
+  return photos.length + gifs.length > 0;
+};
+
 /**
  * grabs the color palette from an image
  * @param {*} T
@@ -305,7 +311,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
       } else {
         tweet = null;
       }
-    } else if (tweet.isReplyTweet()) {
+    } else if (tweet.isReplyTweet() && !checkIfTweetHasMedia(tweet)) {
       tweet = await getOriginalTweetWithMedia(tweet);
     }
 
