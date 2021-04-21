@@ -220,7 +220,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  if (!isGetImageColorCommand(userMessage) && mediaCount === 0) {
+  if (!isGetImageColorCommand(userMessage)) {
     await next();
     return;
   }
@@ -405,8 +405,6 @@ Middlewares.replyThankYou = async (T, tweet, next, db) => {
 
   const botTweet = await T.getTweetByID(tweet.getOriginalTweetID());
   const username = botTweet.getUserName();
-
-  console.log({ username, bot: config.TWITTER_BOT_USERNAME });
 
   if (username !== config.TWITTER_BOT_USERNAME) {
     // abort if it's not a reply to the bot
