@@ -18,9 +18,31 @@
         "quotes": ["error", "double"],
         "semi": ["error", "always"],
 
-        // override default options for rules from base configurations
-        "comma-dangle": ["error", "always"],
+        "comma-dangle": "off",
         "no-cond-assign": ["error", "always"],
+        "space-before-function-paren": "off",
+        "func-names": "off",
+        "no-param-reassign": "off",
+        "prefer-template": "off",
+        "no-bitwise": "off",
+        "prefer-destructuring": "off",
+        "no-plusplus": "off",
+        "no-underscore-dangle": "off",
+        "eqeqeq": "off",
+        "no-restricted-properties": "off",
+        "operator-assignment": "off",
+        "class-methods-use-this": "off",
+        "no-floating-decimal": "off",
+        "no-prototype-builtins": "off",
+        "max-classes-per-file": ["error", 3],
+        "no-restricted-syntax": "off",
+        "import/no-extraneous-dependencies": "off",
+        "import/no-useless-path-segments": "off",
+        "no-shadow": "off",
+        "no-await-in-loop": "off",
+        "no-unused-vars": ["error", { "args": "none" }],
+        "no-continue": "off",
+        "no-return-await": "off",
 
         // disable rules from base configurations
         "no-console": "off"

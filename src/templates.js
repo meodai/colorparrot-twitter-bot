@@ -1,17 +1,33 @@
-const templatesJSON = require('./templates.json');
+const templatesJSON = require("./templates.json");
+
 const templates = {};
 const Templates = {
-  IMAGE_RESPONSE: 'IMAGE_RESPONSE',
-  HEX_TAKEN: 'HEX_TAKEN',
-  PROPOSAL_ACCEPTED: 'PROPOSAL_ACCEPTED',
-  PROPOSAL_DENIED: 'PROPOSAL_DENIED',
-  EXACT_HEX_NAME_RESPONSE: 'EXACT_HEX_NAME_RESPONSE',
-  CLOSEST_HEX_NAME_RESPONSE: 'CLOSEST_HEX_NAME_RESPONSE',
-  REFERENCE_TWEET_NOT_FOUND: 'REFERENCE_TWEET_NOT_FOUND',
-  IMAGE_NOT_FOUND_IN_REFERENCE: 'IMAGE_NOT_FOUND_IN_REFERENCE',
-  COLORS_IN_IMAGE: 'COLORS_IN_IMAGE',
-  ALL_COLORS_IN_IMAGE: 'ALL_COLORS_IN_IMAGE',
-  NO_MORE_COLORS_IN_IMAGE: 'NO_MORE_COLORS_IN_IMAGE',
+  IMAGE_RESPONSE: "IMAGE_RESPONSE",
+  HEX_TAKEN: "HEX_TAKEN",
+  PROPOSAL_ACCEPTED: "PROPOSAL_ACCEPTED",
+  PROPOSAL_DENIED: "PROPOSAL_DENIED",
+  EXACT_HEX_NAME_RESPONSE: "EXACT_HEX_NAME_RESPONSE",
+  CLOSEST_HEX_NAME_RESPONSE: "CLOSEST_HEX_NAME_RESPONSE",
+  REFERENCE_TWEET_NOT_FOUND: "REFERENCE_TWEET_NOT_FOUND",
+  IMAGE_NOT_FOUND_IN_REFERENCE: "IMAGE_NOT_FOUND_IN_REFERENCE",
+  COLORS_IN_IMAGE: "COLORS_IN_IMAGE",
+  ALL_COLORS_IN_IMAGE: "ALL_COLORS_IN_IMAGE",
+  NO_MORE_COLORS_IN_IMAGE: "NO_MORE_COLORS_IN_IMAGE",
+};
+
+/**
+ * Compiles a template with the passed variables
+ * @param {String} tmpl The template to execute
+ * @param {Object} opts Variables for the template
+ */
+const executeTemplate = (tmpl, opts) => {
+  const entries = Object.entries(opts);
+  let result = tmpl;
+  for (const entry of entries) {
+    const regex = new RegExp(`{{${entry[0]}}}`, "g");
+    result = result.replace(regex, entry[1]);
+  }
+  return result;
 };
 
 /**
@@ -24,21 +40,6 @@ const buildMessage = (category, opts) => {
   const idx = Math.floor(Math.random() * tmpls.length);
   const tmpl = tmpls[idx];
   return executeTemplate(tmpl, opts);
-};
-
-/**
- * Compiles a template with the passed variables
- * @param {String} tmpl The template to execute
- * @param {Object} opts Variables for the template
- */
-const executeTemplate = (tmpl, opts) => {
-  const entries = Object.entries(opts);
-  let result = tmpl;
-  for (const entry of entries) {
-    const regex = new RegExp(`{{${entry[0]}}}`, 'g');
-    result = result.replace(regex, entry[1]);
-  }
-  return result;
 };
 
 /**

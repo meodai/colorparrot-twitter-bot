@@ -1,14 +1,13 @@
-const request = require('request');
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
-const ColorThief = require('color-thief');
-const Vibrant = require('node-vibrant');
-const PaletteExtractor = require('./vendor/palette-extractor');
-const config = require('./config');
-const ClosestVector = require('../node_modules/closestvector/.');
-const ImageData = require('@andreekeberg/imagedata');
-const Images = require('./images');
+const request = require("request");
+const path = require("path");
+const fs = require("fs");
+const axios = require("axios");
+const ColorThief = require("color-thief");
+const Vibrant = require("node-vibrant");
+const ImageData = require("@andreekeberg/imagedata");
+const PaletteExtractor = require("./vendor/palette-extractor");
+const config = require("./config");
+const ClosestVector = require("../node_modules/closestvector/.");
 
 const Color = {};
 const colorThief = new ColorThief();
@@ -48,7 +47,7 @@ const setupColors = (namedColors) => {
 Color.getNamedColors = async () => {
   const now = new Date().getTime();
   if (!namedColorsExp || now - lastColorsUpdateTime >= CACHE_UPDATE_INTERVAL) {
-    const {data} = await axios.get('https://api.color.pizza/v1/');
+    const { data } = await axios.get("https://api.color.pizza/v1/");
     setupColors(data.colors);
     lastColorsUpdateTime = now;
   }
@@ -65,27 +64,27 @@ Color.getNamedColors = async () => {
  * @return {object} color
  */
 Color.generateRandomColor = async () => {
-  const {namedColors} = await Color.getNamedColors();
-  const {name, hex} = namedColors[
-      Math.floor(Math.random() * namedColors.length)
+  const { namedColors } = await Color.getNamedColors();
+  const { name, hex } = namedColors[
+    Math.floor(Math.random() * namedColors.length)
   ];
 
-  return {name, hex};
+  return { name, hex };
 };
 
 Color.getColorFromName = async (colorName) => {
   try {
     const url = `https://api.color.pizza/v1/names/${encodeURIComponent(
-        colorName
+      colorName
     )}`;
-    const {data} = await axios.get(url);
-    const {colors} = data;
+    const { data } = await axios.get(url);
+    const { colors } = data;
 
     if (!colors.length) return null;
 
     // find exact match
     const exact = colors.find(
-        (color) => color.name.toLowerCase() === colorName.toLowerCase()
+      (color) => color.name.toLowerCase() === colorName.toLowerCase()
     );
     if (exact) {
       return exact;
@@ -97,9 +96,9 @@ Color.getColorFromName = async (colorName) => {
   }
 };
 
-Color.rgbToHex = ({r, g, b}) => {
-  const s = (x) => x.toString(16).padStart(2, '0');
-  return '#' + s(r) + s(g) + s(b);
+Color.rgbToHex = ({ r, g, b }) => {
+  const s = (x) => x.toString(16).padStart(2, "0");
+  return "#" + s(r) + s(g) + s(b);
 };
 
 /**
@@ -118,9 +117,11 @@ Color.hexToRgb = (hexSrt) => {
       g: (value >> 8) & 0xff,
       b: value & 0xff,
     };
-  } else if (short) {
+  }
+
+  if (short) {
     const rgbArray = Array.from(short, (s) => Number.parseInt(s, 16)).map(
-        (n) => (n << 4) | n
+      (n) => (n << 4) | n
     );
     return {
       r: rgbArray[0],
@@ -128,85 +129,84 @@ Color.hexToRgb = (hexSrt) => {
       b: rgbArray[2],
     };
   }
+
+  return null;
 };
 
 // return HSP luminance http://alienryderflex.com/hsp.html
-Color.luminance = (rgb) =>
-  Math.sqrt(
-      Math.pow(0.299 * rgb.r, 2) +
-      Math.pow(0.587 * rgb.g, 2) +
-      Math.pow(0.114 * rgb.b, 2)
-  );
+Color.luminance = (rgb) => Math.sqrt(
+  Math.pow(0.299 * rgb.r, 2)
+      + Math.pow(0.587 * rgb.g, 2)
+      + Math.pow(0.114 * rgb.b, 2)
+);
 
-Color.getDominantColor = async (imageURL) => {
-  return new Promise((resolve, reject) => {
-    request({url: imageURL, encoding: 'binary'}, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
-        // grnerate file name
-        const file = Math.random().toString(16).substr(2)
-        + '.' + imageURL.split('.').pop();
+Color.getDominantColor = async (imageURL) => new Promise((resolve, reject) => {
+  request({ url: imageURL, encoding: "binary" }, (error, response, body) => {
+    if (!error && response.statusCode == 200) {
+      // grnerate file name
+      const file = Math.random().toString(16).substr(2)
+        + "." + imageURL.split(".").pop();
         // write to disk
-        fs.writeFile(file, body, 'binary', (err) => {
+      fs.writeFile(file, body, "binary", (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const [r, g, b] = colorThief.getColor(file);
+        fs.unlink(file, (err) => {
           if (err) {
             reject(err);
-            return;
+          } else {
+            resolve(Color.rgbToHex({ r, g, b }));
           }
-
-          const [r, g, b] = colorThief.getColor(file);
-          fs.unlink(file, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(Color.rgbToHex({r, g, b}));
-            }
-          });
         });
-      } else {
-        reject(error);
-      }
-    });
+      });
+    } else {
+      reject(error);
+    }
   });
-};
+});
 
 Color.getPaletteWithVibrant = async (imageURL) => {
   const v = new Vibrant(imageURL);
   return v.getPalette()
-      .then(async (palette) => {
-        const {namedColors, namedColorsMap, closest} = await Color.getNamedColors();
+    .then(async (palette) => {
+      const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
 
-        const all = Object.entries(palette).map(async ([variant, color]) => {
-          const rgb = {
-            r: color.rgb[0] | 0,
-            g: color.rgb[1] | 0,
-            b: color.rgb[2] | 0,
-          };
+      const all = Object.entries(palette).map(async ([variant, color]) => {
+        const rgb = {
+          r: color.rgb[0] | 0,
+          g: color.rgb[1] | 0,
+          b: color.rgb[2] | 0,
+        };
 
-          let hex = Color.rgbToHex(rgb);
-          let name = namedColorsMap.get(hex);
-          if (!name) {
-            const closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-            const c = namedColors[closestColor.index];
-            name = c.name;
-            hex = c.hex;
-          }
+        let hex = Color.rgbToHex(rgb);
+        let name = namedColorsMap.get(hex);
+        if (!name) {
+          const closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
+          const c = namedColors[closestColor.index];
+          name = c.name;
+          hex = c.hex;
+        }
 
-          return {name, hex, variant};
-        });
-
-        return Promise.all(all);
+        return { name, hex, variant };
       });
+
+      return Promise.all(all);
+    });
 };
 
 async function download(uri, filename) {
   return new Promise((resolve, reject) => {
-    request.head(uri, function(err, res, body) {
+    request.head(uri, (err, res) => {
       if (err) {
         reject(err);
       } else {
-        console.log('content-type:', res.headers['content-type']);
-        console.log('content-length:', res.headers['content-length']);
+        console.log("content-type:", res.headers["content-type"]);
+        console.log("content-length:", res.headers["content-length"]);
 
-        request(uri).pipe(fs.createWriteStream(filename)).on('close', resolve);
+        request(uri).pipe(fs.createWriteStream(filename)).on("close", resolve);
       }
     });
   });
@@ -214,7 +214,7 @@ async function download(uri, filename) {
 
 Color.getPalette = async (imageURL, numColors) => {
   // imports
-  const {namedColors, namedColorsMap, closest} = await Color.getNamedColors();
+  const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
 
   const ext = path.extname(imageURL);
   let file = new Date().getTime() + Math.random().toString(16).substr(2);
@@ -224,14 +224,15 @@ Color.getPalette = async (imageURL, numColors) => {
   await download(imageURL, file);
 
   return new Promise((res, rej) => {
-    ImageData.get(file, (err, {data}) => {
+    ImageData.get(file, (err, { data }) => {
       if (err) {
         rej(err);
         return;
       }
 
       const paletteExtractor = new PaletteExtractor();
-      const colors = paletteExtractor.processImageData(data, numColors || config.MAX_PALETTE_COLORS);
+      const colorCount = numColors || config.MAX_PALETTE_COLORS;
+      const colors = paletteExtractor.processImageData(data, colorCount);
 
       const usableColors = colors.map((hex) => {
         let name = namedColorsMap.get(hex);
@@ -244,7 +245,7 @@ Color.getPalette = async (imageURL, numColors) => {
           hex = c.hex;
         }
 
-        return {name, hex};
+        return { name, hex };
       });
 
       fs.unlink(file, (err) => {
