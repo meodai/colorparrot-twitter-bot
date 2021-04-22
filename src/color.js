@@ -2,15 +2,12 @@ const request = require("request");
 const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
-const ColorThief = require("color-thief");
-const Vibrant = require("node-vibrant");
 const ImageData = require("@andreekeberg/imagedata");
 const PaletteExtractor = require("./vendor/palette-extractor");
 const config = require("./config");
 const ClosestVector = require("../node_modules/closestvector/.");
 
 const Color = {};
-const colorThief = new ColorThief();
 
 let namedColorsMap;
 let rgbColorsArr;
@@ -139,63 +136,6 @@ Color.luminance = (rgb) => Math.sqrt(
       + Math.pow(0.587 * rgb.g, 2)
       + Math.pow(0.114 * rgb.b, 2)
 );
-
-Color.getDominantColor = async (imageURL) => new Promise((resolve, reject) => {
-  request({ url: imageURL, encoding: "binary" }, (error, response, body) => {
-    if (!error && response.statusCode == 200) {
-      // grnerate file name
-      const file = Math.random().toString(16).substr(2)
-        + "." + imageURL.split(".").pop();
-        // write to disk
-      fs.writeFile(file, body, "binary", (err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        const [r, g, b] = colorThief.getColor(file);
-        fs.unlink(file, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(Color.rgbToHex({ r, g, b }));
-          }
-        });
-      });
-    } else {
-      reject(error);
-    }
-  });
-});
-
-Color.getPaletteWithVibrant = async (imageURL) => {
-  const v = new Vibrant(imageURL);
-  return v.getPalette()
-    .then(async (palette) => {
-      const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
-
-      const all = Object.entries(palette).map(async ([variant, color]) => {
-        const rgb = {
-          r: color.rgb[0] | 0,
-          g: color.rgb[1] | 0,
-          b: color.rgb[2] | 0,
-        };
-
-        let hex = Color.rgbToHex(rgb);
-        let name = namedColorsMap.get(hex);
-        if (!name) {
-          const closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-          const c = namedColors[closestColor.index];
-          name = c.name;
-          hex = c.hex;
-        }
-
-        return { name, hex, variant };
-      });
-
-      return Promise.all(all);
-    });
-};
 
 async function download(uri, filename) {
   return new Promise((resolve, reject) => {
