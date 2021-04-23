@@ -66,7 +66,9 @@
     "@{{screenName}} The phone rings green...green...green! So I pink up and say yellow: \n(answer 'more!' to see more colors)\n",
     "@{{screenName}} *bip* *bop*. Color extraction noises: \n(answer 'more!' to see more colors)\n",
     "@{{screenName}} Color names function like a thread attached to a delicate needle, capable of stitching together our most valued emotions and memories. When the needle hits the target, we feel either pleasure or empathy.\n(reply more for more colors)",
-    "@{{screenName}} Your command is my wish: \n(answer 'more!' to see more colors)\n"
+    "@{{screenName}} Your command is my wish: \n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} Here comes your color swatch: \n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} All baby parrots ready at the swatching station *bip*bup*:  \n(answer 'more!' to see more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
