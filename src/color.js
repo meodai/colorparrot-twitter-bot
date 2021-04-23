@@ -87,7 +87,7 @@ Color.getColorFromName = async (colorName) => {
       return exact;
     }
 
-    return colors[0];
+    return null;
   } catch (error) {
     return null;
   }

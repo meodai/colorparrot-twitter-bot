@@ -149,16 +149,12 @@ const isGetImageColorCommand = (userMessage) => {
   );
 };
 
-const stripUserMessage = (userMessage) => {
-  return userMessage
+const stripUserMessage = (userMessage) => userMessage
   .replace(/@\S+/g, "")
   .replace(/ {2}/g, " ")
   .toLowerCase();
-};
 
-const checkIfTweetIsEmpty = (userMessage) => {
-  return stripUserMessage(userMessage).trim() === "";
-};
+const checkIfTweetIsEmpty = (userMessage) => stripUserMessage(userMessage).trim() === "";
 
 const checkIfTweetHasMedia = (tweet) => {
   const photos = tweet.getAllMediaOfType("photo");
@@ -175,7 +171,6 @@ const checkIfTweetHasMedia = (tweet) => {
 Middlewares.getImageColor = async (T, tweet, next, db) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet();
-  const strippedMessage = stripUserMessage(userMessage);
 
   let ref = null;
   if (checkIfTweetHasMedia(tweet)) {
@@ -224,20 +219,19 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
       in_reply_to_status_id: tweet.getStatusID(),
     });
   };
-  
-  
+
   // abort if empty and there is no media
   if (checkIfTweetIsEmpty(userMessage) && mediaCount === 0) {
     await noImagesFound();
     return;
   }
-  
+
   let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
   let match;
   if (!checkIfTweetIsEmpty(userMessage)) {
     match = /\d+/.exec(userMessage);
     if (match) {
-      colorCount = Math.max(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
+      colorCount = Math.min(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
     }
   }
 
@@ -251,7 +245,6 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     noImagesFound();
     return;
   }
-
 
   const startTime = Date.now();
   const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, colorCount));
