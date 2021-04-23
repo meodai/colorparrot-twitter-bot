@@ -21,7 +21,7 @@ const {
 /**
  *
  */
-function initialize() {
+async function initialize() {
   const db = new RedisDB(
     new Redis(config.REDIS_URL, {
       retryStrategy: (times) => {
@@ -46,12 +46,39 @@ function initialize() {
   /**
    * sends a random tweet
    */
-  function sendNow() {
-    Images.sendRandomImage(T, db).catch((e) => console.log(e));
+  async function sendNow() {
     console.log("sending a random image");
+    return Images.sendRandomImage(T, db);
   }
 
-  setInterval(sendNow, config.RANDOM_COLOR_DELAY);
+  const calcDiff = async () => {
+    const lastRandomPostTime = await db.getLastRandomPostTime();
+    if (!lastRandomPostTime) return 0;
+    const nextTime = lastRandomPostTime + config.RANDOM_COLOR_DELAY;
+    const diff = nextTime - new Date().getTime();
+    return Math.max(diff, 0);
+  };
+
+  const tick = async () => {
+    const diff = calcDiff();
+
+    setTimeout(async () => {
+      try {
+        const sent = await sendNow();
+        if (sent) {
+          // only update time if the tweet was sent
+          await db.updateLastRandomPostTime();
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        // either way, tick again!
+        tick();
+      }
+    }, diff);
+  };
+
+  setTimeout(tick, 0);
 
   const stream = T.statusesFilterStream("@color_parrot");
 
