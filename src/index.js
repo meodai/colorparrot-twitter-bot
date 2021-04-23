@@ -73,9 +73,8 @@ function initialize() {
     middleware.use(Middlewares.getImageColor);
     // there must always be a next, fn
     middleware.use(() => {
-      console.log('The bot did nothing. :(');
+      console.log("The bot did nothing. :(");
     });
-    // middleware.use(Middlewares.addProposalOrFlood);
 
     middleware.run();
   });

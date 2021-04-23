@@ -236,9 +236,16 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
+  let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
+  if (!checkIfTweetIsEmpty(userMessage)) {
+    const match = /\d+/.exec(userMessage);
+    if (match) {
+      colorCount = Math.max(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
+    }
+  }
+
   const startTime = Date.now();
-  const defaultColorCount = 9;
-  const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, defaultColorCount));
+  const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, colorCount));
   const palettes = await Promise.all(paletteWorkers);
   const msElapsed = Date.now() - startTime;
   const sElapsed = Math.round((msElapsed / 1000) * 100) / 100;
