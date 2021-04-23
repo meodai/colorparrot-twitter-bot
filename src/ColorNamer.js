@@ -76,8 +76,8 @@ module.exports = class FindColors {
 
       // get the closest named colors
       const closestColor = localClosest.get([rgb.r, rgb.g, rgb.b]);
-      const color = bestOf ? this.colorsBestOf[closestColor.index] :
-        this.colors[closestColor.index];
+      const color = bestOf ? this.colorsBestOf[closestColor.index]
+        : this.colors[closestColor.index];
 
       return {
         ...color,

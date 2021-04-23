@@ -159,7 +159,7 @@ const stripUserMessage = (userMessage) => userMessage
   .trim()
   .toLowerCase();
 
-console.log(stripUserMessage("@color_parrot What is this color? http:// https://t.co/3LM3YfBG0g"))
+console.log(stripUserMessage("@color_parrot What is this color? http:// https://t.co/3LM3YfBG0g"));
 
 const checkIfTweetIsEmpty = (userMessage) => stripUserMessage(userMessage) === "";
 
