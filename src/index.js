@@ -46,7 +46,7 @@ async function initialize() {
   /**
    * sends a random tweet
    */
-  async function sendNow() {
+  function sendNow() {
     console.log("sending a random image");
     return Images.sendRandomImage(T, db);
   }
@@ -54,31 +54,24 @@ async function initialize() {
   const calcDiff = async () => {
     const lastRandomPostTime = await db.getLastRandomPostTime();
     if (!lastRandomPostTime) return 0;
-    const nextTime = lastRandomPostTime + config.RANDOM_COLOR_DELAY;
+    const nextTime = Number(lastRandomPostTime) + config.RANDOM_COLOR_DELAY;
     const diff = nextTime - new Date().getTime();
-    return Math.max(diff, 0);
+    return diff;
   };
 
-  const tick = async () => {
-    const diff = calcDiff();
-
-    setTimeout(async () => {
+  setInterval(async () => {
+    const diff = await calcDiff();
+    if (diff <= 0) {
       try {
         const sent = await sendNow();
         if (sent) {
-          // only update time if the tweet was sent
           await db.updateLastRandomPostTime();
         }
       } catch (e) {
         console.log(e);
-      } finally {
-        // either way, tick again!
-        tick();
       }
-    }, diff);
-  };
-
-  // setTimeout(tick, 0);
+    }
+  }, 1000 * 60);
 
   const stream = T.statusesFilterStream("@color_parrot");
 

@@ -19,7 +19,7 @@ const Images = {};
  * Sends an image for a random but unique color
  * @param {object} T The instance of Twit class
  * @param {object} db instance of db class
- * @returns {boolean} true if an image was sent; false otherwise
+ * @returns {Promise<boolean>} true if an image was sent; false otherwise
  */
 Images.sendRandomImage = async (T, db) => {
   let attempts = 3;
