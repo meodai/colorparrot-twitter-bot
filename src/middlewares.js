@@ -150,11 +150,18 @@ const isGetImageColorCommand = (userMessage) => {
 };
 
 const stripUserMessage = (userMessage) => userMessage
+  // remove user mentions
   .replace(/@\S+/g, "")
+  // remove URLs
+  .replace(/https?:\/\/\S*/gi, "")
+  // remove extra spaces
   .replace(/ {2}/g, " ")
+  .trim()
   .toLowerCase();
 
-const checkIfTweetIsEmpty = (userMessage) => stripUserMessage(userMessage).trim() === "";
+console.log(stripUserMessage("@color_parrot What is this color? http:// https://t.co/3LM3YfBG0g"))
+
+const checkIfTweetIsEmpty = (userMessage) => stripUserMessage(userMessage) === "";
 
 const checkIfTweetHasMedia = (tweet) => {
   const photos = tweet.getAllMediaOfType("photo");
@@ -229,7 +236,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
   let match;
   if (!checkIfTweetIsEmpty(userMessage)) {
-    match = /\d+/.exec(userMessage);
+    match = /\d+/.exec(stripUserMessage(userMessage));
     if (match) {
       colorCount = Math.min(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
     }
