@@ -76,7 +76,7 @@ Color.getColorFromName = async (colorName) => {
   try {
     const url = `https://api.color.pizza/v1/names/${encodeURIComponent(
       colorName
-    )}`;
+    )}?goodnamesonly=true`;
     const { data } = await axios.get(url);
     const { colors } = data;
 

@@ -174,7 +174,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const userMessage = tweet.getUserTweet();
 
   let ref = null;
-  if (tweet.getMediaURL("photo") || tweet.getMediaURL("animated_gif")) {
+  if (checkIfTweetHasMedia(tweet)) {
     ref = tweet.getStatusID();
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
