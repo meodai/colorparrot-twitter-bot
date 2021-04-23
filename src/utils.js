@@ -10,6 +10,15 @@ class RedisDB {
     await this.redis.sadd("postedColors", colorName);
   }
 
+  getLastRandomPostTime() {
+    return this.redis.get("lastRandomPostTime");
+  }
+
+  async updateLastRandomPostTime() {
+    const time = new Date().getTime();
+    await this.redis.set("lastRandomPostTime", time);
+  }
+
   async addUserMessageToFloodList(message) {
     await this.redis.rpush("flood", message);
   }

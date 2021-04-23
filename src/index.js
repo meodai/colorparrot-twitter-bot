@@ -21,7 +21,7 @@ const {
 /**
  *
  */
-function initialize() {
+async function initialize() {
   const db = new RedisDB(
     new Redis(config.REDIS_URL, {
       retryStrategy: (times) => {
@@ -47,11 +47,31 @@ function initialize() {
    * sends a random tweet
    */
   function sendNow() {
-    Images.sendRandomImage(T, db).catch((e) => console.log(e));
     console.log("sending a random image");
+    return Images.sendRandomImage(T, db);
   }
 
-  setInterval(sendNow, config.RANDOM_COLOR_DELAY);
+  const calcDiff = async () => {
+    const lastRandomPostTime = await db.getLastRandomPostTime();
+    if (!lastRandomPostTime) return 0;
+    const nextTime = Number(lastRandomPostTime) + config.RANDOM_COLOR_DELAY;
+    const diff = nextTime - new Date().getTime();
+    return diff;
+  };
+
+  setInterval(async () => {
+    const diff = await calcDiff();
+    if (diff <= 0) {
+      try {
+        const sent = await sendNow();
+        if (sent) {
+          await db.updateLastRandomPostTime();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }, 1000 * 60);
 
   const stream = T.statusesFilterStream("@color_parrot");
 
@@ -72,8 +92,9 @@ function initialize() {
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.getImageColor);
     // there must always be a next, fn
-    middleware.use(() => void 0);
-    // middleware.use(Middlewares.addProposalOrFlood);
+    middleware.use(() => {
+      console.log("The bot did nothing. :(");
+    });
 
     middleware.run();
   });

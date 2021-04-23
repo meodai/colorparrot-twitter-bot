@@ -149,13 +149,12 @@ const isGetImageColorCommand = (userMessage) => {
   );
 };
 
-const checkIfTweetIsEmpty = (userMessage) => {
-  const msg = userMessage
-    .replace(/@\S+/g, "")
-    .replace(/ {2}/g, " ")
-    .toLowerCase();
-  return msg.trim() === "";
-};
+const stripUserMessage = (userMessage) => userMessage
+  .replace(/@\S+/g, "")
+  .replace(/ {2}/g, " ")
+  .toLowerCase();
+
+const checkIfTweetIsEmpty = (userMessage) => stripUserMessage(userMessage).trim() === "";
 
 const checkIfTweetHasMedia = (tweet) => {
   const photos = tweet.getAllMediaOfType("photo");
@@ -174,7 +173,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   const userMessage = tweet.getUserTweet();
 
   let ref = null;
-  if (tweet.getMediaURL("photo") || tweet.getMediaURL("animated_gif")) {
+  if (checkIfTweetHasMedia(tweet)) {
     ref = tweet.getStatusID();
   } else if (tweet.isQuotedTweet()) {
     ref = tweet.getQuotedTweet();
@@ -221,12 +220,23 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     });
   };
 
+  // abort if empty and there is no media
   if (checkIfTweetIsEmpty(userMessage) && mediaCount === 0) {
     await noImagesFound();
     return;
   }
 
-  if (!isGetImageColorCommand(userMessage)) {
+  let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
+  let match;
+  if (!checkIfTweetIsEmpty(userMessage)) {
+    match = /\d+/.exec(userMessage);
+    if (match) {
+      colorCount = Math.min(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
+    }
+  }
+
+  // abort if command not recognized and user didn't specify a color
+  if (!isGetImageColorCommand(userMessage) && !match) {
     await next();
     return;
   }
@@ -237,8 +247,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
   }
 
   const startTime = Date.now();
-  const defaultColorCount = 9;
-  const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, defaultColorCount));
+  const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, colorCount));
   const palettes = await Promise.all(paletteWorkers);
   const msElapsed = Date.now() - startTime;
   const sElapsed = Math.round((msElapsed / 1000) * 100) / 100;
