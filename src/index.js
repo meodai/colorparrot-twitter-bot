@@ -78,7 +78,7 @@ async function initialize() {
     }, diff);
   };
 
-  setTimeout(tick, 0);
+  // setTimeout(tick, 0);
 
   const stream = T.statusesFilterStream("@color_parrot");
 
