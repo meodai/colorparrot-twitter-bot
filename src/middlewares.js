@@ -149,12 +149,15 @@ const isGetImageColorCommand = (userMessage) => {
   );
 };
 
+const stripUserMessage = (userMessage) => {
+  return userMessage
+  .replace(/@\S+/g, "")
+  .replace(/ {2}/g, " ")
+  .toLowerCase();
+};
+
 const checkIfTweetIsEmpty = (userMessage) => {
-  const msg = userMessage
-    .replace(/@\S+/g, "")
-    .replace(/ {2}/g, " ")
-    .toLowerCase();
-  return msg.trim() === "";
+  return stripUserMessage(userMessage).trim() === "";
 };
 
 const checkIfTweetHasMedia = (tweet) => {
@@ -172,6 +175,7 @@ const checkIfTweetHasMedia = (tweet) => {
 Middlewares.getImageColor = async (T, tweet, next, db) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet();
+  const strippedMessage = stripUserMessage(userMessage);
 
   let ref = null;
   if (checkIfTweetHasMedia(tweet)) {
@@ -220,13 +224,25 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
       in_reply_to_status_id: tweet.getStatusID(),
     });
   };
-
+  
+  
+  // abort if empty and there is no media
   if (checkIfTweetIsEmpty(userMessage) && mediaCount === 0) {
     await noImagesFound();
     return;
   }
+  
+  let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
+  let match;
+  if (!checkIfTweetIsEmpty(userMessage)) {
+    match = /\d+/.exec(userMessage);
+    if (match) {
+      colorCount = Math.max(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
+    }
+  }
 
-  if (!isGetImageColorCommand(userMessage)) {
+  // abort if command not recognized and user didn't specify a color
+  if (!isGetImageColorCommand(userMessage) && !match) {
     await next();
     return;
   }
@@ -236,13 +252,6 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     return;
   }
 
-  let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
-  if (!checkIfTweetIsEmpty(userMessage)) {
-    const match = /\d+/.exec(userMessage);
-    if (match) {
-      colorCount = Math.max(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
-    }
-  }
 
   const startTime = Date.now();
   const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, colorCount));
