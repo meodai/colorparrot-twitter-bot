@@ -37,6 +37,13 @@ class Database {
       { resolved: false, failed: true },
     );
   }
+
+  getFailedRequests() {
+    return this._models.request.find({
+      resolved: false,
+      failed: true,
+    });
+  }
 }
 
 module.exports = { Database };

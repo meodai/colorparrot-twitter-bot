@@ -64,6 +64,71 @@ async function initialize() {
     return Images.sendRandomImage(T, db, redis);
   }
 
+  const handleIncomingTweet = async (req, tweetId) => {
+    const tweet = await T.getTweetByID(tweetId);
+    const middleware = new Middleware(T, tweet, db, redis);
+
+    console.log({
+      msg: tweet.getUserTweet(),
+      user: tweet.getUserName(),
+    });
+
+    tweet._reqId = req._id;
+
+    middleware.use(Middlewares.checkIfSelf);
+    middleware.use(Middlewares.checkMessageType);
+    middleware.use(Middlewares.replyThankYou);
+    middleware.use(Middlewares.getFullImagePalette);
+    middleware.use(Middlewares.getImage);
+    middleware.use(Middlewares.getColorName);
+    middleware.use(Middlewares.getImageColor);
+    // there must always be a next, fn
+    middleware.use(async () => {
+      console.log("The bot did nothing. :(");
+      await db.resolveRequest(req._id);
+    });
+
+    middleware.run();
+  };
+
+  const retryFailedRequests = async () => {
+    const requests = await db.getFailedRequests();
+    const next = async () => {
+      if (!requests.length) return;
+      const req = requests.pop();
+      try {
+        await handleIncomingTweet(req, req.tweet_id);
+      } catch (e) {
+        console.log("an error occured while retrying failed request %s:\n %s", req._id, e);
+      } finally {
+        await next();
+      }
+    };
+
+    try {
+      await next();
+    } catch (e) {
+      console.log("an error occured while retrying failed requests:", e);
+    } finally {
+      setTimeout(retryFailedRequests, 1000 * 60);
+    }
+  };
+
+  const stream = T.statusesFilterStream("@color_parrot");
+
+  stream.on("tweet", async (tweet) => {
+    const tweetId = tweet.id_str;
+    let req;
+    try {
+      req = await db.createRequest(tweetId);
+    } catch (e) {
+      console.log("error occured while creating a new request:", e);
+      return;
+    }
+    await handleIncomingTweet(req, tweetId);
+  });
+
+  // timers
   const calcDiff = async () => {
     const lastRandomPostTime = await redis.getLastRandomPostTime();
     if (!lastRandomPostTime) return 0;
@@ -86,43 +151,7 @@ async function initialize() {
     }
   }, 1000 * 60);
 
-  const stream = T.statusesFilterStream("@color_parrot");
-
-  stream.on("tweet", async (tweet) => {
-    const tweetId = tweet.id_str;
-    tweet = await T.getTweetByID(tweetId);
-    const middleware = new Middleware(T, tweet, db, redis);
-
-    console.log({
-      msg: tweet.getUserTweet(),
-      user: tweet.getUserName(),
-    });
-
-    let req;
-    try {
-      req = await db.createRequest(tweetId);
-    } catch (e) {
-      console.log("error occured while creating a new request:", e);
-      return;
-    }
-
-    tweet._reqId = req._id;
-
-    middleware.use(Middlewares.checkIfSelf);
-    middleware.use(Middlewares.checkMessageType);
-    middleware.use(Middlewares.replyThankYou);
-    middleware.use(Middlewares.getFullImagePalette);
-    middleware.use(Middlewares.getImage);
-    middleware.use(Middlewares.getColorName);
-    middleware.use(Middlewares.getImageColor);
-    // there must always be a next, fn
-    middleware.use(async () => {
-      console.log("The bot did nothing. :(");
-      await db.resolveRequest(req._id);
-    });
-
-    middleware.run();
-  });
+  setTimeout(retryFailedRequests, 1000 * 60);
 
   console.log("color parrot started");
 }
