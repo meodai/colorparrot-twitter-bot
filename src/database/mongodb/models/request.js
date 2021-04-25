@@ -10,6 +10,11 @@ const Request = new mongoose.Schema({
     required: false,
     default: false,
   },
+  failed: {
+    type: Boolean,
+    required: false,
+    default: false,
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("requests", Request);

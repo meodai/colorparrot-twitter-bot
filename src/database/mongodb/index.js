@@ -1,18 +1,16 @@
 const mongoose = require("mongoose");
 
 // models
-const Request = require("./models/request");
+const request = require("./models/request");
 
-const models = { Request };
+const models = { request };
 
-const connect = (uri) => {
-  return mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: true,
-    useUnifiedTopology: true,
-  });
-};
+const connect = (uri) => mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: true,
+  useUnifiedTopology: true,
+});
 
 module.exports = {
   connect,

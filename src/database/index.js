@@ -15,13 +15,27 @@ class Database {
 
   /**
    * Creates a new [unresolved] request in the database
-   * @param {String} tweet_id The id for the tweet
+   * @param {String} tweetId The id for the tweet
    * @returns {Promise}
    */
-  createRequest(tweet_id) {
+  createRequest(tweetId) {
     return this._models.request.create({
-      tweet_id,
+      tweet_id: tweetId,
     });
+  }
+
+  resolveRequest(id) {
+    return this._models.request.updateOne(
+      { _id: id },
+      { resolved: true, failed: false },
+    );
+  }
+
+  failRequest(id) {
+    return this._models.request.updateOne(
+      { _id: id },
+      { resolved: false, failed: true },
+    );
   }
 }
 

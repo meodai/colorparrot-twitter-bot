@@ -40,6 +40,7 @@ async function initialize() {
   // connect to the database
   try {
     await db.connect();
+    console.log("db connected");
   } catch (e) {
     // TODO: handle?
     console.log(e);
@@ -85,18 +86,27 @@ async function initialize() {
     }
   }, 1000 * 60);
 
-  return;
-
   const stream = T.statusesFilterStream("@color_parrot");
 
   stream.on("tweet", async (tweet) => {
-    tweet = await T.getTweetByID(tweet.id_str);
+    const tweetId = tweet.id_str;
+    tweet = await T.getTweetByID(tweetId);
     const middleware = new Middleware(T, tweet, db, redis);
 
     console.log({
       msg: tweet.getUserTweet(),
       user: tweet.getUserName(),
     });
+
+    let req;
+    try {
+      req = await db.createRequest(tweetId);
+    } catch (e) {
+      console.log("error occured while creating a new request:", e);
+      return;
+    }
+
+    tweet._reqId = req._id;
 
     middleware.use(Middlewares.checkIfSelf);
     middleware.use(Middlewares.checkMessageType);
@@ -106,8 +116,9 @@ async function initialize() {
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.getImageColor);
     // there must always be a next, fn
-    middleware.use(() => {
+    middleware.use(async () => {
       console.log("The bot did nothing. :(");
+      await db.resolveRequest(req._id);
     });
 
     middleware.run();
