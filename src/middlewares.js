@@ -16,10 +16,11 @@ const palleteArrToHexArr = (arr) => arr.map((c) => c.hex);
  * @class
  */
 class Middleware {
-  constructor(T, tweet, db) {
+  constructor(T, tweet, db, redis) {
     this.T = T;
     this.tweet = tweet;
     this.db = db;
+    this.redis = redis;
     this.listOfMiddlewares = [];
   }
 
@@ -41,7 +42,7 @@ class Middleware {
       if (f.constructor.name === "Function") {
         func = () => {
           try {
-            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db);
+            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.redis);
           } catch (e) {
             console.log(e);
           }
@@ -52,7 +53,7 @@ class Middleware {
             this.T,
             this.tweet,
             this.listOfMiddlewares[i + 1],
-            this.db
+            this.redis
           ).catch((e) => console.log(e));
         };
       }
@@ -173,7 +174,7 @@ const checkIfTweetHasMedia = (tweet) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.getImageColor = async (T, tweet, next, db) => {
+Middlewares.getImageColor = async (T, tweet, next, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet();
 
@@ -291,7 +292,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
+Middlewares.getFullImagePalette = async (T, tweet, next, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet().replace(/ {2}/g, " ").toLowerCase();
 
@@ -408,7 +409,7 @@ const isThankYouMessage = (msg) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.replyThankYou = async (T, tweet, next, db) => {
+Middlewares.replyThankYou = async (T, tweet, next, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet()
     .replace(/ {2}/g, " ").toLowerCase();
@@ -446,9 +447,9 @@ Middlewares.replyThankYou = async (T, tweet, next, db) => {
  * @param {*} T
  * @param {*} tweet
  * @param {function} next
- * @param {*} db
+ * @param {*} redis
  */
-Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
+Middlewares.addProposalOrFlood = async (T, tweet, next, redis) => {
   const { namedColorsMap } = await Color.getNamedColors();
 
   const userMessageArray = tweet.getUserTweet().split(" ");
@@ -482,7 +483,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
         in_reply_to_status_id: tweet.getStatusID(),
       });
 
-      await db.addUserMessageToProposalsList(
+      await redis.addUserMessageToProposalsList(
         `${tweet.getUserName()} -> ${tweet.getUserTweet()}`
       );
     }
@@ -499,7 +500,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
     //   in_reply_to_status_id: tweet.getStatusID(),
     // });
 
-    await db.addUserMessageToFloodList(
+    await redis.addUserMessageToFloodList(
       `${tweet.getUserName()} -> ${tweet.getUserTweet()}`
     );
   }

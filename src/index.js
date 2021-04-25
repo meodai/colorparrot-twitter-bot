@@ -10,6 +10,7 @@ const config = require("./config");
 
 const Images = require("./images");
 const { Middleware, Middlewares } = require("./middlewares");
+const { Database } = require("./database");
 
 const {
   RedisDB,
@@ -22,7 +23,7 @@ const {
  *
  */
 async function initialize() {
-  const db = new RedisDB(
+  const redis = new RedisDB(
     new Redis(config.REDIS_URL, {
       retryStrategy: (times) => {
         if (times > 3) {
@@ -33,6 +34,17 @@ async function initialize() {
       },
     })
   );
+
+  const db = new Database("mongodb", config.MONGODB_URI);
+
+  // connect to the database
+  try {
+    await db.connect();
+  } catch (e) {
+    // TODO: handle?
+    console.log(e);
+    return;
+  }
 
   const T = new Twit(
     new Twitt({
@@ -48,11 +60,11 @@ async function initialize() {
    */
   function sendNow() {
     console.log("sending a random image");
-    return Images.sendRandomImage(T, db);
+    return Images.sendRandomImage(T, db, redis);
   }
 
   const calcDiff = async () => {
-    const lastRandomPostTime = await db.getLastRandomPostTime();
+    const lastRandomPostTime = await redis.getLastRandomPostTime();
     if (!lastRandomPostTime) return 0;
     const nextTime = Number(lastRandomPostTime) + config.RANDOM_COLOR_DELAY;
     const diff = nextTime - new Date().getTime();
@@ -65,7 +77,7 @@ async function initialize() {
       try {
         const sent = await sendNow();
         if (sent) {
-          await db.updateLastRandomPostTime();
+          await redis.updateLastRandomPostTime();
         }
       } catch (e) {
         console.log(e);
@@ -73,11 +85,13 @@ async function initialize() {
     }
   }, 1000 * 60);
 
+  return;
+
   const stream = T.statusesFilterStream("@color_parrot");
 
   stream.on("tweet", async (tweet) => {
     tweet = await T.getTweetByID(tweet.id_str);
-    const middleware = new Middleware(T, tweet, db);
+    const middleware = new Middleware(T, tweet, db, redis);
 
     console.log({
       msg: tweet.getUserTweet(),
