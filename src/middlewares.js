@@ -587,7 +587,7 @@ Middlewares.getColorName = (function() {
       for (const c of userMessageArray) {
         if (hexColorRegex().test(c)) {
           const match = hexColorRegex().exec(c);
-          if (match) continue;
+          if (!match) continue;
 
           hex = match[0];
           rgb = Color.hexToRgb(hex);

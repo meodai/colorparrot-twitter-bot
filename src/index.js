@@ -64,6 +64,11 @@ async function initialize() {
     return Images.sendRandomImage(T, db, redis);
   }
 
+  /**
+   * Handles an incoming request
+   * @param {mongoose.Document} req The mongoose document for the request
+   * @param {string} tweetId
+   */
   const handleIncomingTweet = async (req, tweetId) => {
     const tweet = await T.getTweetByID(tweetId);
     const middleware = new Middleware(T, tweet, db, redis);
@@ -91,6 +96,11 @@ async function initialize() {
     middleware.run();
   };
 
+  /**
+   * Retries fulfulling requests that failed. It schedules a next retry
+   * automatically after it's done. This ensures that no two retry processes
+   * interrupt each other.
+   */
   const retryFailedRequests = async () => {
     const requests = await db.getFailedRequests();
     const next = async () => {
@@ -128,8 +138,11 @@ async function initialize() {
     await handleIncomingTweet(req, tweetId);
   });
 
-  // timers
-  const calcDiff = async () => {
+  /**
+   * Calculates the difference between now and the next random post time
+   * @returns {Promise<number>}
+   */
+  const calcRandomScheduleTimeDiff = async () => {
     const lastRandomPostTime = await redis.getLastRandomPostTime();
     if (!lastRandomPostTime) return 0;
     const nextTime = Number(lastRandomPostTime) + config.RANDOM_COLOR_DELAY;
@@ -137,8 +150,10 @@ async function initialize() {
     return diff;
   };
 
+  // timers
   setInterval(async () => {
-    const diff = await calcDiff();
+    const diff = await calcRandomScheduleTimeDiff();
+    // only send if we're ahead of the next random post time
     if (diff <= 0) {
       try {
         const sent = await sendNow();
