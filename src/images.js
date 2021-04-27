@@ -18,16 +18,16 @@ const Images = {};
 /**
  * Sends an image for a random but unique color
  * @param {object} T The instance of Twit class
- * @param {object} db instance of db class
+ * @param {object} redis instance of db class
  * @returns {Promise<boolean>} true if an image was sent; false otherwise
  */
-Images.sendRandomImage = async (T, db) => {
+Images.sendRandomImage = async (T, redis) => {
   let attempts = 3;
   let generatedUnique = false;
   let color;
   while (generatedUnique === false && attempts !== 0) {
     color = await Color.generateRandomColor();
-    if (!(await db.checkIfColorExistsInTweets(color.name))) {
+    if (!(await redis.checkIfColorExistsInTweets(color.name))) {
       generatedUnique = true;
     }
     attempts -= 1;
@@ -43,7 +43,7 @@ Images.sendRandomImage = async (T, db) => {
       status: `#${hashTagColorName} ${hashTagHexValue}`,
       media_ids: mediaIdString,
     });
-    db.addColorNameInPostedTweets(color.name);
+    redis.addColorNameInPostedTweets(color.name);
     return true;
   }
 

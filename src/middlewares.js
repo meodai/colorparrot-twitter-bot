@@ -16,10 +16,11 @@ const palleteArrToHexArr = (arr) => arr.map((c) => c.hex);
  * @class
  */
 class Middleware {
-  constructor(T, tweet, db) {
+  constructor(T, tweet, db, redis) {
     this.T = T;
     this.tweet = tweet;
     this.db = db;
+    this.redis = redis;
     this.listOfMiddlewares = [];
   }
 
@@ -35,15 +36,21 @@ class Middleware {
    * Run chain of middlewares, starting from the first
    */
   run() {
+    const fail = (e) => {
+      console.log(e);
+      return this.db.failRequest(this.tweet.getRequestID())
+        .catch((err) => console.log("an error occured while marking a request as failed:", err));
+    };
+
     for (let i = 0; i < this.listOfMiddlewares.length; i++) {
       const f = this.listOfMiddlewares[i];
       let func;
       if (f.constructor.name === "Function") {
         func = () => {
           try {
-            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db);
+            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db, this.redis);
           } catch (e) {
-            console.log(e);
+            fail(e);
           }
         };
       } else if (f.constructor.name === "AsyncFunction") {
@@ -52,8 +59,9 @@ class Middleware {
             this.T,
             this.tweet,
             this.listOfMiddlewares[i + 1],
-            this.db
-          ).catch((e) => console.log(e));
+            this.db,
+            this.redis
+          ).catch((e) => fail(e));
         };
       }
       this.listOfMiddlewares[i] = func;
@@ -86,7 +94,7 @@ Middlewares.checkIfSelf = async (T, tweet, next) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.getImage = async (T, tweet, next) => {
+Middlewares.getImage = async (T, tweet, next, db) => {
   const userMessageArray = tweet.getUserTweet().split(" ");
   if (
     userMessageArray[0] === "@color_parrot"
@@ -113,6 +121,7 @@ Middlewares.getImage = async (T, tweet, next) => {
         media_ids: mediaIdString,
         in_reply_to_status_id: tweet.getStatusID(),
       });
+      await db.resolveRequest(tweet.getRequestID());
     } else {
       await next();
     }
@@ -175,7 +184,7 @@ const checkIfTweetHasMedia = (tweet) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.getImageColor = async (T, tweet, next, db) => {
+Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet();
 
@@ -200,6 +209,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
+    await db.resolveRequest(tweet.getRequestID());
     return;
   }
 
@@ -225,6 +235,8 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
+
+    await db.resolveRequest(tweet.getRequestID());
   };
 
   // abort if empty and there is no media
@@ -285,6 +297,8 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
     media_ids: mediaIds,
     in_reply_to_status_id: tweet.getStatusID(),
   });
+
+  await db.resolveRequest(tweet.getRequestID());
 };
 
 /**
@@ -293,7 +307,7 @@ Middlewares.getImageColor = async (T, tweet, next, db) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
+Middlewares.getFullImagePalette = async (T, tweet, next, db, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet().replace(/ {2}/g, " ").toLowerCase();
 
@@ -375,6 +389,7 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
+    await db.resolveRequest(tweet.getRequestID());
     return;
   }
 
@@ -397,6 +412,8 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db) => {
     media_ids: mediaIds,
     in_reply_to_status_id: tweet.getStatusID(),
   });
+
+  await db.resolveRequest(tweet.getRequestID());
 };
 
 const isThankYouMessage = (msg) => {
@@ -410,7 +427,7 @@ const isThankYouMessage = (msg) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.replyThankYou = async (T, tweet, next, db) => {
+Middlewares.replyThankYou = async (T, tweet, next, db, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet()
     .replace(/ {2}/g, " ").toLowerCase();
@@ -441,6 +458,8 @@ Middlewares.replyThankYou = async (T, tweet, next, db) => {
     }),
     in_reply_to_status_id: tweet.getStatusID(),
   });
+
+  await db.resolveRequest(tweet.getRequestID());
 };
 
 /**
@@ -448,9 +467,9 @@ Middlewares.replyThankYou = async (T, tweet, next, db) => {
  * @param {*} T
  * @param {*} tweet
  * @param {function} next
- * @param {*} db
+ * @param {*} redis
  */
-Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
+Middlewares.addProposalOrFlood = async (T, tweet, next, db, redis) => {
   const { namedColorsMap } = await Color.getNamedColors();
 
   const userMessageArray = tweet.getUserTweet().split(" ");
@@ -484,7 +503,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
         in_reply_to_status_id: tweet.getStatusID(),
       });
 
-      await db.addUserMessageToProposalsList(
+      await redis.addUserMessageToProposalsList(
         `${tweet.getUserName()} -> ${tweet.getUserTweet()}`
       );
     }
@@ -501,7 +520,7 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db) => {
     //   in_reply_to_status_id: tweet.getStatusID(),
     // });
 
-    await db.addUserMessageToFloodList(
+    await redis.addUserMessageToFloodList(
       `${tweet.getUserName()} -> ${tweet.getUserTweet()}`
     );
   }
@@ -541,7 +560,7 @@ Middlewares.getColorName = (function() {
    * @param {*} tweet
    * @param {function} next
    */
-  return async (T, tweet, next) => {
+  return async (T, tweet, next, db) => {
     const {
       namedColors,
       namedColorsMap,
@@ -590,6 +609,7 @@ Middlewares.getColorName = (function() {
           }),
           in_reply_to_status_id: tweet.getStatusID(),
         });
+        await db.resolveRequest(tweet.getRequestID());
       } else {
         // get the closest named colors
         closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
@@ -604,6 +624,8 @@ Middlewares.getColorName = (function() {
           }),
           in_reply_to_status_id: tweet.getStatusID(),
         });
+
+        await db.resolveRequest(tweet.getRequestID());
       }
     } else {
       await next();

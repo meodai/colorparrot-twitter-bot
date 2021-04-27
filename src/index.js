@@ -10,6 +10,7 @@ const config = require("./config");
 
 const Images = require("./images");
 const { Middleware, Middlewares } = require("./middlewares");
+const { Database } = require("./database");
 
 const {
   RedisDB,
@@ -22,7 +23,7 @@ const {
  *
  */
 async function initialize() {
-  const db = new RedisDB(
+  const redis = new RedisDB(
     new Redis(config.REDIS_URL, {
       retryStrategy: (times) => {
         if (times > 3) {
@@ -33,6 +34,18 @@ async function initialize() {
       },
     })
   );
+
+  const db = new Database("mongodb", config.MONGODB_URI);
+
+  // connect to the database
+  try {
+    await db.connect();
+    console.log("db connected");
+  } catch (e) {
+    // TODO: handle?
+    console.log(e);
+    return;
+  }
 
   const T = new Twit(
     new Twitt({
@@ -48,41 +61,24 @@ async function initialize() {
    */
   function sendNow() {
     console.log("sending a random image");
-    return Images.sendRandomImage(T, db);
+    return Images.sendRandomImage(T, db, redis);
   }
 
-  const calcDiff = async () => {
-    const lastRandomPostTime = await db.getLastRandomPostTime();
-    if (!lastRandomPostTime) return 0;
-    const nextTime = Number(lastRandomPostTime) + config.RANDOM_COLOR_DELAY;
-    const diff = nextTime - new Date().getTime();
-    return diff;
-  };
-
-  setInterval(async () => {
-    const diff = await calcDiff();
-    if (diff <= 0) {
-      try {
-        const sent = await sendNow();
-        if (sent) {
-          await db.updateLastRandomPostTime();
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }, 1000 * 60);
-
-  const stream = T.statusesFilterStream("@color_parrot");
-
-  stream.on("tweet", async (tweet) => {
-    tweet = await T.getTweetByID(tweet.id_str);
-    const middleware = new Middleware(T, tweet, db);
+  /**
+   * Handles an incoming request
+   * @param {mongoose.Document} req The mongoose document for the request
+   * @param {string} tweetId
+   */
+  const handleIncomingTweet = async (req, tweetId) => {
+    const tweet = await T.getTweetByID(tweetId);
+    const middleware = new Middleware(T, tweet, db, redis);
 
     console.log({
       msg: tweet.getUserTweet(),
       user: tweet.getUserName(),
     });
+
+    tweet._reqId = req._id;
 
     middleware.use(Middlewares.checkIfSelf);
     middleware.use(Middlewares.checkMessageType);
@@ -92,12 +88,85 @@ async function initialize() {
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.getImageColor);
     // there must always be a next, fn
-    middleware.use(() => {
+    middleware.use(async () => {
       console.log("The bot did nothing. :(");
+      await db.resolveRequest(req._id);
     });
 
     middleware.run();
+  };
+
+  /**
+   * Retries fulfulling requests that failed. It schedules a next retry
+   * automatically after it's done. This ensures that no two retry processes
+   * interrupt each other.
+   */
+  const retryFailedRequests = async () => {
+    const requests = await db.getFailedRequests();
+    const next = async () => {
+      if (!requests.length) return;
+      const req = requests.pop();
+      try {
+        await handleIncomingTweet(req, req.tweet_id);
+      } catch (e) {
+        console.log("an error occured while retrying failed request %s:\n %s", req._id, e);
+      } finally {
+        await next();
+      }
+    };
+
+    try {
+      await next();
+    } catch (e) {
+      console.log("an error occured while retrying failed requests:", e);
+    } finally {
+      setTimeout(retryFailedRequests, 1000 * 60);
+    }
+  };
+
+  const stream = T.statusesFilterStream("@color_parrot");
+
+  stream.on("tweet", async (tweet) => {
+    const tweetId = tweet.id_str;
+    let req;
+    try {
+      req = await db.createRequest(tweetId);
+    } catch (e) {
+      console.log("error occured while creating a new request:", e);
+      return;
+    }
+    await handleIncomingTweet(req, tweetId);
   });
+
+  /**
+   * Calculates the difference between now and the next random post time
+   * @returns {Promise<number>}
+   */
+  const calcRandomScheduleTimeDiff = async () => {
+    const lastRandomPostTime = await redis.getLastRandomPostTime();
+    if (!lastRandomPostTime) return 0;
+    const nextTime = Number(lastRandomPostTime) + config.RANDOM_COLOR_DELAY;
+    const diff = nextTime - new Date().getTime();
+    return diff;
+  };
+
+  // timers
+  setInterval(async () => {
+    const diff = await calcRandomScheduleTimeDiff();
+    // only send if we're ahead of the next random post time
+    if (diff <= 0) {
+      try {
+        const sent = await sendNow();
+        if (sent) {
+          await redis.updateLastRandomPostTime();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }, 1000 * 60);
+
+  setTimeout(retryFailedRequests, 1000 * 60);
 
   console.log("color parrot started");
 }

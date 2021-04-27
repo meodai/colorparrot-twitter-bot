@@ -32,6 +32,7 @@
     "dotenv": "^8.2.0",
     "hex-color-regex": "^1.1.0",
     "ioredis": "^4.9.0",
+    "mongoose": "^5.12.5",
     "node-vibrant": "^3.2.1-alpha.1",
     "twit": "^2.2.11"
   },

@@ -39,6 +39,11 @@ const Twitter = (function() {
   class Tweet {
     constructor(tweet) {
       this._tweet = tweet;
+      this._reqId = null;
+    }
+
+    getRequestID() {
+      return this._reqId;
     }
 
     getStatusID() {
