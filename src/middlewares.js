@@ -333,16 +333,18 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db, redis) => {
   const getOriginalTweetWithMedia = async (start) => {
     let tweet = await T.getTweetByID(start.getOriginalTweetID());
 
-    if (tweet.isQuotedTweet()) {
-      const q = tweet.getQuotedTweet();
+    if (!checkIfTweetHasMedia(tweet)) {
+      if (tweet.isQuotedTweet()) {
+        const q = tweet.getQuotedTweet();
 
-      if (q) {
-        tweet = await T.getTweetByID(q.id_str);
-      } else {
-        tweet = null;
+        if (q) {
+          tweet = await T.getTweetByID(q.id_str);
+        } else {
+          tweet = null;
+        }
+      } else if (tweet.isReplyTweet()) {
+        tweet = await getOriginalTweetWithMedia(tweet);
       }
-    } else if (tweet.isReplyTweet() && !checkIfTweetHasMedia(tweet)) {
-      tweet = await getOriginalTweetWithMedia(tweet);
     }
 
     return tweet;
