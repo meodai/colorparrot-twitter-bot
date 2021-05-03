@@ -40,7 +40,7 @@ Images.sendRandomImage = async (T, db) => {
     const hashTagHexValue = color.hex;
     const mediaIdString = await T.mediaUpload(imgBase64);
     T.statusesUpdate({
-      status: `#${hashTagColorName} ${hashTagHexValue}`,
+      status: `#${hashTagColorName} ${hashTagHexValue} https://parrot.color.pizza/color/${hashTagHexValue.replace("#", "")}`,
       media_ids: mediaIdString,
     });
     db.addColorNameInPostedTweets(color.name);
