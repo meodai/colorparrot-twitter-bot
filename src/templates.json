@@ -89,8 +89,14 @@
   ],
 
   "THANK_YOU_REPLY": [
-    "@{{screenName}} You are welcome, I was built for this.",
-    "@{{screenName}} Love it when you feed me colors",
-    "@{{screenName}} Please don't hesitate to feed me more colors"
+    "@{{screenName}} You are welcome, I was built for this. 🤖",
+    "@{{screenName}} Love it when you feed me colors 🦜",
+    "@{{screenName}} Please don't hesitate to feed me more colors",
+    "@{{screenName}} You're welcome, human",
+    "@{{screenName}} You got it 🤖🦜",
+    "@{{screenName}} Don’t mention it 🤖🦜",
+    "@{{screenName}} My pleasure, loved squeezing those colors out for you.",
+    "@{{screenName}} Anytime 💖🦜",
+    "@{{screenName}} 💖🌈🤖🦜"
   ]
 }
