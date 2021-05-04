@@ -165,18 +165,15 @@ async function initialize() {
     }
   };
 
-  // timers
-  postRandomTweet()
-    .catch((e) => console.log("startup operation failed:", e))
-    .then(() => {
-      setInterval(postRandomTweet, 1000 * 60);
-    });
+  const startTimers = () => {
+    setInterval(postRandomTweet, 1000 * 60);
+    setTimeout(retryFailedRequests, 1000 * 60);
+  };
 
-  retryFailedRequests()
-    .catch((e) => console.log("startup operation failed:", e))
-    .then(() => {
-      setTimeout(retryFailedRequests, 1000 * 60);
-    });
+  // timers
+  Promise.all([postRandomTweet(), retryFailedRequests()])
+    .then(() => startTimers())
+    .catch(() => startTimers());
 
   console.log("color parrot started");
 }
