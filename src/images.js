@@ -18,10 +18,11 @@ const Images = {};
 /**
  * Sends an image for a random but unique color
  * @param {object} T The instance of Twit class
- * @param {object} redis instance of db class
+ * @param {object} db instance of db class
+ * @param {object} redis instance of redis db class
  * @returns {Promise<boolean>} true if an image was sent; false otherwise
  */
-Images.sendRandomImage = async (T, redis) => {
+Images.sendRandomImage = async (T, db, redis) => {
   let attempts = 3;
   let generatedUnique = false;
   let color;
