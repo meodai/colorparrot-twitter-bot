@@ -160,6 +160,11 @@ const isGetImageColorCommand = (userMessage) => {
   );
 };
 
+/**
+ * Strips a tweet of unnecessary entities
+ * @param {string} userMessage - the tweet's content
+ * @returns {string}
+ */
 const stripUserMessage = (userMessage) => userMessage
   // remove user mentions
   .replace(/@\S+/g, "")
@@ -187,6 +192,7 @@ const checkIfTweetHasMedia = (tweet) => {
 Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
   const screenName = tweet.getUserName();
   const userMessage = tweet.getUserTweet();
+  const strippedMessage = stripUserMessage(userMessage);
 
   let ref = null;
   if (checkIfTweetHasMedia(tweet)) {
@@ -250,16 +256,20 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
 
   let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
   if (!tweetIsEmpty) {
-    const match = /\d+/.exec(stripUserMessage(userMessage));
+    const match = /\d+/.exec(strippedMessage);
     if (match) {
       colorCount = Math.min(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
     }
   }
 
   // abort if command not recognized and tweet isn't empty
-  if (!isGetImageColorCommand(userMessage) && !tweetIsEmpty) {
-    await next();
-    return;
+  if (!isGetImageColorCommand(userMessage)) {
+    // abort if the tweet is not empty and doesn't contain
+    // only numbers
+    if (!tweetIsEmpty && !/^\d+$/.test(strippedMessage)) {
+      await next();
+      return;
+    }
   }
 
   const startTime = Date.now();
