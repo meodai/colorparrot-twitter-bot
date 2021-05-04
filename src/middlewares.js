@@ -239,29 +239,26 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
     await db.resolveRequest(tweet.getRequestID());
   };
 
-  // abort if empty and there is no media
-  if (checkIfTweetIsEmpty(userMessage) && mediaCount === 0) {
+  const tweetIsEmpty = checkIfTweetIsEmpty(userMessage);
+  const hasMedia = mediaCount > 0;
+
+  // abort if there isn't any media
+  if (!hasMedia) {
     await noImagesFound();
     return;
   }
 
   let colorCount = config.INITIAL_PALETTE_COLOR_COUNT;
-  let match;
-  if (!checkIfTweetIsEmpty(userMessage)) {
-    match = /\d+/.exec(stripUserMessage(userMessage));
+  if (!tweetIsEmpty) {
+    const match = /\d+/.exec(stripUserMessage(userMessage));
     if (match) {
       colorCount = Math.min(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
     }
   }
 
-  // abort if command not recognized and user didn't specify a color
-  if (!isGetImageColorCommand(userMessage) && !match) {
+  // abort if command not recognized and tweet isn't empty
+  if (!isGetImageColorCommand(userMessage) && !tweetIsEmpty) {
     await next();
-    return;
-  }
-
-  if (mediaCount === 0) {
-    noImagesFound();
     return;
   }
 
