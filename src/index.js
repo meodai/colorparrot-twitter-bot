@@ -150,8 +150,7 @@ async function initialize() {
     return diff;
   };
 
-  // timers
-  setInterval(async () => {
+  const postRandomTweet = async () => {
     const diff = await calcRandomScheduleTimeDiff();
     // only send if we're ahead of the next random post time
     if (diff <= 0) {
@@ -164,9 +163,18 @@ async function initialize() {
         console.log(e);
       }
     }
-  }, 1000 * 60);
+  };
 
-  setTimeout(retryFailedRequests, 1000 * 60);
+  // timers
+  postRandomTweet()
+    .finally(() => {
+      setInterval(postRandomTweet, 1000 * 60);
+    });
+
+  retryFailedRequests()
+    .finally(() => {
+      setTimeout(retryFailedRequests, 1000 * 60);
+    });
 
   console.log("color parrot started");
 }
