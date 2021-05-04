@@ -168,13 +168,13 @@ async function initialize() {
   // timers
   postRandomTweet()
     .catch((e) => console.log("startup operation failed:", e))
-    .finally(() => {
+    .then(() => {
       setInterval(postRandomTweet, 1000 * 60);
     });
 
   retryFailedRequests()
     .catch((e) => console.log("startup operation failed:", e))
-    .finally(() => {
+    .then(() => {
       setTimeout(retryFailedRequests, 1000 * 60);
     });
 
