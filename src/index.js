@@ -129,6 +129,7 @@ async function initialize() {
   stream.on("tweet", async (tweet) => {
     const tweetId = tweet.id_str;
     let req;
+    console.log("new tweet:", tweetId);
     try {
       req = await db.createRequest(tweetId);
     } catch (e) {
