@@ -52,6 +52,35 @@ Images.sendRandomImage = async (T, db, redis) => {
 };
 
 /**
+ * Cuts off text amd adds ellipsis after text gets too wide
+ * @param {object}  ctx
+ * @param {string}  str
+ * @param {integer} maxWidth
+ * @param {string} ellipsis
+ * @returns {string} cut string including ellipsis character
+ */
+function textOverflowEllipsis(
+  ctx,
+  str,
+  maxWidth,
+  ellipsis = "…"
+) {
+  let width = ctx.measureText(str).width;
+  const ellipsisWidth = ctx.measureText(ellipsis).width;
+
+  if (width <= maxWidth) {
+    return str;
+  }
+
+  let strLength = str.length;
+  while (width >= maxWidth - ellipsisWidth && --strLength > 0) {
+    str = str.substring(0, strLength);
+    width = ctx.measureText(str).width;
+  }
+  return str + ellipsis;
+}
+
+/**
  * Generates an image [buffer] from a color
  * @param {object} colorObj
  * @param {string} colorObj.name
@@ -77,8 +106,9 @@ Images.generateImage = (colorObj) => {
   // color name
   ctx.fillStyle = "#000";
   ctx.font = `${canvasHeight * 0.08}px Inter-EtraBold`;
+
   ctx.fillText(
-    `${name}`,
+    `${textOverflowEllipsis(ctx, name, canvasWidth * 0.9)}`,
     canvasWidth * 0.05,
     canvasHeight * 0.8 + canvasHeight * 0.1
   );
@@ -86,28 +116,9 @@ Images.generateImage = (colorObj) => {
   // color hex value
   ctx.font = `${canvasHeight * 0.04}px Inter-Regular`;
   ctx.fillText(
-    `${color}`,
+    `${textOverflowEllipsis(ctx, color, canvasWidth * 0.9)}`,
     canvasWidth * 0.05,
     canvasHeight * 0.8 + canvasHeight * 0.1 + canvasHeight * 0.06
-  );
-
-  // overlays a gradient on the text so it would not get cut off on the
-  // right side
-  const gradient = ctx.createLinearGradient(
-    canvasWidth * 0.7,
-    0,
-    canvasWidth * 0.99,
-    0
-  );
-  gradient.addColorStop(0, "rgba(255,255,255,0)");
-  gradient.addColorStop(1, "rgba(255,255,255,1)");
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(
-    canvasWidth * 0.7,
-    canvasHeight * 0.8,
-    canvasWidth * 0.3,
-    canvasHeight * 0.2
   );
 
   return canvas.toBuffer("image/png", {
