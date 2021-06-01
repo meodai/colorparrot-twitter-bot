@@ -168,11 +168,11 @@ async function initialize() {
 
   const startTimers = () => {
     setInterval(postRandomTweet, 1000 * 60);
-    setTimeout(retryFailedRequests, 1000 * 60);
+    //setTimeout(retryFailedRequests, 1000 * 60);
   };
 
   // timers
-  Promise.all([postRandomTweet(), retryFailedRequests()])
+  Promise.all([postRandomTweet() /*, retryFailedRequests() */])
     .then(() => startTimers())
     .catch(() => startTimers());
 
