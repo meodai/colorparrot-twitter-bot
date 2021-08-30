@@ -117,6 +117,7 @@ const Twitter = (function() {
           if (err) {
             rej(err);
           } else {
+            console.log('getTweetByID data', data);
             res(new Tweet(data));
           }
         });
