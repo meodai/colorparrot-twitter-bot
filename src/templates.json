@@ -29,9 +29,9 @@
   ],
 
   "IMAGE_NOT_FOUND_IN_REFERENCE": [
-    "@{{screenName}} I could not find an image in the tweet.",
-    "@{{screenName}} Error! Is there an image in the tweet?",
-    "@{{screenName}} Sorry, I could not find an image :("
+    "@{{screenName}} I could not find an image in the tweet. Learn how to use me here: https://t.co/ecZhYtG6vO",
+    "@{{screenName}} Error! Is there an image in the tweet? Learn how to use me here: https://t.co/ecZhYtG6vO",
+    "@{{screenName}} Sorry, I could not find an image :( Learn how to use me here: https://t.co/ecZhYtG6vO"
   ],
 
   "COLORS_IN_IMAGE": [
