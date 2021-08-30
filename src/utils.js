@@ -154,7 +154,7 @@ const Twitter = (function() {
     statusesFilterStream(track) {
       return this._T.stream("statuses/filter", {
         track,
-        language: "en",
+        //language: "en",
       });
     }
   }
