@@ -127,8 +127,6 @@ async function initialize() {
   const stream = T.statusesFilterStream("@color_parrot");
 
   stream.on("tweet", async (tweet) => {
-    console.log('on tweet', tweet);
-
     const tweetId = tweet.id_str;
     let req;
     console.log("new tweet:", tweetId);
