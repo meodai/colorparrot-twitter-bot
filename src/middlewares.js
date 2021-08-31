@@ -428,7 +428,14 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db, redis) => {
 };
 
 const isThankYouMessage = (msg) => {
-  const queries = ["thank you", "thanks"];
+  const queries = [
+    "thank you",
+    "thanks",
+    "ty",
+    "merci",
+    "danke",
+    "thank"
+  ];
   return queries.some((query) => msg.includes(query));
 };
 
