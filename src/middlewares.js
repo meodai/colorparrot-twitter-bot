@@ -237,12 +237,14 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
       console.log({ error });
     }
 
+    /*
     await T.statusesUpdate({
       status: buildMessage(Templates.IMAGE_NOT_FOUND_IN_REFERENCE, {
         screenName,
       }),
       in_reply_to_status_id: tweet.getStatusID(),
     });
+    */
 
     await db.resolveRequest(tweet.getRequestID());
   };
