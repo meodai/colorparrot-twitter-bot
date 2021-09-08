@@ -8,8 +8,9 @@ const imageColorExtract = async () => {
   } = await color.getNamedColors();
 
   const he = await color.getPalette(
-    'https://pbs.twimg.com/media/E-ysPycXoAAb00E?format=jpg&name=900x900'
-  , 9);
+    "https://pbs.twimg.com/media/E-y8HQsWEAQiiTl?format=jpg&name=small",
+    9
+  );
 
   console.log(he);
 

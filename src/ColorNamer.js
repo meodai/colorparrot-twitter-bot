@@ -1,4 +1,5 @@
 const ClosestVector = require("closestvector");
+
 const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
 
 const hexToRgb = (hexSrt) => {

@@ -16,10 +16,10 @@ let lastColorsUpdateTime = -1;
 const CACHE_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 3;
 const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
 
-const setupColors = (namedColors) => {
+const setupColors = (namedColors, namedColorsBestOf) => {
   namedColorsMap = new Map();
 
-  findColors = new FindColors(namedColors, namedColors);
+  findColors = new FindColors(namedColors, namedColorsBestOf);
   namedColorsExp = [...findColors.colors];
   namedColorsExp.forEach((c) => {
     namedColorsMap.set(c.hex, c.name);
