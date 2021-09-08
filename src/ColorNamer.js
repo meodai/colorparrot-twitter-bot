@@ -1,5 +1,31 @@
 const ClosestVector = require("closestvector");
-const Color = require("./color");
+const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
+
+const hexToRgb = (hexSrt) => {
+  const [, short, long] = String(hexSrt).match(RGB_HEX) || [];
+
+  if (long) {
+    const value = Number.parseInt(long, 16);
+    return {
+      r: value >> 16,
+      g: (value >> 8) & 0xff,
+      b: value & 0xff,
+    };
+  }
+
+  if (short) {
+    const rgbArray = Array.from(short, (s) => Number.parseInt(s, 16)).map(
+      (n) => (n << 4) | n
+    );
+    return {
+      r: rgbArray[0],
+      g: rgbArray[1],
+      b: rgbArray[2],
+    };
+  }
+
+  return null;
+}
 
 /**
  * entriches color object and fills RGB color arrays
@@ -9,7 +35,7 @@ const Color = require("./color");
  * @return  {object} enriched color object
  */
 const enrichColorObj = (colorObj, rgbColorArrRef) => {
-  const rgb = Color.hexToRgb(colorObj.hex);
+  const rgb = hexToRgb(colorObj.hex);
   // populates array needed for ClosestVector()
   rgbColorArrRef.push([rgb.r, rgb.g, rgb.b]);
   // transform hex to RGB
@@ -72,7 +98,7 @@ module.exports = class FindColors {
 
     const colorResp = colorArr.map((hex) => {
       // calculate RGB values for passed color
-      const rgb = Color.hexToRgb(hex);
+      const rgb = hexToRgb(hex);
 
       // get the closest named colors
       const closestColor = localClosest.get([rgb.r, rgb.g, rgb.b]);
@@ -81,7 +107,7 @@ module.exports = class FindColors {
 
       return {
         ...color,
-        requestedHex: `#${hex}`,
+        requestedHex: hex,
         distance: Math.sqrt(
           Math.pow(color.rgb.r - rgb.r, 2)
           + Math.pow(color.rgb.g - rgb.g, 2)

@@ -5,36 +5,25 @@ const axios = require("axios");
 const ImageData = require("@andreekeberg/imagedata");
 const PaletteExtractor = require("./vendor/palette-extractor");
 const config = require("./config");
-const ClosestVector = require("../node_modules/closestvector/.");
+const FindColors = require("./ColorNamer");
 
 const Color = {};
 
 let namedColorsMap;
-let rgbColorsArr;
 let namedColorsExp;
-let closest;
+let findColors;
 let lastColorsUpdateTime = -1;
 const CACHE_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 3;
 const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
 
 const setupColors = (namedColors) => {
   namedColorsMap = new Map();
-  rgbColorsArr = [];
-  namedColorsExp = [...namedColors];
 
+  findColors = new FindColors(namedColors, namedColors);
+  namedColorsExp = [...findColors.colors];
   namedColorsExp.forEach((c) => {
-    const rgb = Color.hexToRgb(c.hex);
     namedColorsMap.set(c.hex, c.name);
-
-    // populates array needed for ClosestVector()
-    rgbColorsArr.push([rgb.r, rgb.g, rgb.b]);
-    // transform hex to RGB
-    c.rgb = rgb;
-    // calculate luminancy for each color
-    c.luminance = Color.luminance(rgb);
   });
-
-  closest = new ClosestVector(rgbColorsArr);
 };
 
 /**
@@ -45,14 +34,20 @@ Color.getNamedColors = async () => {
   const now = new Date().getTime();
   if (!namedColorsExp || now - lastColorsUpdateTime >= CACHE_UPDATE_INTERVAL) {
     const { data } = await axios.get("https://api.color.pizza/v1/");
-    setupColors(data.colors);
+    const bestOf = await axios.get("https://api.color.pizza/v1/?goodnamesonly=true");
+
+    setupColors(
+      data.colors,
+      bestOf.data.colors
+    );
+
     lastColorsUpdateTime = now;
   }
 
   return {
     namedColors: namedColorsExp,
     namedColorsMap,
-    closest,
+    findColors,
   };
 };
 
@@ -154,7 +149,7 @@ async function download(uri, filename) {
 
 Color.getPalette = async (imageURL, numColors) => {
   // imports
-  const { namedColors, namedColorsMap, closest } = await Color.getNamedColors();
+  const { findColors } = await Color.getNamedColors();
 
   const ext = path.extname(imageURL);
   let file = new Date().getTime() + Math.random().toString(16).substr(2);
@@ -174,19 +169,12 @@ Color.getPalette = async (imageURL, numColors) => {
       const colorCount = numColors || config.MAX_PALETTE_COLORS;
       const colors = paletteExtractor.processImageData(data, colorCount);
 
-      const usableColors = colors.map((hex) => {
-        let name = namedColorsMap.get(hex);
-
-        if (!name) {
-          const rgb = Color.hexToRgb(hex);
-          const closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-          const c = namedColors[closestColor.index];
-          name = c.name;
-          hex = c.hex;
-        }
-
-        return { name, hex };
-      });
+      const usableColors = findColors.getNamesForValues(
+        colors, true, true
+      ).map((c) => ({
+        name: c.name,
+        hex: c.requestedHex,
+      }));
 
       fs.unlink(file, (err) => {
         if (err) {

@@ -582,9 +582,8 @@ Middlewares.getColorName = (function() {
    */
   return async (T, tweet, next, db) => {
     const {
-      namedColors,
       namedColorsMap,
-      closest,
+      findColors,
     } = await Color.getNamedColors();
 
     const userMessageArray = tweet.getUserTweet().split(" ");
@@ -593,7 +592,6 @@ Middlewares.getColorName = (function() {
     let hex;
     let rgb;
     let color;
-    let closestColor;
     const screenName = tweet.getUserName();
 
     if (userImageURL) {
@@ -632,8 +630,7 @@ Middlewares.getColorName = (function() {
         await db.resolveRequest(tweet.getRequestID());
       } else {
         // get the closest named colors
-        closestColor = closest.get([rgb.r, rgb.g, rgb.b]);
-        color = namedColors[closestColor.index];
+        color = findColors.getNamesForValues([rgb.r, rgb.g, rgb.b]);
 
         await T.statusesUpdate({
           status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {
