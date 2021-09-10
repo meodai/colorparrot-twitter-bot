@@ -610,7 +610,6 @@ Middlewares.getColorName = (function() {
           if (!match) continue;
 
           hex = match[0];
-          rgb = Color.hexToRgb(hex);
           validHex = true;
 
           break;
@@ -630,7 +629,7 @@ Middlewares.getColorName = (function() {
         await db.resolveRequest(tweet.getRequestID());
       } else {
         // get the closest named colors
-        color = findColors.getNamesForValues([rgb.r, rgb.g, rgb.b]);
+        color = findColors.getNamesForValues([hex]);
 
         await T.statusesUpdate({
           status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {

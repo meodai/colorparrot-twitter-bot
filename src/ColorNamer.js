@@ -2,6 +2,12 @@ const ClosestVector = require("closestvector");
 
 const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
 
+/**
+ * disassembles a HEX color to its RGB components
+ * https: //gist.github.com/comficker/871d378c535854c1c460f7867a191a5a#gistcomment-2615849
+ * @param   {string} hexSrt hex color representatin
+ * @return  {object} {r,g,b}
+ */
 const hexToRgb = (hexSrt) => {
   const [, short, long] = String(hexSrt).match(RGB_HEX) || [];
 
