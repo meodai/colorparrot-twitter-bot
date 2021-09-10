@@ -7,7 +7,8 @@
     "start": "node src/index.js",
     "start:dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "lint": "eslint .",
-    "lint-fix": "eslint --fix ."
+    "lint-fix": "eslint --fix .",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
+    "jest": "^27.1.1",
     "nodemon": "^2.0.7"
   },
   "engines": {
