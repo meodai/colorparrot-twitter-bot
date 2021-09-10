@@ -590,7 +590,6 @@ Middlewares.getColorName = (function() {
     const userImageURL = tweet.getUserPhoto();
     let validHex = false;
     let hex;
-    let rgb;
     let color;
     const screenName = tweet.getUserName();
 
@@ -629,7 +628,8 @@ Middlewares.getColorName = (function() {
         await db.resolveRequest(tweet.getRequestID());
       } else {
         // get the closest named colors
-        color = findColors.getNamesForValues([hex]);
+        const foundColors = findColors.getNamesForValues([hex]);
+        color = foundColors[0];
 
         await T.statusesUpdate({
           status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {

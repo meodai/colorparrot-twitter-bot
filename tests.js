@@ -7,14 +7,17 @@ const imageColorExtract = async () => {
     findColors,
   } = await color.getNamedColors();
 
-  const he = await color.getPalette(
+  const colorsInImage = await color.getPalette(
     "https://pbs.twimg.com/media/E-y8HQsWEAQiiTl?format=jpg&name=small",
     9
   );
 
-  console.log(he);
+  const name = findColors.getNamesForValues(['#fedcba']);
 
-  return he;
+  console.log('colors in image', colorsInImage);
+  console.log('approx color name', name);
+
+  return colorsInImage;
 };
 
 imageColorExtract();
