@@ -98,7 +98,11 @@ async function initialize() {
 
     // 6) checks if user wants to know the name of a hex color
     middleware.use(Middlewares.getColorName);
+
+    // 7) finally if the tweet contains an image, extract its colors
     middleware.use(Middlewares.getImageColor);
+
+    // 8) the bot exhausted all of its possiblities
     // there must always be a next, fn
     middleware.use(async () => {
       console.log("The bot did nothing. :(");
@@ -150,6 +154,8 @@ async function initialize() {
     }
     await handleIncomingTweet(req, tweetId);
   });
+
+  stream.on("user_event", async (eventMsg) => console.log(eventMsg));
 
   /**
    * Calculates the difference between now and the next random post time
