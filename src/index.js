@@ -80,11 +80,23 @@ async function initialize() {
 
     tweet._reqId = req._id;
 
+    // 1) Check if bot mentioned itself, if not continue
     middleware.use(Middlewares.checkIfSelf);
+
+    // 2) Ignore if its a retweet
     middleware.use(Middlewares.checkMessageType);
+
+    // 3) If its a reply and the user thanks the bot reply something
+    // and end it here
     middleware.use(Middlewares.replyThankYou);
+
+    // 4) Check if user wants "more" colors, and respond with an image
     middleware.use(Middlewares.getFullImagePalette);
+
+    // 5) if an image is found in the tweet, get colors an return a palette
     middleware.use(Middlewares.getImage);
+
+    // 6) checks if user wants to know the name of a hex color
     middleware.use(Middlewares.getColorName);
     middleware.use(Middlewares.getImageColor);
     // there must always be a next, fn

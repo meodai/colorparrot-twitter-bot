@@ -13,7 +13,7 @@ const palleteArrToHexArr = (arr) => arr.map((c) => c.hex);
 /**
  * Middleware provides functionality to implement middleware-style control
  * flow
- * @class
+ * @class Middleware (T, tweet, db, redis)
  */
 class Middleware {
   constructor(T, tweet, db, redis) {
@@ -614,15 +614,24 @@ Middlewares.getColorName = (function() {
           break;
         }
       }
+
       if (!validHex && !userImageURL) {
         await next();
       } else if (namedColorsMap.get(hex)) {
+        const imgBuff = Images.generateImage({
+          name: namedColorsMap.get(hex),
+          hex,
+        });
+        const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+        const mediaIdString = await T.mediaUpload(imgBase64);
+
         await T.statusesUpdate({
           status: buildMessage(Templates.EXACT_HEX_NAME_RESPONSE, {
             screenName,
             hex,
             colorName: namedColorsMap.get(hex),
           }),
+          media_ids: mediaIdString,
           in_reply_to_status_id: tweet.getStatusID(),
         });
         await db.resolveRequest(tweet.getRequestID());
@@ -631,6 +640,13 @@ Middlewares.getColorName = (function() {
         const foundColors = findColors.getNamesForValues([hex]);
         color = foundColors[0];
 
+        const imgBuff = Images.generateImage({
+          name: color.name,
+          hex: color.hex,
+        });
+        const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+        const mediaIdString = await T.mediaUpload(imgBase64);
+
         await T.statusesUpdate({
           status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {
             screenName,
@@ -638,6 +654,7 @@ Middlewares.getColorName = (function() {
             closestHex: color.hex,
             closestName: color.name,
           }),
+          media_ids: mediaIdString,
           in_reply_to_status_id: tweet.getStatusID(),
         });
 
