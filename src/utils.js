@@ -157,6 +157,12 @@ const Twitter = (function() {
         //language: "en",
       });
     }
+
+    userEvents(source) {
+      return this._T.stream("user_event", {
+        source,
+      });
+    }
   }
 
   return { Tweet, Twit };
