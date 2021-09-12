@@ -157,10 +157,11 @@ const Twitter = (function() {
         //language: "en",
       });
     }
-
+    /*
     userStream() {
       return this._T.stream("user");
     }
+    */
   }
 
   return { Tweet, Twit };
