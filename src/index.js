@@ -155,7 +155,9 @@ async function initialize() {
     await handleIncomingTweet(req, tweetId);
   });
 
-  //eventStream.on("favorite", async (eventMsg) => console.log(eventMsg));
+  const userStream = T.userStream();
+
+  userStream.on("user_event", async (eventMsg) => console.log(eventMsg));
 
   /**
    * Calculates the difference between now and the next random post time
