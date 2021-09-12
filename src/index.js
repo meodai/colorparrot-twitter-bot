@@ -156,9 +156,8 @@ async function initialize() {
   });
 
   //const userStream = T.userStream();
-
-  stream.on("user_event", async (eventMsg) => console.log(eventMsg));
-  stream.on("favourite", async (eventMsg) => console.log(eventMsg));
+  //stream.on("user_event", async (eventMsg) => console.log(eventMsg));
+  //stream.on("favourite", async (eventMsg) => console.log(eventMsg));
 
   /**
    * Calculates the difference between now and the next random post time
