@@ -69,7 +69,14 @@
     "@{{screenName}} Color names function like a thread attached to a delicate needle, capable of stitching together our most valued emotions and memories. When the needle hits the target, we feel either pleasure or empathy.\n(reply more for more colors)",
     "@{{screenName}} Your command is my wish: \n(answer 'more!' to see more colors)\n",
     "@{{screenName}} Here comes your color swatch: \n(answer 'more!' to see more colors)\n",
-    "@{{screenName}} All baby parrots ready at the swatching station *bip*bup*:  \n(answer 'more!' to see more colors)\n"
+    "@{{screenName}} The colors live a remarkable life of their own after they have been applied to the canvas. ― Edvard Munch\n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} All baby parrots ready at the swatching station *bip*bup*:  \n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} The parrot assumes the colors of his surroundings. \n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} “Every parrot assumes the colors of his surroundings.” ― Chinese Proverb \n(say 'more!' to see more colors and less proverbs)\n",
+    "@{{screenName}} “Colors, like features, follow the changes of the emotions.” ― Pablo Picasso\n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} Color Parrot inspired Pablo Picasso to paint his greatest masterpieces. Ok I made that up, but it can inspire you.\n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} “Color possesses me. I don’t have to pursue it. It will possess me always, I know it. That is the meaning of this happy hour: Color and I are one. I am a painter.” ― Paul Klee\n(answer 'more!' to see more colors)\n",
+    "@{{screenName}} “The best colour in the whole world is the one @color_parrot picks for you.” ― Coco Chanel\n(answer 'more!' to see more colors)\n"
   ],
 
   "ALL_COLORS_IN_IMAGE": [
@@ -80,7 +87,9 @@
     "@{{screenName}} Snatching colors is kinda addicting:\n",
     "@{{screenName}} Baby robots found some more:\n",
     "@{{screenName}} These are the other ones:\n",
+    "@{{screenName}} Coloring outside the lines is a fine art. ― Kim Nance\n",
     "@{{screenName}} Looks like you can't get enough:\n",
+    "@{{screenName}} Truth has but one color, a lie has many:\n",
     "@{{screenName}} It took me an other {{sElapsed}} seconds to find these colors:\n"
   ],
 
