@@ -45,7 +45,8 @@ test("extract colors from images", async () => {
 test("Make sure messages are not too long", async () => {
   for (const [category, messages] of Object.entries(templatesJSON)) {
     for (const message of messages) {
-      expect(message.length).toBeLessThan(240);
+      expect(message.length).toBeLessThan(241);
+
       /*
         260 is the actual
         twitter max length
