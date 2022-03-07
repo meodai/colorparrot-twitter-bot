@@ -36,6 +36,7 @@
   ],
 
   "COLORS_IN_IMAGE": [
+    "@{{screenName}} I was nervous when I saw it was you requesting colors. I hurried and got those in {{sElapsed}}s!",
     "@{{screenName}} Hey! These are the colors we found in your picture.\n(answer 'more' to see more colors)\n",
     "@{{screenName}} Voilà! Some of the colors our robo-parrots found.\n(reply 'more' to see even more colors)\n",
     "@{{screenName}} GoGo Robo-Parrot found some colors.\n(respond 'more' to get more colors)\n",
@@ -102,6 +103,8 @@
   ],
 
   "THANK_YOU_REPLY": [
+    "@{{screenName}} Thank you for using the color parrot!",
+    "@{{screenName}} Hope to get colors from you again soon! 💖",
     "@{{screenName}} You are welcome, I was built for this. 🤖",
     "@{{screenName}} Love it when you feed me colors 🦜",
     "@{{screenName}} Please don't hesitate to feed me more colors",

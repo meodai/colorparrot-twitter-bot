@@ -1,4 +1,5 @@
 const color = require("./src/color");
+const templatesJSON = require("./src/templates.json");
 
 /**
  *
@@ -39,3 +40,18 @@ test("extract colors from images", async () => {
   expect(colorsInImage[0]).toHaveProperty("name");
 });
 
+
+
+test("Make sure messages are not too long", async () => {
+  for (const [category, messages] of Object.entries(templatesJSON)) {
+    for (const message of messages) {
+      expect(message.length).toBeLessThan(240);
+      /*
+        260 is the actual
+        twitter max length
+        but there are some rules regarding emoji etc..
+        https: //developer.twitter.com/en/docs/counting-characters#:~:text=In%20most%20cases%2C%20the%20text,more%20characters%20as%20its%20weight.
+      */
+    }
+  }
+});
