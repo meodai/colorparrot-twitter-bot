@@ -135,30 +135,38 @@ Middlewares.getImage = async (T, tweet, next, db) => {
 const isGetImageColorCommand = (userMessage) => {
   const msg = userMessage.replace(/ {2}/g, " ").toLowerCase();
 
-  return !(
-    !msg.includes("what color is this")
-    && !msg.includes("what colour is this")
-    && !msg.includes("what color is that")
-    && !msg.includes("what colour is that")
-    && !msg.includes("what is this color")
-    && !msg.includes("what is this colour")
-    && !msg.includes("what is that color")
-    && !msg.includes("what is that colour")
-    && !msg.includes("what are those colors")
-    && !msg.includes("what are those colours")
-    && !msg.includes("what colors are in this")
-    && !msg.includes("what colours are in this")
-    && !msg.includes("what is the dominant color")
-    && !msg.includes("what are the colors")
-    && !msg.includes("what are the colours")
-    && !msg.includes("what colors are in this picture")
-    && !msg.includes("what colours are in this picture")
-    && !msg.includes("what colors are these")
-    && !msg.includes("what colours are these")
-    && !msg.includes("what colors are those")
-    && !msg.includes("what colours are those")
-    && !msg.includes("what are these colors")
-    && !msg.includes("what are these colours")
+  return (
+    msg.includes("what color is this")
+    || msg.includes("what colour is this")
+    || msg.includes("what color is that")
+    || msg.includes("what colour is that")
+    || msg.includes("what is this color")
+    || msg.includes("what is this colour")
+    || msg.includes("what is that color")
+    || msg.includes("what is that colour")
+    || msg.includes("what are those colors")
+    || msg.includes("what are those colours")
+    || msg.includes("what colors are in this")
+    || msg.includes("what colours are in this")
+    || msg.includes("what is the dominant color")
+    || msg.includes("what are the colors")
+    || msg.includes("what are the colours")
+    || msg.includes("what colors are in this picture")
+    || msg.includes("what colours are in this picture")
+    || msg.includes("what colors are these")
+    || msg.includes("what colours are these")
+    || msg.includes("what colors are those")
+    || msg.includes("what colours are those")
+    || msg.includes("what are these colors")
+    || msg.includes("what are these colours")
+    || msg.includes("what's this colour")
+    || msg.includes("what's this color")
+    || msg.includes("what color")
+    || msg.includes("what colour")
+    || msg.includes("get image color")
+    || msg.includes("get image colour")
+    || msg.includes("get image colors")
+    || msg.includes("get image colours")
   );
 };
 
@@ -666,4 +674,8 @@ Middlewares.getColorName = (function() {
   };
 }());
 
-module.exports = { Middleware, Middlewares };
+const testFn = {
+  isGetImageColorCommand,
+};
+
+module.exports = { Middleware, Middlewares, testFn };
