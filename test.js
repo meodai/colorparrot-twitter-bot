@@ -1,6 +1,8 @@
 const color = require("./src/color");
 const templatesJSON = require("./src/templates.json");
-
+const {
+  testFn
+} = require("./src/middlewares");
 /**
  *
  const {
@@ -40,8 +42,6 @@ test("extract colors from images", async () => {
   expect(colorsInImage[0]).toHaveProperty("name");
 });
 
-
-
 test("Make sure messages are not too long", async () => {
   for (const [category, messages] of Object.entries(templatesJSON)) {
     for (const message of messages) {
@@ -56,3 +56,12 @@ test("Make sure messages are not too long", async () => {
     }
   }
 });
+
+test("twitter trigger messages", async () => {
+  expect(testFn.isGetImageColorCommand("get image color")).toBe(true);
+  expect(testFn.isGetImageColorCommand("what are those colors?")).toBe(true);
+
+  expect(testFn.isGetImageColorCommand("what?")).toBe(false);
+  expect(testFn.isGetImageColorCommand("lorem ipsum")).toBe(false);
+  expect(testFn.isGetImageColorCommand("dini mueter")).toBe(false);
+})
