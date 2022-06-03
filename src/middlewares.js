@@ -270,7 +270,10 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
   if (!tweetIsEmpty) {
     const match = /\d+/.exec(strippedMessage);
     if (match) {
-      colorCount = Math.min(parseInt(match[0], 10), config.MAX_USER_COLOR_COUNT);
+      colorCount = Math.min(
+        parseInt(match[0], 10),
+        config.MAX_USER_COLOR_COUNT
+      );
     }
   }
 
@@ -287,12 +290,12 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
   const startTime = Date.now();
   const paletteWorkers = allMediaURLs.map((url) => Color.getPalette(url, colorCount));
   const palettes = await Promise.all(paletteWorkers);
-  const msElapsed = Date.now() - startTime;
-  const sElapsed = Math.round((msElapsed / 1000) * 100) / 100;
 
   const hexArrays = palettes.map((palette) => palleteArrToHexArr(palette));
   const hexURLStrings = hexArrays.map((hexArr) => hexArrToURLStr(hexArr));
 
+  const msElapsed = Date.now() - startTime;
+  const sElapsed = Math.round((msElapsed / 1000) * 100) / 100;
   console.log(
     `it took ${sElapsed}s to generate the images`,
   );
@@ -387,14 +390,15 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db, redis) => {
   const imageURLs = allMedia.map((media) => media.media_url_https);
 
   const startTime = Date.now();
+
   const paletteWorkers = imageURLs.map((url) => Color.getPalette(url));
   const palettes = await Promise.all(paletteWorkers);
-  const msElapsed = Date.now() - startTime;
-  const sElapsed = Math.round((msElapsed / 1000) * 100) / 100;
 
   const hexArrays = palettes.map((palette) => palleteArrToHexArr(palette));
   const hexURLStrings = hexArrays.map((hexArr) => hexArrToURLStr(hexArr));
 
+  const msElapsed = Date.now() - startTime;
+  const sElapsed = Math.round((msElapsed / 1000) * 100) / 100;
   console.log(
     `it took ${sElapsed}s to generate the image`,
   );
