@@ -617,9 +617,7 @@ Middlewares.getColorName = (function() {
       });
 
       await db.resolveRequest(tweet.getRequestID());
-    }
-
-    if (
+    } else if (
       userTweet.includes("what is the name of")
       || userTweet.includes("what's the name of")
     ) {
