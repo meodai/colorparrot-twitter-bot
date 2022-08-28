@@ -26,7 +26,13 @@
   ],
 
   "RANDOM_COLOR_RESPONSE": [
-    "@{{screenName}} There you go: '{{hex}}' is your random color and its called '{{name}}'"
+    "@{{screenName}} There you go: '{{hex}}' is your random color and its called '{{name}}'",
+    "@{{screenName}} Your lucky color is {{name}} {{hex}}!",
+    "@{{screenName}} {{name}} fits you perfectly {{hex}}!",
+    "@{{screenName}} My baby robo-parrots found a color named {{name}} for you: {{hex}}!",
+    "@{{screenName}} If you like it or not, {{name}} is now your color {{hex}}!",
+    "@{{screenName}} Hey you asked for a color, there you go {{name}}: {{hex}}!",
+    "@{{screenName}} I was nervous when I saw it was you requesting a color, hope you like {{name}} → {{hex}}!"
   ],
 
   "REFERENCE_TWEET_NOT_FOUND": [
