@@ -25,6 +25,10 @@
     "@{{screenName}} There are 16,777,216 possible RGB colors. I don't know the axact name of {{hex}} but {{closestHex}} is pretty close and its name is {{closestName}}"
   ],
 
+  "RANDOM_COLOR_RESPONSE": [
+    "@{{screenName}} There you go: '{{hex}}' is your random color and its called '{{name}}'"
+  ],
+
   "REFERENCE_TWEET_NOT_FOUND": [
     "@{{screenName}} Remember to quote or reply to a tweet when asking for the color in an image!"
   ],

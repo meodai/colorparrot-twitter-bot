@@ -61,7 +61,16 @@ test("twitter trigger messages", async () => {
   expect(testFn.isGetImageColorCommand("get image color")).toBe(true);
   expect(testFn.isGetImageColorCommand("what are those colors?")).toBe(true);
 
+  expect(testFn.isGetImageColorCommand("random")).toBe(false);
   expect(testFn.isGetImageColorCommand("what?")).toBe(false);
   expect(testFn.isGetImageColorCommand("lorem ipsum")).toBe(false);
   expect(testFn.isGetImageColorCommand("dini mueter")).toBe(false);
-})
+});
+
+test("get a random color", async () => {
+  const randomColor = await color.generateRandomColor();
+
+  expect(typeof randomColor).toBe("object");
+  expect(randomColor).toHaveProperty("name");
+  expect(randomColor).toHaveProperty("hex");
+});

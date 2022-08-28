@@ -572,21 +572,6 @@ Middlewares.checkMessageType = (T, tweet, next) => {
 
 Middlewares.getColorName = (function() {
   /**
-   *
-   * @param {*} uri
-   * @param {*} filename
-   * @param {function} callback
-   */
-  function download(uri, filename, callback) {
-    request.head(uri, (err, res, body) => {
-      console.log("content-type:", res.headers["content-type"]);
-      console.log("content-length:", res.headers["content-length"]);
-
-      request(uri).pipe(fs.createWriteStream(filename)).on("close", callback);
-    });
-  }
-
-  /**
    * Determines the color name for the specified hex value.
    * @param {*} T
    * @param {*} tweet
@@ -605,11 +590,34 @@ Middlewares.getColorName = (function() {
     let color;
     const screenName = tweet.getUserName();
 
-    if (userImageURL) {
-      download(userImageURL);
-    }
-
     const userTweet = tweet.getUserTweet().replace(/ {2}/g, " ").toLowerCase();
+
+    if (
+      userTweet.includes("random") ||
+      userTweet.includes("i feel lucky")
+    ) {
+      const color = await Color.generateRandomColor();
+
+      const imgBuff = Images.generateImage({
+        name: color.name,
+        hex: color.hex,
+      });
+
+      const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+      const mediaIdString = await T.mediaUpload(imgBase64);
+
+      await T.statusesUpdate({
+        status: buildMessage(Templates.RANDOM_COLOR_RESPONSE, {
+          screenName,
+          name: color.name,
+          hex: color.hex,
+        }),
+        media_ids: mediaIdString,
+        in_reply_to_status_id: tweet.getStatusID(),
+      });
+
+      await db.resolveRequest(tweet.getRequestID());
+    }
 
     if (
       userTweet.includes("what is the name of")
