@@ -36,7 +36,7 @@
   ],
 
   "REFERENCE_TWEET_NOT_FOUND": [
-    "@{{screenName}} Remember to quote or reply to a tweet when asking for the color in an image!"
+    "@{{screenName}} Remember to quote or reply to a tweet when asking for the color in an image! Or simply ask for a random color."
   ],
 
   "IMAGE_NOT_FOUND_IN_REFERENCE": [
