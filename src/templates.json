@@ -22,7 +22,7 @@
 
   "CLOSEST_HEX_NAME_RESPONSE": [
     "@{{screenName}} We don't have an exact match for {{hex}} but the closest color we have is {{closestHex}} and its name is {{closestName}}",
-    "@{{screenName}} There are 16,777,216 possible RGB colors. I don't know the axact name of {{hex}} but {{closestHex}} is pretty close and its name is {{closestName}}"
+    "@{{screenName}} There are 16,777,216 possible RGB colors. I don't know the exact name of {{hex}} but {{closestHex}} is pretty close and its name is {{closestName}}"
   ],
 
   "RANDOM_COLOR_RESPONSE": [
