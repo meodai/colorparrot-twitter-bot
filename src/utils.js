@@ -107,55 +107,57 @@ const Twitter = (function() {
   }
 
   class Twit {
-    constructor(twitt) {
-      this._T = twitt;
+    constructor(twitterClient) {
+      this.client = twitterClient.readOnly;
     }
 
     getTweetByID(id) {
-      return new Promise((res, rej) => {
-        this._T.get("statuses/show/:id", { id, tweet_mode: "extended" }, (err, data) => {
-          if (err) {
-            rej(err);
-          } else {
-            res(new Tweet(data));
-          }
-        });
-      });
+      return this.client.v2.singleTweet(id, {
+        expansions: [
+          "entities.mentions.username",
+          "in_reply_to_user_id",
+        ]
+      }).then(({ data }) => new Tweet(data));
     }
 
     statusesUpdate(params) {
-      return new Promise((res, rej) => {
-        this._T.post("statuses/update", params, (err) => {
-          if (err) {
-            rej(err);
-          } else {
-            res(true);
-          }
+      return this.client.v1.reply(
+        params.status,
+        params.in_reply_to_status_id,
+        {
+          media_ids: params.media_ids,
+        },
+      ).then(() => true);
+    }
+
+    mediaUpload(imageBuffer) {
+      return this.client.v1.uploadMedia(imageBuffer);
+    }
+
+    async statusesFilterStream(track) {
+      const { client } = this;
+
+      const rules = await client.v2.streamRules();
+      if (rules.data && rules.data.length) {
+        await client.v2.updateStreamRules({
+          delete: { ids: rules.data.map((rule) => rule.id) }
         });
-      });
-    }
+      }
 
-    mediaUpload(b64content) {
-      return new Promise((res, rej) => {
-        this._T.post(
-          "media/upload",
-          { media_data: b64content },
-          (err, data) => {
-            if (err) {
-              rej(err);
-            } else {
-              res(data.media_id_string);
-            }
-          }
-        );
+      // Add our rules
+      await client.v2.updateStreamRules({
+        add: [{ value: track }],
       });
-    }
 
-    statusesFilterStream(track) {
-      return this._T.stream("statuses/filter", {
-        track,
-        //language: "en",
+      const stream = await client.v2.searchStream({
+        "tweet.fields": ["referenced_tweets", "author_id"],
+        expansions: ["referenced_tweets.id"],
       });
+
+      // Enable auto reconnect
+      stream.autoReconnect = true;
+
+      return stream;
     }
     /*
     userStream() {

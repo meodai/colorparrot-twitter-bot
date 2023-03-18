@@ -5,7 +5,8 @@ if (process.env.NODE_ENV === "development") {
 require("dotenv").config(options);
 
 const Redis = require("ioredis");
-const Twitt = require("twit");
+// const Twitt = require("twit");
+const { TwitterApi, ETwitterStreamEvent } = require("twitter-api-v2");
 const config = require("./config");
 
 const Images = require("./images");
@@ -47,13 +48,21 @@ async function initialize() {
     return;
   }
 
+  const userClient = new TwitterApi({
+    appKey: config.CONSUMER_KEY,
+    appSecret: config.CONSUMER_SECRET,
+    accessToken: config.ACCESS_TOKEN,
+    accessSecret: config.ACCESS_TOKEN_SECRET,
+  });
+
   const T = new Twit(
-    new Twitt({
-      consumer_key: config.CONSUMER_KEY,
-      consumer_secret: config.CONSUMER_SECRET,
-      access_token: config.ACCESS_TOKEN,
-      access_token_secret: config.ACCESS_TOKEN_SECRET,
-    })
+    await userClient.login()
+    // new Twitt({
+    //   consumer_key: config.CONSUMER_KEY,
+    //   consumer_secret: config.CONSUMER_SECRET,
+    //   access_token: config.ACCESS_TOKEN,
+    //   access_token_secret: config.ACCESS_TOKsEN_SECRET,
+    // })
   );
 
   /**
@@ -142,7 +151,7 @@ async function initialize() {
 
   const stream = T.statusesFilterStream("@color_parrot");
 
-  stream.on("tweet", async (tweet) => {
+  stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
     const tweetId = tweet.id_str;
     let req;
     console.log("new tweet:", tweetId);
@@ -155,9 +164,9 @@ async function initialize() {
     await handleIncomingTweet(req, tweetId);
   });
 
-  //const userStream = T.userStream();
-  //stream.on("user_event", async (eventMsg) => console.log(eventMsg));
-  //stream.on("favourite", async (eventMsg) => console.log(eventMsg));
+  // const userStream = T.userStream();
+  // stream.on("user_event", async (eventMsg) => console.log(eventMsg));
+  // stream.on("favourite", async (eventMsg) => console.log(eventMsg));
 
   /**
    * Calculates the difference between now and the next random post time
