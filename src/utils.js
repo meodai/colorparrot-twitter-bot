@@ -123,12 +123,7 @@ const Twitter = (function() {
     }
 
     async getTweetByID(id) {
-      const data = await this.appClient.v1.singleTweet(id, {
-        expansions: [
-          "entities.mentions.username",
-          "in_reply_to_user_id",
-        ]
-      });
+      const data = await this.appClient.v1.singleTweet(id);
       return new Tweet(data);
     }
 
