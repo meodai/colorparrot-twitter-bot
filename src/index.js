@@ -23,6 +23,9 @@ const {
 async function initialize() {
   const redis = new RedisDB(
     new Redis(config.REDIS_URL, {
+      tls: {
+        rejectUnauthorized: false
+      },
       retryStrategy: (times) => {
         if (times > 3) {
           console.log("could not connect to redis");
@@ -196,9 +199,9 @@ async function initialize() {
   };
 
   // timers
-  // Promise.all([postRandomTweet()/* , retryFailedRequests() */])
-  //   .then(() => startTimers())
-  //   .catch(() => startTimers());
+  Promise.all([postRandomTweet()/* , retryFailedRequests() */])
+    .then(() => startTimers())
+    .catch(() => startTimers());
 
   console.log("color parrot started");
 }
