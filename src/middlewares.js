@@ -54,15 +54,13 @@ class Middleware {
           }
         };
       } else if (f.constructor.name === "AsyncFunction") {
-        func = async () => {
-          await f(
-            this.T,
-            this.tweet,
-            this.listOfMiddlewares[i + 1],
-            this.db,
-            this.redis
-          ).catch((e) => fail(e));
-        };
+        func = () => f(
+          this.T,
+          this.tweet,
+          this.listOfMiddlewares[i + 1],
+          this.db,
+          this.redis
+        ).catch((e) => fail(e));
       }
       this.listOfMiddlewares[i] = func;
     }

@@ -36,10 +36,10 @@ Images.sendRandomImage = async (T, db, redis) => {
 
   if (generatedUnique) {
     const imgBuf = Images.generateImage(color);
-    const imgBase64 = Images.convertImagebuffTobase64(imgBuf);
+    // const imgBase64 = Images.convertImagebuffTobase64(imgBuf);
     const hashTagColorName = color.name.split(" ").join("_");
     const hashTagHexValue = color.hex;
-    const mediaIdString = await T.mediaUpload(imgBase64);
+    const mediaIdString = await T.mediaUpload(imgBuf);
     T.statusesUpdate({
       status: `#${hashTagColorName} ${hashTagHexValue} https://parrot.color.pizza/color/${hashTagHexValue.replace("#", "")}`,
       media_ids: mediaIdString,
@@ -129,7 +129,7 @@ Images.generateImage = (colorObj) => {
 
 /**
  * Converts an image buffer to base64
- * @param {buffer} imageBuff, image buffer
+ * @param {Buffer} imageBuff, image buffer
  * @return {string}
  */
 Images.convertImagebuffTobase64 = (imageBuff) => imageBuff.toString("base64");

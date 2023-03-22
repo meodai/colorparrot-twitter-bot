@@ -1,3 +1,6 @@
+// eslint-disable-next-line no-unused-vars
+const { TwitterApi, EUploadMimeType } = require("twitter-api-v2");
+
 /**
  * Redis database
  */
@@ -37,6 +40,9 @@ class RedisDB {
  */
 const Twitter = (function() {
   class Tweet {
+    /**
+     * @param {import("twitter-api-v2").TweetV1} tweet
+     */
     constructor(tweet) {
       this._tweet = tweet;
       this._reqId = null;
@@ -107,52 +113,61 @@ const Twitter = (function() {
   }
 
   class Twit {
-    constructor(twitterClient) {
-      this.client = twitterClient.readOnly;
+    /**
+     * @param {TwitterApi} userClient
+     * @param {TwitterApi} appClient
+     */
+    constructor(userClient, appClient) {
+      this.userClient = userClient;
+      this.appClient = appClient;
     }
 
-    getTweetByID(id) {
-      return this.client.v2.singleTweet(id, {
+    async getTweetByID(id) {
+      const data = await this.appClient.v1.singleTweet(id, {
         expansions: [
           "entities.mentions.username",
           "in_reply_to_user_id",
         ]
-      }).then(({ data }) => new Tweet(data));
+      });
+      return new Tweet(data);
     }
 
-    statusesUpdate(params) {
-      return this.client.v1.reply(
+    async statusesUpdate(params) {
+      await this.userClient.v2.reply(
         params.status,
         params.in_reply_to_status_id,
         {
-          media_ids: params.media_ids,
-        },
-      ).then(() => true);
+          media: {
+            media_ids: params.media_ids,
+          },
+        }
+      );
+
+      return true;
     }
 
     mediaUpload(imageBuffer) {
-      return this.client.v1.uploadMedia(imageBuffer);
+      return this.userClient.v1.uploadMedia(imageBuffer, {
+        mimeType: EUploadMimeType.Png,
+      });
     }
 
     async statusesFilterStream(track) {
-      const { client } = this;
+      const { appClient } = this;
 
-      const rules = await client.v2.streamRules();
+      const rules = await appClient.v2.streamRules();
       if (rules.data && rules.data.length) {
-        await client.v2.updateStreamRules({
+        await appClient.v2.updateStreamRules({
           delete: { ids: rules.data.map((rule) => rule.id) }
         });
       }
 
       // Add our rules
-      await client.v2.updateStreamRules({
+      await appClient.v2.updateStreamRules({
         add: [{ value: track }],
       });
 
-      const stream = await client.v2.searchStream({
-        "tweet.fields": ["referenced_tweets", "author_id"],
-        expansions: ["referenced_tweets.id"],
-      });
+      const stream = await appClient.v2.searchStream();
 
       // Enable auto reconnect
       stream.autoReconnect = true;
