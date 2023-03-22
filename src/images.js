@@ -42,7 +42,7 @@ Images.sendRandomImage = async (T, db, redis) => {
     const mediaIdString = await T.mediaUpload(imgBuf);
     T.statusesUpdate({
       status: `#${hashTagColorName} ${hashTagHexValue} https://parrot.color.pizza/color/${hashTagHexValue.replace("#", "")}`,
-      media_ids: mediaIdString,
+      media_ids: [mediaIdString],
     });
     redis.addColorNameInPostedTweets(color.name);
     return true;
