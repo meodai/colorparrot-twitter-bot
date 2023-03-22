@@ -1,5 +1,3 @@
-const fs = require("fs");
-const request = require("request");
 const hexColorRegex = require("hex-color-regex");
 
 const Color = require("./color");
@@ -56,15 +54,13 @@ class Middleware {
           }
         };
       } else if (f.constructor.name === "AsyncFunction") {
-        func = async () => {
-          await f(
-            this.T,
-            this.tweet,
-            this.listOfMiddlewares[i + 1],
-            this.db,
-            this.redis
-          ).catch((e) => fail(e));
-        };
+        func = () => f(
+          this.T,
+          this.tweet,
+          this.listOfMiddlewares[i + 1],
+          this.db,
+          this.redis
+        ).catch((e) => fail(e));
       }
       this.listOfMiddlewares[i] = func;
     }
@@ -113,8 +109,8 @@ Middlewares.getImage = async (T, tweet, next, db) => {
       });
       const screenName = tweet.getUserName();
       const hashTag = colorName.split(" ").join("_");
-      const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
-      const mediaIdString = await T.mediaUpload(imgBase64);
+      // const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+      const mediaIdString = await T.mediaUpload(imgBuff);
       await T.statusesUpdate({
         status: buildMessage(Templates.IMAGE_RESPONSE, {
           screenName,
@@ -302,8 +298,8 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
 
   const generateAndUploadCollection = async (palette) => {
     const imgBuff = Images.generateCollection(palette);
-    const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
-    const mediaIdString = await T.mediaUpload(imgBase64);
+    // const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+    const mediaIdString = await T.mediaUpload(imgBuff);
     return mediaIdString;
   };
 
@@ -420,8 +416,8 @@ Middlewares.getFullImagePalette = async (T, tweet, next, db, redis) => {
 
   const generateAndUploadCollection = async (palette) => {
     const imgBuff = Images.generateCollection(palette);
-    const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
-    const mediaIdString = await T.mediaUpload(imgBase64);
+    // const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+    const mediaIdString = await T.mediaUpload(imgBuff);
     return mediaIdString;
   };
 
@@ -593,8 +589,8 @@ Middlewares.getColorName = (function() {
     const userTweet = tweet.getUserTweet().replace(/ {2}/g, " ").toLowerCase();
 
     if (
-      userTweet.includes("random") ||
-      userTweet.includes("i feel lucky")
+      userTweet.includes("random")
+      || userTweet.includes("i feel lucky")
     ) {
       const color = await Color.generateRandomColor();
 
@@ -603,8 +599,8 @@ Middlewares.getColorName = (function() {
         hex: color.hex,
       });
 
-      const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
-      const mediaIdString = await T.mediaUpload(imgBase64);
+      // const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+      const mediaIdString = await T.mediaUpload(imgBuff);
 
       await T.statusesUpdate({
         status: buildMessage(Templates.RANDOM_COLOR_RESPONSE, {
@@ -640,8 +636,8 @@ Middlewares.getColorName = (function() {
           name: namedColorsMap.get(hex),
           hex,
         });
-        const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
-        const mediaIdString = await T.mediaUpload(imgBase64);
+        // const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+        const mediaIdString = await T.mediaUpload(imgBuff);
 
         await T.statusesUpdate({
           status: buildMessage(Templates.EXACT_HEX_NAME_RESPONSE, {
@@ -662,8 +658,8 @@ Middlewares.getColorName = (function() {
           name: color.name,
           hex: color.hex,
         });
-        const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
-        const mediaIdString = await T.mediaUpload(imgBase64);
+        // const imgBase64 = Images.convertImagebuffTobase64(imgBuff);
+        const mediaIdString = await T.mediaUpload(imgBuff);
 
         await T.statusesUpdate({
           status: buildMessage(Templates.CLOSEST_HEX_NAME_RESPONSE, {

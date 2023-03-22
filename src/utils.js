@@ -1,3 +1,6 @@
+// eslint-disable-next-line no-unused-vars
+const { TwitterApi, EUploadMimeType } = require("twitter-api-v2");
+
 /**
  * Redis database
  */
@@ -37,6 +40,9 @@ class RedisDB {
  */
 const Twitter = (function() {
   class Tweet {
+    /**
+     * @param {import("twitter-api-v2").TweetV1} tweet
+     */
     constructor(tweet) {
       this._tweet = tweet;
       this._reqId = null;
@@ -107,55 +113,61 @@ const Twitter = (function() {
   }
 
   class Twit {
-    constructor(twitt) {
-      this._T = twitt;
+    /**
+     * @param {TwitterApi} userClient
+     * @param {TwitterApi} appClient
+     */
+    constructor(userClient, appClient) {
+      this.userClient = userClient;
+      this.appClient = appClient;
     }
 
-    getTweetByID(id) {
-      return new Promise((res, rej) => {
-        this._T.get("statuses/show/:id", { id, tweet_mode: "extended" }, (err, data) => {
-          if (err) {
-            rej(err);
-          } else {
-            res(new Tweet(data));
-          }
+    async getTweetByID(id) {
+      const data = await this.appClient.v1.singleTweet(id);
+      return new Tweet(data);
+    }
+
+    async statusesUpdate(params) {
+      await this.userClient.v2.reply(
+        params.status,
+        params.in_reply_to_status_id,
+        {
+          media: {
+            media_ids: params.media_ids,
+          },
+        }
+      );
+
+      return true;
+    }
+
+    mediaUpload(imageBuffer) {
+      return this.userClient.v1.uploadMedia(imageBuffer, {
+        mimeType: EUploadMimeType.Png,
+      });
+    }
+
+    async statusesFilterStream(track) {
+      const { appClient } = this;
+
+      const rules = await appClient.v2.streamRules();
+      if (rules.data && rules.data.length) {
+        await appClient.v2.updateStreamRules({
+          delete: { ids: rules.data.map((rule) => rule.id) }
         });
-      });
-    }
+      }
 
-    statusesUpdate(params) {
-      return new Promise((res, rej) => {
-        this._T.post("statuses/update", params, (err) => {
-          if (err) {
-            rej(err);
-          } else {
-            res(true);
-          }
-        });
+      // Add our rules
+      await appClient.v2.updateStreamRules({
+        add: [{ value: track }],
       });
-    }
 
-    mediaUpload(b64content) {
-      return new Promise((res, rej) => {
-        this._T.post(
-          "media/upload",
-          { media_data: b64content },
-          (err, data) => {
-            if (err) {
-              rej(err);
-            } else {
-              res(data.media_id_string);
-            }
-          }
-        );
-      });
-    }
+      const stream = await appClient.v2.searchStream();
 
-    statusesFilterStream(track) {
-      return this._T.stream("statuses/filter", {
-        track,
-        //language: "en",
-      });
+      // Enable auto reconnect
+      stream.autoReconnect = true;
+
+      return stream;
     }
     /*
     userStream() {

@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === "development") {
 require("dotenv").config(options);
 
 const Redis = require("ioredis");
-const Twitt = require("twit");
+const { TwitterApi, ETwitterStreamEvent } = require("twitter-api-v2");
 const config = require("./config");
 
 const Images = require("./images");
@@ -14,9 +14,7 @@ const { Database } = require("./database");
 
 const {
   RedisDB,
-  Twitter: {
-    Twit,
-  },
+  Twitter: { Twit },
 } = require("./utils");
 
 /**
@@ -27,7 +25,7 @@ async function initialize() {
     new Redis(config.REDIS_URL, {
       retryStrategy: (times) => {
         if (times > 3) {
-          console.log("cannot connect to redis");
+          console.log("could not connect to redis");
           process.exit(1);
         }
         return 5000; // ms
@@ -42,19 +40,20 @@ async function initialize() {
     await db.connect();
     console.log("db connected");
   } catch (e) {
+    console.log("could not connect to the database");
     // TODO: handle?
     console.log(e);
     return;
   }
 
-  const T = new Twit(
-    new Twitt({
-      consumer_key: config.CONSUMER_KEY,
-      consumer_secret: config.CONSUMER_SECRET,
-      access_token: config.ACCESS_TOKEN,
-      access_token_secret: config.ACCESS_TOKEN_SECRET,
-    })
-  );
+  const userClient = new TwitterApi({
+    appKey: config.CONSUMER_KEY,
+    appSecret: config.CONSUMER_SECRET,
+    accessToken: config.ACCESS_TOKEN,
+    accessSecret: config.ACCESS_TOKEN_SECRET,
+  });
+  const userAppClient = await userClient.appLogin();
+  const T = new Twit(userClient, userAppClient);
 
   /**
    * sends a random tweet
@@ -125,7 +124,11 @@ async function initialize() {
       try {
         await handleIncomingTweet(req, req.tweet_id);
       } catch (e) {
-        console.log("an error occured while retrying failed request %s:\n %s", req._id, e);
+        console.log(
+          "an error occured while retrying failed request %s:\n %s",
+          req._id,
+          e
+        );
       } finally {
         await next();
       }
@@ -136,14 +139,15 @@ async function initialize() {
     } catch (e) {
       console.log("an error occured while retrying failed requests:", e);
     } finally {
+      // eslint-disable-next-line no-unused-vars
       setTimeout(retryFailedRequests, 1000 * 60);
     }
   };
 
-  const stream = T.statusesFilterStream("@color_parrot");
+  const stream = await T.statusesFilterStream("@color_parrot");
 
-  stream.on("tweet", async (tweet) => {
-    const tweetId = tweet.id_str;
+  stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
+    const tweetId = tweet.id;
     let req;
     console.log("new tweet:", tweetId);
     try {
@@ -155,9 +159,9 @@ async function initialize() {
     await handleIncomingTweet(req, tweetId);
   });
 
-  //const userStream = T.userStream();
-  //stream.on("user_event", async (eventMsg) => console.log(eventMsg));
-  //stream.on("favourite", async (eventMsg) => console.log(eventMsg));
+  // const userStream = T.userStream();
+  // stream.on("user_event", async (eventMsg) => console.log(eventMsg));
+  // stream.on("favourite", async (eventMsg) => console.log(eventMsg));
 
   /**
    * Calculates the difference between now and the next random post time
@@ -188,13 +192,13 @@ async function initialize() {
 
   const startTimers = () => {
     setInterval(postRandomTweet, 1000 * 60);
-    //setTimeout(retryFailedRequests, 1000 * 60);
+    // setTimeout(retryFailedRequests, 1000 * 60);
   };
 
   // timers
-  Promise.all([postRandomTweet() /*, retryFailedRequests() */])
-    .then(() => startTimers())
-    .catch(() => startTimers());
+  // Promise.all([postRandomTweet()/* , retryFailedRequests() */])
+  //   .then(() => startTimers())
+  //   .catch(() => startTimers());
 
   console.log("color parrot started");
 }
