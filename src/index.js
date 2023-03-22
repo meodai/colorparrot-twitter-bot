@@ -26,7 +26,7 @@ async function initialize() {
       retryStrategy: (times) => {
         if (times > 3) {
           console.log("could not connect to redis");
-          // process.exit(1);
+          process.exit(1);
         }
         return 5000; // ms
       },
