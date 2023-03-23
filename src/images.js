@@ -40,7 +40,7 @@ Images.sendRandomImage = async (T, db, redis) => {
     const hashTagColorName = color.name.split(" ").join("_");
     const hashTagHexValue = color.hex;
     const mediaIdString = await T.mediaUpload(imgBuf);
-    T.statusesUpdate({
+    await T.statusesUpdate({
       status: `#${hashTagColorName} ${hashTagHexValue} https://parrot.color.pizza/color/${hashTagHexValue.replace("#", "")}`,
       media_ids: [mediaIdString],
     });
