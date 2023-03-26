@@ -116,7 +116,7 @@ Middlewares.getImage = async (T, tweet, next, db) => {
           screenName,
           hashTag,
         }),
-        media_ids: mediaIdString,
+        media_ids: [mediaIdString],
         in_reply_to_status_id: tweet.getStatusID(),
       });
       await db.resolveRequest(tweet.getRequestID());
@@ -608,7 +608,7 @@ Middlewares.getColorName = (function() {
           name: color.name,
           hex: color.hex,
         }),
-        media_ids: mediaIdString,
+        media_ids: [mediaIdString],
         in_reply_to_status_id: tweet.getStatusID(),
       });
 
@@ -645,7 +645,7 @@ Middlewares.getColorName = (function() {
             hex,
             colorName: namedColorsMap.get(hex),
           }),
-          media_ids: mediaIdString,
+          media_ids: [mediaIdString],
           in_reply_to_status_id: tweet.getStatusID(),
         });
         await db.resolveRequest(tweet.getRequestID());
@@ -668,7 +668,7 @@ Middlewares.getColorName = (function() {
             closestHex: color.hex,
             closestName: color.name,
           }),
-          media_ids: mediaIdString,
+          media_ids: [mediaIdString],
           in_reply_to_status_id: tweet.getStatusID(),
         });
 

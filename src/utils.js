@@ -128,14 +128,22 @@ const Twitter = (function() {
     }
 
     async statusesUpdate(params) {
-      await this.userClient.v2.reply(
+      const extraPayload = {};
+
+      if (params.in_reply_to_status_id) {
+        extraPayload.reply = {
+          in_reply_to_tweet_id: params.in_reply_to_status_id,
+        };
+      }
+
+      await this.userClient.v2.tweet(
         params.status,
-        params.in_reply_to_status_id,
         {
           media: {
             media_ids: params.media_ids,
           },
-        }
+          ...extraPayload,
+        },
       );
 
       return true;
