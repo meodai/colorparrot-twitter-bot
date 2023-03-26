@@ -3,6 +3,7 @@ const hexColorRegex = require("hex-color-regex");
 const Color = require("./color");
 const config = require("./config");
 const Images = require("./images");
+const { logError } = require("./log");
 const { Templates, buildMessage } = require("./templates");
 
 const hexArrToURLStr = (arr) => arr.toString().replace(/(,#)/g, "-").replace(/^#/, "");
@@ -38,7 +39,7 @@ class Middleware {
    */
   run() {
     const fail = (e) => {
-      console.log(e);
+      logError(e);
 
       // this need to be modified, it should only retry if the code was statusCode 403
       return this.db.failRequest(this.tweet.getRequestID())

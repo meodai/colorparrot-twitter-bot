@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const { TwitterApi, EUploadMimeType } = require("twitter-api-v2");
+const { log } = require("./log");
 
 /**
  * Redis database
@@ -123,8 +124,13 @@ const Twitter = (function() {
     }
 
     async getTweetByID(id) {
-      const data = await this.appClient.v1.singleTweet(id);
-      return new Tweet(data);
+      try {
+        const data = await this.appClient.v1.singleTweet(id);
+        return new Tweet(data);
+      } catch (error) {
+        log("An error occured while fetching a tweet");
+        throw error;
+      }
     }
 
     async statusesUpdate(params) {
@@ -136,23 +142,33 @@ const Twitter = (function() {
         };
       }
 
-      await this.userClient.v2.tweet(
-        params.status,
-        {
-          media: {
-            media_ids: params.media_ids,
+      try {
+        await this.userClient.v2.tweet(
+          params.status,
+          {
+            media: {
+              media_ids: params.media_ids,
+            },
+            ...extraPayload,
           },
-          ...extraPayload,
-        },
-      );
-
-      return true;
+        );
+        return true;
+      } catch (error) {
+        log("An error occured while sending a tweet");
+        throw error;
+      }
     }
 
-    mediaUpload(imageBuffer) {
-      return this.userClient.v1.uploadMedia(imageBuffer, {
-        mimeType: EUploadMimeType.Png,
-      });
+    async mediaUpload(imageBuffer) {
+      try {
+        const mediaID = await this.userClient.v1.uploadMedia(imageBuffer, {
+          mimeType: EUploadMimeType.Png,
+        });
+        return mediaID;
+      } catch (error) {
+        log("An error occured while uploading media");
+        throw error;
+      }
     }
 
     async statusesFilterStream(track) {
