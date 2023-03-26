@@ -12,6 +12,10 @@ const {
  } = await color.getNamedColors();
  */
 
+// the time taken for color.getNamedColors() to return
+// is undeterministic. this is a random number
+jest.setTimeout(7000);
+
 // Preload the colors
 beforeAll(() => color.getNamedColors());
 
