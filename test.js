@@ -12,6 +12,9 @@ const {
  } = await color.getNamedColors();
  */
 
+// Preload the colors
+beforeAll(() => color.getNamedColors());
+
 test("make sure the findColor function works", async () => {
   const {
     findColors,
@@ -28,10 +31,6 @@ test("make sure the findColor function works", async () => {
 });
 
 test("extract colors from images", async () => {
-  const {
-    findColors,
-  } = await color.getNamedColors();
-
   const colorsInImage = await color.getPalette(
     "https://pbs.twimg.com/media/E-y8HQsWEAQiiTl?format=jpg&name=small",
     9
