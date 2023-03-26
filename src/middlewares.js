@@ -3,6 +3,7 @@ const hexColorRegex = require("hex-color-regex");
 const Color = require("./color");
 const config = require("./config");
 const Images = require("./images");
+const { logError } = require("./log");
 const { Templates, buildMessage } = require("./templates");
 
 const hexArrToURLStr = (arr) => arr.toString().replace(/(,#)/g, "-").replace(/^#/, "");
@@ -19,12 +20,15 @@ class Middleware {
     this.tweet = tweet;
     this.db = db;
     this.redis = redis;
+    /**
+     * @type {Array<() => Promise<any>>}
+     */
     this.listOfMiddlewares = [];
   }
 
   /**
    * Register middleware
-   * @param {function} f - function or asyncFunction.
+   * @param {() => Promise<any>} f - asyncFunction.
    */
   use(f) {
     this.listOfMiddlewares.push(f);
@@ -35,7 +39,7 @@ class Middleware {
    */
   run() {
     const fail = (e) => {
-      console.log(e);
+      logError(e);
 
       // this need to be modified, it should only retry if the code was statusCode 403
       return this.db.failRequest(this.tweet.getRequestID())
@@ -43,28 +47,19 @@ class Middleware {
     };
 
     for (let i = 0; i < this.listOfMiddlewares.length; i++) {
-      const f = this.listOfMiddlewares[i];
-      let func;
-      if (f.constructor.name === "Function") {
-        func = () => {
-          try {
-            f(this.T, this.tweet, this.listOfMiddlewares[i + 1], this.db, this.redis);
-          } catch (e) {
-            fail(e);
-          }
-        };
-      } else if (f.constructor.name === "AsyncFunction") {
-        func = () => f(
-          this.T,
-          this.tweet,
-          this.listOfMiddlewares[i + 1],
-          this.db,
-          this.redis
-        ).catch((e) => fail(e));
-      }
-      this.listOfMiddlewares[i] = func;
+      const func = this.listOfMiddlewares[i];
+      const newFunc = () => func(
+        this.T,
+        this.tweet,
+        this.listOfMiddlewares[i + 1],
+        this.db,
+        this.redis
+      );
+      this.listOfMiddlewares[i] = newFunc;
     }
-    this.listOfMiddlewares[0]();
+
+    this.listOfMiddlewares[0]()
+      .catch((e) => fail(e));
   }
 }
 
@@ -80,7 +75,7 @@ const Middlewares = {};
 Middlewares.checkIfSelf = async (T, tweet, next) => {
   const screenName = tweet.getUserName();
   if (screenName !== config.TWITTER_BOT_USERNAME) {
-    next();
+    await next();
   } else {
     console.log("Bot mentioned itself.");
   }
@@ -317,6 +312,8 @@ Middlewares.getImageColor = async (T, tweet, next, db, redis) => {
   });
 
   await db.resolveRequest(tweet.getRequestID());
+
+  console.log("Bot responded with a color palette");
 };
 
 /**
@@ -560,9 +557,9 @@ Middlewares.addProposalOrFlood = async (T, tweet, next, db, redis) => {
  * @param {*} tweet
  * @param {function} next
  */
-Middlewares.checkMessageType = (T, tweet, next) => {
+Middlewares.checkMessageType = async (T, tweet, next) => {
   if (!tweet.getRetweetedStatus()) {
-    next();
+    await next();
   }
 };
 

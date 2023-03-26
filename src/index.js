@@ -16,6 +16,7 @@ const {
   RedisDB,
   Twitter: { Twit },
 } = require("./utils");
+const { logError } = require("./log");
 
 /**
  *
@@ -147,20 +148,25 @@ async function initialize() {
     }
   };
 
-  const stream = await T.statusesFilterStream("@color_parrot");
+  try {
+    const stream = await T.statusesFilterStream("@color_parrot");
 
-  stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
-    const tweetId = tweet.id;
-    let req;
-    console.log("new tweet:", tweetId);
-    try {
-      req = await db.createRequest(tweetId);
-    } catch (e) {
-      console.log("error occured while creating a new request:", e);
-      return;
-    }
-    await handleIncomingTweet(req, tweetId);
-  });
+    stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
+      const tweetId = tweet.id;
+      let req;
+      console.log("new tweet:", tweetId);
+      try {
+        req = await db.createRequest(tweetId);
+      } catch (e) {
+        console.log("error occured while creating a new request:", e);
+        return;
+      }
+      await handleIncomingTweet(req, tweetId);
+    });
+  } catch (error) {
+    console.log("Failed to start tweet stream");
+    logError(error);
+  }
 
   // const userStream = T.userStream();
   // stream.on("user_event", async (eventMsg) => console.log(eventMsg));
