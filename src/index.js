@@ -148,25 +148,38 @@ async function initialize() {
     }
   };
 
-  try {
-    const stream = await T.statusesFilterStream("@color_parrot");
+  let stream;
 
-    stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
-      const tweetId = tweet.id;
-      let req;
-      console.log("new tweet:", tweetId);
-      try {
-        req = await db.createRequest(tweetId);
-      } catch (e) {
-        console.log("error occured while creating a new request:", e);
-        return;
-      }
-      await handleIncomingTweet(req, tweetId);
-    });
-  } catch (error) {
-    console.log("Failed to start tweet stream");
-    logError(error);
-  }
+  const startStream = async () => {
+    // close any previous streams
+    if (stream) stream.close();
+
+    try {
+      stream = await T.statusesFilterStream("@color_parrot");
+
+      stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
+        const tweetId = tweet.id;
+        let req;
+        console.log("new tweet:", tweetId);
+        try {
+          req = await db.createRequest(tweetId);
+        } catch (e) {
+          console.log("error occured while creating a new request:", e);
+          return;
+        }
+        await handleIncomingTweet(req, tweetId);
+      });
+
+      stream.on(ETwitterStreamEvent.ConnectionClosed, startStream);
+      stream.on(ETwitterStreamEvent.ConnectionError, startStream);
+      stream.on(ETwitterStreamEvent.ConnectionLost, startStream);
+    } catch (error) {
+      console.log("Failed to start tweet stream");
+      logError(error);
+    }
+  };
+
+  await startStream();
 
   // const userStream = T.userStream();
   // stream.on("user_event", async (eventMsg) => console.log(eventMsg));
