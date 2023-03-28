@@ -151,9 +151,6 @@ async function initialize() {
   let stream;
 
   const startStream = async () => {
-    // close any previous streams
-    if (stream) stream.close();
-
     try {
       stream = await T.statusesFilterStream("@color_parrot");
 
@@ -170,9 +167,11 @@ async function initialize() {
         await handleIncomingTweet(req, tweetId);
       });
 
-      stream.on(ETwitterStreamEvent.ConnectionClosed, startStream);
-      stream.on(ETwitterStreamEvent.ConnectionError, startStream);
-      stream.on(ETwitterStreamEvent.ConnectionLost, startStream);
+      const print = (msg) => () => console.log(msg);
+
+      stream.on(ETwitterStreamEvent.ConnectionClosed, print("Twitter stream connection closed."));
+      stream.on(ETwitterStreamEvent.ConnectionError, print("Twitter stream connection error."));
+      stream.on(ETwitterStreamEvent.ConnectionLost, print("Twitter stream connection lost."));
     } catch (error) {
       console.log("Failed to start tweet stream");
       logError(error);
