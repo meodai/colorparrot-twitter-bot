@@ -212,6 +212,7 @@ async function initialize() {
   };
 
   const startTimers = () => {
+    // Runs every 60 seconds / 1 minute
     setInterval(postRandomTweet, 1000 * 60);
     // setTimeout(retryFailedRequests, 1000 * 60);
   };
