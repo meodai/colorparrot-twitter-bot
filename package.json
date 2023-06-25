@@ -1,6 +1,6 @@
 {
   "name": "colorparrot-twitter-bot",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A twitter bot that tweet colors names and lets you invent new ones",
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,7 @@
     "hex-color-regex": "^1.1.0",
     "ioredis": "^4.9.0",
     "mongoose": "^5.12.5",
-    "node-vibrant": "^3.2.1-alpha.1",
+    "node-vibrant": "^3.1.6",
     "request": "^2.88.2",
     "twitter-api-v2": "^1.14.2"
   },
@@ -42,8 +42,8 @@
     "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "jest": "^27.1.1",
-    "nodemon": "^2.0.7"
+    "jest": "^25.0.0",
+    "nodemon": "^1.14.9"
   },
   "engines": {
     "node": "^10"
