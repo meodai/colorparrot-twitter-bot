@@ -25,7 +25,7 @@ async function initialize() {
   const redis = new RedisDB(
     new Redis(config.REDIS_URL, {
       tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       },
       retryStrategy: (times) => {
         if (times > 3) {
@@ -56,8 +56,8 @@ async function initialize() {
     accessToken: config.ACCESS_TOKEN,
     accessSecret: config.ACCESS_TOKEN_SECRET,
   });
-  const userAppClient = await userClient.appLogin();
-  const T = new Twit(userClient, userAppClient);
+  const appClient = new TwitterApi(config.BEARER_TOKEN);
+  const T = new Twit(userClient, appClient);
 
   /**
    * sends a random tweet
@@ -169,9 +169,18 @@ async function initialize() {
 
       const print = (msg) => () => console.log(msg);
 
-      stream.on(ETwitterStreamEvent.ConnectionClosed, print("Twitter stream connection closed."));
-      stream.on(ETwitterStreamEvent.ConnectionError, print("Twitter stream connection error."));
-      stream.on(ETwitterStreamEvent.ConnectionLost, print("Twitter stream connection lost."));
+      stream.on(
+        ETwitterStreamEvent.ConnectionClosed,
+        print("Twitter stream connection closed.")
+      );
+      stream.on(
+        ETwitterStreamEvent.ConnectionError,
+        print("Twitter stream connection error.")
+      );
+      stream.on(
+        ETwitterStreamEvent.ConnectionLost,
+        print("Twitter stream connection lost.")
+      );
     } catch (error) {
       console.log("Failed to start tweet stream");
       logError(error);
@@ -218,7 +227,7 @@ async function initialize() {
   };
 
   // timers
-  Promise.all([postRandomTweet()/* , retryFailedRequests() */])
+  Promise.all([postRandomTweet() /* , retryFailedRequests() */])
     .then(() => startTimers())
     .catch(() => startTimers());
 

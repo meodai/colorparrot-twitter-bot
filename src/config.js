@@ -7,6 +7,7 @@ const parseNumber = (val, defaultVal) => {
 };
 
 module.exports = {
+  BEARER_TOKEN: process.env.BEARER_TOKEN,
   CONSUMER_KEY: process.env.CONSUMER_KEY,
   CONSUMER_SECRET: process.env.CONSUMER_SECRET,
   ACCESS_TOKEN: process.env.ACCESS_TOKEN,
