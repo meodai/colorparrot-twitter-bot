@@ -25,7 +25,7 @@ async function initialize() {
   const redis = new RedisDB(
     new Redis(config.REDIS_URL, {
       tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       },
       retryStrategy: (times) => {
         if (times > 3) {
@@ -56,8 +56,8 @@ async function initialize() {
     accessToken: config.ACCESS_TOKEN,
     accessSecret: config.ACCESS_TOKEN_SECRET,
   });
-  const userAppClient = await userClient.appLogin();
-  const T = new Twit(userClient, userAppClient);
+  const appClient = new TwitterApi(config.BEARER_TOKEN);
+  const T = new Twit(userClient, appClient);
 
   /**
    * sends a random tweet
@@ -148,25 +148,46 @@ async function initialize() {
     }
   };
 
-  try {
-    const stream = await T.statusesFilterStream("@color_parrot");
+  let stream;
 
-    stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
-      const tweetId = tweet.id;
-      let req;
-      console.log("new tweet:", tweetId);
-      try {
-        req = await db.createRequest(tweetId);
-      } catch (e) {
-        console.log("error occured while creating a new request:", e);
-        return;
-      }
-      await handleIncomingTweet(req, tweetId);
-    });
-  } catch (error) {
-    console.log("Failed to start tweet stream");
-    logError(error);
-  }
+  const startStream = async () => {
+    try {
+      stream = await T.statusesFilterStream("@color_parrot");
+
+      stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
+        const tweetId = tweet.id;
+        let req;
+        console.log("new tweet:", tweetId);
+        try {
+          req = await db.createRequest(tweetId);
+        } catch (e) {
+          console.log("error occured while creating a new request:", e);
+          return;
+        }
+        await handleIncomingTweet(req, tweetId);
+      });
+
+      const print = (msg) => () => console.log(msg);
+
+      stream.on(
+        ETwitterStreamEvent.ConnectionClosed,
+        print("Twitter stream connection closed.")
+      );
+      stream.on(
+        ETwitterStreamEvent.ConnectionError,
+        print("Twitter stream connection error.")
+      );
+      stream.on(
+        ETwitterStreamEvent.ConnectionLost,
+        print("Twitter stream connection lost.")
+      );
+    } catch (error) {
+      console.log("Failed to start tweet stream");
+      logError(error);
+    }
+  };
+
+  await startStream();
 
   // const userStream = T.userStream();
   // stream.on("user_event", async (eventMsg) => console.log(eventMsg));
@@ -200,12 +221,13 @@ async function initialize() {
   };
 
   const startTimers = () => {
+    // Runs every 60 seconds / 1 minute
     setInterval(postRandomTweet, 1000 * 60);
     // setTimeout(retryFailedRequests, 1000 * 60);
   };
 
   // timers
-  Promise.all([postRandomTweet()/* , retryFailedRequests() */])
+  Promise.all([postRandomTweet() /* , retryFailedRequests() */])
     .then(() => startTimers())
     .catch(() => startTimers());
 

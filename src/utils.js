@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const { TwitterApi, EUploadMimeType } = require("twitter-api-v2");
-const { log } = require("./log");
+const { logError } = require("./log");
 
 /**
  * Redis database
@@ -128,7 +128,7 @@ const Twitter = (function() {
         const data = await this.appClient.v1.singleTweet(id);
         return new Tweet(data);
       } catch (error) {
-        log("An error occured while fetching a tweet");
+        console.log("An error occured while fetching a tweet");
         throw error;
       }
     }
@@ -154,7 +154,7 @@ const Twitter = (function() {
         );
         return true;
       } catch (error) {
-        log("An error occured while sending a tweet");
+        console.log("An error occured while sending a tweet");
         throw error;
       }
     }
@@ -166,7 +166,7 @@ const Twitter = (function() {
         });
         return mediaID;
       } catch (error) {
-        log("An error occured while uploading media");
+        console.log("An error occured while uploading media");
         throw error;
       }
     }
