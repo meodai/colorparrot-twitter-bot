@@ -35,7 +35,7 @@ async function initialize() {
     })
   );
 
-  const db = new Database("mongodb", config.MONGODB_URI);
+  const db = new Database();
 
   // connect to the database
   try {

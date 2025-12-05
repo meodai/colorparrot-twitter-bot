@@ -1,16 +1,17 @@
-const mongodb = require("./mongodb");
-
-const adapters = { mongodb };
+const prisma = require("./prisma");
 
 class Database {
-  constructor(dbclass, uri) {
-    this._db = adapters[dbclass];
+  constructor() {
+    this._db = prisma;
     this._models = this._db.models;
-    this._uri = uri;
   }
 
   connect() {
-    return this._db.connect(this._uri);
+    return this._db.connect();
+  }
+
+  disconnect() {
+    return this._db.disconnect();
   }
 
   /**

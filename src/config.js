@@ -18,5 +18,5 @@ module.exports = {
   INITIAL_PALETTE_COLOR_COUNT: parseNumber(process.env.INITIAL_PALETTE_COLOR_COUNT, 9),
   REDIS_URL: process.env.REDIS_URL,
   TWITTER_BOT_USERNAME: process.env.TWITTER_BOT_USERNAME,
-  MONGODB_URI: process.env.MONGODB_URI,
+  DATABASE_URL: process.env.DATABASE_URL || "file:./dev.db",
 };

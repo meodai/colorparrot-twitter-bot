@@ -56,6 +56,14 @@ typings/
 
 # dotenv environment variables file
 .env*
+!.env.example
+
+# SQLite database files
+*.db
+*.db-journal
+
+# Prisma
+prisma/migrations/
 
 # next.js build output
 .next
