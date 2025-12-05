@@ -32,7 +32,7 @@ const hexToRgb = (hexSrt) => {
   }
 
   return null;
-}
+};
 
 /**
  * entriches color object and fills RGB color arrays
@@ -116,9 +116,9 @@ module.exports = class FindColors {
         ...color,
         requestedHex: hex,
         distance: Math.sqrt(
-          Math.pow(color.rgb.r - rgb.r, 2)
-          + Math.pow(color.rgb.g - rgb.g, 2)
-          + Math.pow(color.rgb.b - rgb.b, 2)
+          (color.rgb.r - rgb.r) ** 2
+          + (color.rgb.g - rgb.g) ** 2
+          + (color.rgb.b - rgb.b) ** 2
         ),
       };
     });

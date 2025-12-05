@@ -24,15 +24,13 @@ const { logError } = require("./log");
 async function initialize() {
   const redis = new RedisDB(
     new Redis(config.REDIS_URL, {
-      tls: {
-        rejectUnauthorized: false,
-      },
+      tls: config.REDIS_URL?.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
       retryStrategy: (times) => {
         if (times > 3) {
           console.log("could not connect to redis");
           process.exit(1);
         }
-        return 5000; // ms
+        return 5000;
       },
     })
   );
@@ -154,14 +152,19 @@ async function initialize() {
     try {
       stream = await T.statusesFilterStream("@color_parrot");
 
-      stream.on(ETwitterStreamEvent.Data, async ({ data: tweet }) => {
-        const tweetId = tweet.id;
+      stream.on(ETwitterStreamEvent.Data, async (event) => {
+        const tweetId = event.data?.id;
+        if (!tweetId) {
+          console.log("Received stream event without tweet ID");
+          return;
+        }
+
         let req;
         console.log("new tweet:", tweetId);
         try {
           req = await db.createRequest(tweetId);
         } catch (e) {
-          console.log("error occured while creating a new request:", e);
+          console.log("error occurred while creating a new request:", e);
           return;
         }
         await handleIncomingTweet(req, tweetId);
@@ -227,7 +230,7 @@ async function initialize() {
   };
 
   // timers
-  Promise.all([postRandomTweet() /* , retryFailedRequests() */])
+  Promise.all([postRandomTweet()])
     .then(() => startTimers())
     .catch(() => startTimers());
 

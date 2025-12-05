@@ -1,4 +1,3 @@
-const request = require("request");
 const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
@@ -101,21 +100,27 @@ Color.getColorFromName = async (
   }
 };
 
-async function download(
-  uri,
-  filename
-) {
-  return new Promise((resolve, reject) => {
-    request.head(uri, (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        console.log("content-type:", res.headers["content-type"]);
-        console.log("content-length:", res.headers["content-length"]);
+/**
+ * Downloads an image from a URL to a local file
+ * @param {string} uri - URL to download from
+ * @param {string} filename - Local filename to save to
+ */
+async function download(uri, filename) {
+  const response = await axios({
+    url: uri,
+    method: "GET",
+    responseType: "stream",
+  });
 
-        request(uri).pipe(fs.createWriteStream(filename)).on("close", resolve);
-      }
-    });
+  console.log("content-type:", response.headers["content-type"]);
+  console.log("content-length:", response.headers["content-length"]);
+
+  const writer = fs.createWriteStream(filename);
+  response.data.pipe(writer);
+
+  return new Promise((resolve, reject) => {
+    writer.on("finish", resolve);
+    writer.on("error", reject);
   });
 }
 
@@ -144,9 +149,7 @@ Color.getPalette = async (
       const colorCount = numColors || config.MAX_PALETTE_COLORS;
       const colors = paletteExtractor.processImageData(data, colorCount);
 
-      const usableColors = findColors.getNamesForValues(
-        colors, true, true
-      ).map((c) => ({
+      const usableColors = findColors.getNamesForValues(colors, true, true).map((c) => ({
         name: c.name,
         hex: c.requestedHex,
       }));

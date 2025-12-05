@@ -334,9 +334,7 @@ class PaletteExtractor {
     const results = [];
 
     for (let i = 0; i < this.seeds_.length; i++) {
-      const rgb = this.labToRgb(
-        this.seeds_[i][0], this.seeds_[i][1], this.seeds_[i][2]
-      );
+      const rgb = this.labToRgb(this.seeds_[i][0], this.seeds_[i][1], this.seeds_[i][2]);
       results.push(this.rgbToHex(rgb[0], rgb[1], rgb[2]));
     }
 
@@ -408,9 +406,7 @@ class PaletteExtractor {
     if (!(clusterIndex in seeds)) {
       seeds[clusterIndex] = vec3Utils.createFloat32FromArray([0, 0, 0]);
     }
-    vec3Utils.add(
-      seeds[clusterIndex], this.labs_[histogramIndex], seeds[clusterIndex]
-    );
+    vec3Utils.add(seeds[clusterIndex], this.labs_[histogramIndex], seeds[clusterIndex]);
     this.seedWeights_[clusterIndex] += this.weights_[histogramIndex];
   }
 
@@ -537,17 +533,17 @@ class PaletteExtractor {
     let g = x * -0.9689 + y * 1.8758 + z * 0.0415;
     let b = x * 0.0557 + y * -0.2040 + z * 1.0570;
     if (r > 0.0031308) {
-      r = 1.055 * Math.pow(r, 1 / 2.4) - .055;
+      r = 1.055 * r ** (1 / 2.4) - .055;
     } else {
       r = 12.92 * r;
     }
     if (g > 0.0031308) {
-      g = 1.055 * Math.pow(g, 1 / 2.4) - .055;
+      g = 1.055 * g ** (1 / 2.4) - .055;
     } else {
       g = 12.92 * g;
     }
     if (b > 0.0031308) {
-      b = 1.055 * Math.pow(b, 1 / 2.4) - .055;
+      b = 1.055 * b ** (1 / 2.4) - .055;
     } else {
       b = 12.92 * b;
     }
@@ -566,9 +562,9 @@ class PaletteExtractor {
   labToXyz(lValue, a, b) {
     const p = (lValue + 16) / 116;
     return [
-      PaletteExtractor.REF_X * Math.pow(p + a / 500, 3),
-      PaletteExtractor.REF_Y * Math.pow(p, 3),
-      PaletteExtractor.REF_Z * Math.pow(p - b / 200, 3),
+      PaletteExtractor.REF_X * (p + a / 500) ** 3,
+      PaletteExtractor.REF_Y * p ** 3,
+      PaletteExtractor.REF_Z * (p - b / 200) ** 3,
     ];
   }
 
@@ -586,7 +582,7 @@ class PaletteExtractor {
     const yRatio = y / PaletteExtractor.REF_Y;
     const zRatio = z / PaletteExtractor.REF_Z;
     return [
-      yRatio > 0.008856 ? 116 * Math.pow(yRatio, 1.0 / 3) - 16 : 903.3 * yRatio,
+      yRatio > 0.008856 ? 116 * yRatio ** (1.0 / 3) - 16 : 903.3 * yRatio,
       500 * (this.transformation(xRatio) - this.transformation(yRatio)),
       200 * (this.transformation(yRatio) - this.transformation(zRatio)),
     ];
@@ -603,17 +599,17 @@ class PaletteExtractor {
    */
   rgbToXyz(r, g, b) {
     if (r > 0.04045) {
-      r = Math.pow((r + .055) / 1.055, 2.4);
+      r = ((r + .055) / 1.055) ** 2.4;
     } else {
       r = r / 12.92;
     }
     if (g > 0.04045) {
-      g = Math.pow((g + .055) / 1.055, 2.4);
+      g = ((g + .055) / 1.055) ** 2.4;
     } else {
       g = g / 12.92;
     }
     if (b > 0.04045) {
-      b = Math.pow((b + .055) / 1.055, 2.4);
+      b = ((b + .055) / 1.055) ** 2.4;
     } else {
       b = b / 12.92;
     }
@@ -634,7 +630,7 @@ class PaletteExtractor {
    */
   transformation(t) {
     if (t > 0.008856) {
-      return Math.pow(t, 1.0 / 3);
+      return t ** (1.0 / 3);
     }
     return 7.787 * t + 16.0 / 116;
   }

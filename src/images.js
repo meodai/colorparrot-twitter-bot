@@ -1,17 +1,12 @@
-const Canvas = require("canvas");
+const { createCanvas, GlobalFonts } = require("@napi-rs/canvas");
 const chroma = require("chroma-js");
 const Color = require("./color");
 
 const canvasWidth = 768;
 const canvasHeight = 1024;
 
-Canvas.registerFont("./assets/Inter-ExtraBold.ttf", {
-  family: "Inter-EtraBold",
-});
-
-Canvas.registerFont("./assets/Inter-Regular.ttf", {
-  family: "Inter-Regular",
-});
+GlobalFonts.registerFromPath("./assets/Inter-ExtraBold.ttf", "Inter-ExtraBold");
+GlobalFonts.registerFromPath("./assets/Inter-Regular.ttf", "Inter-Regular");
 
 const Images = {};
 
@@ -92,7 +87,7 @@ Images.generateImage = (colorObj) => {
   const name = colorObj.name;
   const color = colorObj.hex;
 
-  const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, "png");
+  const canvas = createCanvas(canvasWidth, canvasHeight);
   const ctx = canvas.getContext("2d");
 
   // paints the background in the requested color
@@ -105,7 +100,7 @@ Images.generateImage = (colorObj) => {
 
   // color name
   ctx.fillStyle = "#000";
-  ctx.font = `${canvasHeight * 0.08}px Inter-EtraBold`;
+  ctx.font = `${canvasHeight * 0.08}px Inter-ExtraBold`;
 
   ctx.fillText(
     `${textOverflowEllipsis(ctx, name, canvasWidth * 0.9)}`,
@@ -121,10 +116,7 @@ Images.generateImage = (colorObj) => {
     canvasHeight * 0.8 + canvasHeight * 0.1 + canvasHeight * 0.06
   );
 
-  return canvas.toBuffer("image/png", {
-    compressionLevel: 3,
-    filters: canvas.PNG_FILTER_NONE,
-  });
+  return canvas.toBuffer("image/png");
 };
 
 /**
@@ -137,7 +129,8 @@ Images.convertImagebuffTobase64 = (imageBuff) => imageBuff.toString("base64");
 Images.generateCollection = (() => {
   const generateImage = (
     colorObj,
-    w = 768, h = 1024,
+    w = 768,
+    h = 1024,
     labelBackground = "#fff", // eslint-disable-line
     labelColor = "#000" // eslint-disable-line
   ) => {
@@ -148,7 +141,7 @@ Images.generateCollection = (() => {
     const row2 = colorObj.row2;
     const color = colorObj.color;
 
-    const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, "png");
+    const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
     // paints the background in the requested color
@@ -161,7 +154,7 @@ Images.generateCollection = (() => {
 
     // color row1
     ctx.fillStyle = "#000";
-    ctx.font = `700 ${canvasHeight * 0.08}px 'Inter-EtraBold'`;
+    ctx.font = `700 ${canvasHeight * 0.08}px 'Inter-ExtraBold'`;
     ctx.fillText(
       `${row1}`,
       canvasWidth * 0.05,
@@ -180,8 +173,10 @@ Images.generateCollection = (() => {
     // overlays a gradient on the text so it would not get cut off on the
     // right side
     const gradient = ctx.createLinearGradient(
-      canvasWidth * 0.7, 0,
-      canvasWidth * 0.99, 0
+      canvasWidth * 0.7,
+      0,
+      canvasWidth * 0.99,
+      0
     );
 
     gradient.addColorStop(0, "rgba(255,255,255,0)");
@@ -200,8 +195,10 @@ Images.generateCollection = (() => {
 
   const generateGrid = (
     colors,
-    w, h,
-    x = 3, y = 3,
+    w,
+    h,
+    x = 3,
+    y = 3,
     padding = 40
   ) => {
     const realX = Math.min(colors.length, x);
@@ -209,7 +206,7 @@ Images.generateCollection = (() => {
     const canvasWidth = realX * (w + padding * 2) + (padding * 2);
     const canvasHeight = realY * (h + padding * 2) + (padding * 2);
 
-    const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, "png");
+    const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
     ctx.fillStyle = "#212121";
@@ -232,7 +229,8 @@ Images.generateCollection = (() => {
 
       ctx.drawImage(
         generateImage(color, w, h),
-        cx, cy
+        cx,
+        cy
       );
     });
 
@@ -250,7 +248,7 @@ Images.generateCollection = (() => {
     const canvasWidth = rows * (rowWidth + padding * 2);
     const canvasHeight = Math.ceil(colors.length / rows) * rowHeight + padding;
 
-    const canvas = Canvas.createCanvas(canvasWidth, canvasHeight, "png");
+    const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
     ctx.fillStyle = "#212121";
@@ -281,7 +279,7 @@ Images.generateCollection = (() => {
       // color row1
       ctx.fillStyle = "#fff";
 
-      ctx.font = `900 ${rowHeight * 0.4}px 'Inter-EtraBold'`;
+      ctx.font = `900 ${rowHeight * 0.4}px 'Inter-ExtraBold'`;
       ctx.fillText(
         `${color.row1}`,
         watchSize[0] + padding + left,
@@ -331,10 +329,7 @@ Images.generateCollection = (() => {
 
   const generateCollection = (colors) => {
     const canvas = colorsToImage(colors);
-    return canvas.toBuffer("image/png", {
-      compressionLevel: 3,
-      filters: canvas.PNG_FILTER_NONE,
-    });
+    return canvas.toBuffer("image/png");
   };
 
   return generateCollection;

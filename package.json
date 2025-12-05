@@ -1,6 +1,6 @@
 {
   "name": "colorparrot-twitter-bot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A twitter bot that tweet colors names and lets you invent new ones",
   "main": "index.js",
   "scripts": {
@@ -25,28 +25,26 @@
   "homepage": "https://github.com/meodai/colorparrot-twitter-bot#readme",
   "dependencies": {
     "@andreekeberg/imagedata": "^1.0.2",
-    "axios": "^0.21.2",
-    "canvas": "^2.8.0",
-    "chroma-js": "^2.1.1",
+    "@napi-rs/canvas": "^0.1.60",
+    "axios": "^1.6.0",
+    "chroma-js": "^2.4.0",
     "closestvector": "^0.6.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^16.3.0",
     "hex-color-regex": "^1.1.0",
-    "ioredis": "^4.9.0",
-    "mongoose": "^5.12.5",
-    "node-vibrant": "^3.2.1-alpha.1",
-    "request": "^2.88.2",
-    "twitter-api-v2": "^1.14.2"
+    "ioredis": "^5.3.0",
+    "mongoose": "^8.0.0",
+    "twitter-api-v2": "^1.15.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "eslint": "^7.24.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1",
-    "jest": "^25.0.0",
-    "nodemon": "^1.14.9"
+    "eslint": "^8.54.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.0"
   },
   "engines": {
-    "node": "^16.0.0"
+    "node": ">=18.0.0"
   },
   "engineStrict": true
 }

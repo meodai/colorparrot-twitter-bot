@@ -1,9 +1,7 @@
-// eslint-disable-next-line no-unused-vars
-const { TwitterApi, EUploadMimeType } = require("twitter-api-v2");
-const { logError } = require("./log");
+const { EUploadMimeType } = require("twitter-api-v2");
 
 /**
- * Redis database
+ * Redis database wrapper
  */
 class RedisDB {
   constructor(redis) {
@@ -37,173 +35,175 @@ class RedisDB {
 }
 
 /**
- * Twitter utility
+ * Tweet wrapper class for v2 API response
  */
-const Twitter = (function() {
-  class Tweet {
-    /**
-     * @param {import("twitter-api-v2").TweetV1} tweet
-     */
-    constructor(tweet) {
-      this._tweet = tweet;
-      this._reqId = null;
-    }
-
-    getRequestID() {
-      return this._reqId;
-    }
-
-    getStatusID() {
-      return this._tweet.id_str;
-    }
-
-    getUserTweet() {
-      return this._tweet.full_text || this._tweet.text;
-    }
-
-    isQuotedTweet() {
-      return this._tweet.is_quote_status;
-    }
-
-    getQuotedTweet() {
-      return this._tweet.quoted_status;
-    }
-
-    isReplyTweet() {
-      return !!this._tweet.in_reply_to_status_id;
-    }
-
-    getOriginalTweetID() {
-      return this._tweet.in_reply_to_status_id_str;
-    }
-
-    getUserPhoto() {
-      if (
-        this._tweet.hasOwnProperty("media")
-        && this._tweet.media.type === "photo"
-      ) {
-        return this._tweet.media.media_url;
-      }
-      return null;
-    }
-
-    getMediaURL(type) {
-      const { media } = this._tweet.extended_entities || this._tweet.entities;
-      if (!media || media.length === 0) {
-        return null;
-      }
-      return media.find((m) => m.type === type) || null;
-    }
-
-    getAllMediaOfType(type) {
-      const { media } = this._tweet.extended_entities || this._tweet.entities;
-      if (!media || media.length === 0) {
-        return [];
-      }
-      const checkIfOfType = (object) => object.type == type;
-      return media.filter(checkIfOfType);
-    }
-
-    getUserName() {
-      return this._tweet.user.screen_name;
-    }
-
-    getRetweetedStatus() {
-      return this._tweet.hasOwnProperty("retweeted_status");
-    }
+class Tweet {
+  constructor(tweet, includes = {}) {
+    this._tweet = tweet;
+    this._includes = includes;
+    this._reqId = null;
   }
 
-  class Twit {
-    /**
-     * @param {TwitterApi} userClient
-     * @param {TwitterApi} appClient
-     */
-    constructor(userClient, appClient) {
-      this.userClient = userClient;
-      this.appClient = appClient;
-    }
+  getRequestID() {
+    return this._reqId;
+  }
 
-    async getTweetByID(id) {
-      try {
-        const data = await this.appClient.v1.singleTweet(id);
-        return new Tweet(data);
-      } catch (error) {
-        console.log("An error occured while fetching a tweet");
-        throw error;
-      }
-    }
+  getStatusID() {
+    return this._tweet.id;
+  }
 
-    async statusesUpdate(params) {
-      const extraPayload = {};
+  getUserTweet() {
+    return this._tweet.text;
+  }
 
-      if (params.in_reply_to_status_id) {
-        extraPayload.reply = {
-          in_reply_to_tweet_id: params.in_reply_to_status_id,
-        };
-      }
+  isQuotedTweet() {
+    return !!this._tweet.referenced_tweets?.find((ref) => ref.type === "quoted");
+  }
 
-      try {
-        await this.userClient.v2.tweet(
-          params.status,
-          {
-            media: {
-              media_ids: params.media_ids,
-            },
-            ...extraPayload,
-          },
-        );
-        return true;
-      } catch (error) {
-        console.log("An error occured while sending a tweet");
-        throw error;
-      }
-    }
+  getQuotedTweet() {
+    const quotedRef = this._tweet.referenced_tweets?.find((ref) => ref.type === "quoted");
+    if (!quotedRef) return null;
 
-    async mediaUpload(imageBuffer) {
-      try {
-        const mediaID = await this.userClient.v1.uploadMedia(imageBuffer, {
-          mimeType: EUploadMimeType.Png,
-        });
-        return mediaID;
-      } catch (error) {
-        console.log("An error occured while uploading media");
-        throw error;
-      }
-    }
+    const quotedTweet = this._includes.tweets?.find((t) => t.id === quotedRef.id);
+    return quotedTweet ? { id_str: quotedTweet.id } : null;
+  }
 
-    async statusesFilterStream(track) {
-      const { appClient } = this;
+  isReplyTweet() {
+    return !!this._tweet.referenced_tweets?.find((ref) => ref.type === "replied_to");
+  }
 
-      const rules = await appClient.v2.streamRules();
-      if (rules.data && rules.data.length) {
-        await appClient.v2.updateStreamRules({
-          delete: { ids: rules.data.map((rule) => rule.id) }
-        });
-      }
+  getOriginalTweetID() {
+    const replyRef = this._tweet.referenced_tweets?.find((ref) => ref.type === "replied_to");
+    return replyRef?.id || null;
+  }
 
-      // Add our rules
-      await appClient.v2.updateStreamRules({
-        add: [{ value: track }],
+  getUserPhoto() {
+    const media = this._includes.media;
+    if (!media || media.length === 0) return null;
+    const photo = media.find((m) => m.type === "photo");
+    return photo?.url || null;
+  }
+
+  getMediaURL(type) {
+    const media = this._includes.media;
+    if (!media || media.length === 0) return null;
+    return media.find((m) => m.type === type) || null;
+  }
+
+  getAllMediaOfType(type) {
+    const media = this._includes.media;
+    if (!media || media.length === 0) return [];
+
+    // Map v2 media types to expected format
+    return media
+      .filter((m) => m.type === type || (type === "photo" && m.type === "photo"))
+      .map((m) => ({
+        type: m.type,
+        media_url_https: m.url || m.preview_image_url,
+      }));
+  }
+
+  getUserName() {
+    // In v2, author info comes from includes
+    const author = this._includes.users?.find((u) => u.id === this._tweet.author_id);
+    return author?.username || "";
+  }
+
+  getRetweetedStatus() {
+    return !!this._tweet.referenced_tweets?.find((ref) => ref.type === "retweeted");
+  }
+}
+
+/**
+ * Twitter API v2 wrapper
+ */
+class Twit {
+  constructor(userClient, appClient) {
+    this.userClient = userClient;
+    this.appClient = appClient;
+  }
+
+  async getTweetByID(id) {
+    try {
+      const { data, includes } = await this.appClient.v2.singleTweet(id, {
+        expansions: ["author_id", "attachments.media_keys", "referenced_tweets.id"],
+        "tweet.fields": ["text", "author_id", "referenced_tweets", "attachments"],
+        "user.fields": ["username"],
+        "media.fields": ["url", "preview_image_url", "type"],
       });
-
-      const stream = await appClient.v2.searchStream();
-
-      // Enable auto reconnect
-      stream.autoReconnect = true;
-
-      return stream;
+      return new Tweet(data, includes);
+    } catch (error) {
+      console.log("An error occurred while fetching a tweet");
+      throw error;
     }
-    /*
-    userStream() {
-      return this._T.stream("user");
-    }
-    */
   }
 
-  return { Tweet, Twit };
-}());
+  async statusesUpdate(params) {
+    const payload = {};
+
+    if (params.in_reply_to_status_id) {
+      payload.reply = {
+        in_reply_to_tweet_id: params.in_reply_to_status_id,
+      };
+    }
+
+    if (params.media_ids && params.media_ids.length > 0) {
+      payload.media = {
+        media_ids: params.media_ids,
+      };
+    }
+
+    try {
+      await this.userClient.v2.tweet(params.status, payload);
+      return true;
+    } catch (error) {
+      console.log("An error occurred while sending a tweet");
+      throw error;
+    }
+  }
+
+  async mediaUpload(imageBuffer) {
+    try {
+      const mediaID = await this.userClient.v1.uploadMedia(imageBuffer, {
+        mimeType: EUploadMimeType.Png,
+      });
+      return mediaID;
+    } catch (error) {
+      console.log("An error occurred while uploading media");
+      throw error;
+    }
+  }
+
+  async statusesFilterStream(track) {
+    const { appClient } = this;
+
+    // Clear existing rules
+    const rules = await appClient.v2.streamRules();
+    if (rules.data?.length) {
+      await appClient.v2.updateStreamRules({
+        delete: { ids: rules.data.map((rule) => rule.id) },
+      });
+    }
+
+    // Add new rule
+    await appClient.v2.updateStreamRules({
+      add: [{ value: track }],
+    });
+
+    const stream = await appClient.v2.searchStream({
+      expansions: ["author_id", "attachments.media_keys", "referenced_tweets.id"],
+      "tweet.fields": ["text", "author_id", "referenced_tweets", "attachments"],
+      "user.fields": ["username"],
+      "media.fields": ["url", "preview_image_url", "type"],
+    });
+
+    stream.autoReconnect = true;
+
+    return stream;
+  }
+}
 
 module.exports = {
   RedisDB,
-  Twitter,
+  Twitter: { Tweet, Twit },
 };

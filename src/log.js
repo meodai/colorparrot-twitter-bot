@@ -4,7 +4,7 @@ const statusMessages = {
 };
 
 exports.logError = (error) => {
-  if (error.data && error.data.title) {
+  if (error?.data?.title) {
     console.log("Twitter error");
     console.log("-".repeat(10));
     if (error.code && statusMessages[error.code]) {

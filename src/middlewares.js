@@ -41,9 +41,8 @@ class Middleware {
     const fail = (e) => {
       logError(e);
 
-      // this need to be modified, it should only retry if the code was statusCode 403
       return this.db.failRequest(this.tweet.getRequestID())
-        .catch((err) => console.log("an error occured while marking a request as failed:", err));
+        .catch((err) => console.log("an error occurred while marking a request as failed:", err));
     };
 
     for (let i = 0; i < this.listOfMiddlewares.length; i++) {
